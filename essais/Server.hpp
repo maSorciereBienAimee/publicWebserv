@@ -18,6 +18,7 @@ class Server
 	public :
 	Server();
 	~Server();
+	void clear_fd();
 	void connect();
 	void init_epoll();
 	void loop();

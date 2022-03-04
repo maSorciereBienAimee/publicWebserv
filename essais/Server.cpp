@@ -1,4 +1,5 @@
 #include "Server.hpp"
+#include <iostream>
 
 Server::Server()
 {
@@ -15,6 +16,15 @@ Server::~Server()
 			close(this->epfd);
 }
 
+void Server::clear_fd()
+{
+	if (this->listenfd != -1)
+			close(this->listenfd);
+	if (this->epfd != -1)
+			close(this->epfd);
+}
+
+
 void Server::connect()
 {
 	struct sockaddr_in srv;
@@ -22,21 +32,25 @@ void Server::connect()
 
 	if ((this->listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			exit(1);
+	
 	setsockopt(this->listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
+	
 	memset(srv.sin_zero, '\0', sizeof(srv.sin_zero));
 	srv.sin_family = AF_INET;
 	srv.sin_addr.s_addr = INADDR_ANY;
 	srv.sin_port = htons(PORT);
 	if (bind(this->listenfd, (struct sockaddr *) &srv, sizeof(srv)) < 0)
 	{
-		Server::~Server();
+		std::cout << "Bind address already in use \n";
+		clear_fd();
 		exit(1);
 	}
 	if (listen(this->listenfd, 1024) < 0)
 	{
-		Server::~Server();
+		clear_fd();
 		exit(1);
 	}
+	
 }
 
 void Server::init_epoll()
@@ -46,14 +60,14 @@ void Server::init_epoll()
 	this->epfd = epoll_create(MAX_CLIENT);
 	if (!this->epfd)
 	{
-		Server::~Server();
+		clear_fd();
 		exit(1);
 	}
 	ev.events = EPOLLIN | EPOLLERR | EPOLLHUP;
 	ev.data.fd = this->listenfd;
-	if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, this->listenfd, &ev) < 0)
+	if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, listenfd, &ev) < 0)
 	{
-		Server::~Server();
+		clear_fd();
 		exit(1);
 	}
 }
@@ -88,7 +102,7 @@ void Server::addFd()
 		ev.data.fd = clifd;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, clifd, &ev) < 0)
 		{
-			Server::~Server();
+			clear_fd();
 			exit(1);
 		}
 	}
@@ -113,7 +127,7 @@ void Server::readData(int i)
 		std::ifstream is ("index.html", std::ifstream::binary);
 		if (!is)
 		{
-			Server::~Server();
+			clear_fd();
 			exit(1);
 		}
 		is.seekg (0, is.end);
@@ -165,8 +179,8 @@ void Server::nonblock(int sockfd)
   opts = fcntl(sockfd, F_GETFL);
    if(opts < 0)
   {
-		  Server::~Server();
-    exit(1);
+		clear_fd();
+    	exit(1);
    }
   opts = (opts | O_NONBLOCK);
   if(fcntl(sockfd, F_SETFL, opts) < 0)
