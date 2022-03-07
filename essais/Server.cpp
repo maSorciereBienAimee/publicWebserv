@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include <iostream>
+#include "Request.hpp"
 
 Server::Server()
 {
@@ -112,6 +113,7 @@ void Server::readData(int i)
 {
 	int n;
 	char buf[1024];
+	std::string str;
 	n = recv(this->events[i].data.fd, buf, 1023, 0);
 	if (n == 0)
 	{
@@ -140,10 +142,14 @@ void Server::readData(int i)
 		std::string lenstr= ss.str();
 		is.read (b,length);
 		std::string bufStr(b);
+		str = buf;
+		Request Req(str);
 		std::string goodresponse = "HTTP/1.1 200 ok\nContent-Type: text/html\nContent-Length: " + lenstr +"\n\n" + bufStr;
 		free(b);
 		char badrequest[1024] = {"HTTP/1.1 400 Bad Request\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Bad Request</TITLE></HEAD><BODY>\r\n<H1>Bad Request</H1>\r\n</BODY></HTML>\r\n\r\n"};
 		char badresponse[1024] = {"HTTP/1.1 404 Not Found\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Not Found</TITLE></HEAD><BODY>\r\n<H1>Not Found</H1>\r\n</BODY></HTML>\r\n\r\n"};
+		
+		
 		if (!(buf[0]=='G') || !(buf[1]=='E') || !(buf[2]=='T') || !(buf[3]==' '))	
 		{
 				send(this->events[i].data.fd, badrequest, strlen(badrequest), 0);	
