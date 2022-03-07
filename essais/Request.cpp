@@ -36,33 +36,39 @@ const std::map<std::string, std::string> &Request::getHeaders(void) const
 
 int Request::parse(const std::string &str)
 {
-    /*** LINE1 ***/
-    //todo ERROR HANDLING
+    /*** LINE1 PARSING ***/
     std::string line;
     int end = str.find_first_of('\r');
-    line = str.substr(0, end );
+    //COLLECT FIRST LINE ONLY
+    line = str.substr(0, end);
     int break_1 = line.find_first_of(' ');
+    //METHOD IS FROM 0 UNTIL FIRST SPACE
     _method = line.substr(0, break_1);
     break_1 += 1;
-    line = line.substr(break_1, line.length());
+    //REMOVE METHOD AND SPACE FROM LINE
+    line = line.substr(break_1, end - break_1);
     int break_2 = line.find_first_of(' ');
+    //PATH IS FROM 0 UNTIL FIRST SPACE
     _path = line.substr(0, break_2);
     break_2 += 1;
-    _version = line.substr(break_2, end );
+    //VERSION IS FROM AFTER PREV SPACE UNTIL END
+    _version = line.substr(break_2,  line.length() - break_2);
     
     
-
     /*** HEADERS ***/
     std::string tmp = str;
     std::string key;
     std::string val;
     int split;
+    //DELETE FIRST LINE FROM STR
     tmp = tmp.erase(0, (size_t)end + 2);
     int ptr = 0;
     int ptr_end = tmp.find_first_of('\n');
     int count = 0;
+    //UNTIL WE GET TO AN EMPTY LINE
     while (ptr_end != ptr + 1)
     {
+        //COLLECT KEY AND VALUE AND INSERT IN MAP HEADERS
         split = tmp.find_first_of(':');
         key = tmp.substr(0, split);
         val = tmp.substr(split + 2, ((ptr_end - 1) - (split + 2)));
@@ -72,11 +78,12 @@ int Request::parse(const std::string &str)
         ptr_end = tmp.find_first_of('\n');
         
     }
-    
+    //SKIP OVER EMPTY LINES
     while (tmp.find_first_of('\n') == 1)
     {
         tmp = tmp.erase(0, 1);
     }
+    //COLLECT BODY
     _body = tmp.substr(0, tmp.find_first_of('\n'));
     printer();
 }
