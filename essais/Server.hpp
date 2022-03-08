@@ -23,6 +23,8 @@ class Server
 	void init_epoll();
 	void loop();
 	void nonblock(int sockfd); // !je crois qu'on a pas le droit a cela
+	std::vector<std::string> _server;
+
 
 	private:
 	int listenfd;

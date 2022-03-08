@@ -32,7 +32,7 @@ class Request
 			void	setMethod(const std::string &method);*/
 
 			/*** FUNCTIONS ****/
-			int		parse(const std::string& str);
+			void		parse(const std::string& str);
 
             private:
 

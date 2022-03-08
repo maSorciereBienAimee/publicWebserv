@@ -34,7 +34,7 @@ const std::map<std::string, std::string> &Request::getHeaders(void) const
     return (_headers);
 }
 
-int Request::parse(const std::string &str)
+void Request::parse(const std::string &str)
 {
     /*** LINE1 PARSING ***/
     std::string line;
