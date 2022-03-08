@@ -26,8 +26,9 @@ class Server
 	void processTransferEncoding(std::string);
 	void processContentLength(std::string);
 	void nonblock(int sockfd); // !je crois qu'on a pas le droit a cela
+	std::vector<std::string> _server;
 	void pseudoReponse(std::string str, int i); // a supprimer quand response sera faite
-
+std::vector<std::string> _server;
 	private:
 	std::string request;
 	int listenfd;
