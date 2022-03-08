@@ -15,13 +15,13 @@ class Request
 
 			/*** GETTERS ***/
 			const std::map<std::string, std::string>&			getHeaders() const;
-			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getMethod() const;
+			const std::string&									getPath() const;
+			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;
 			const std::string&									getBody() const;
 			int													getPort() const;
-			const std::string&									getPath() const;
 			const std::string&									getQuery() const;
 			const std::string&									getRaw() const;
 			const std::list<std::pair<std::string, float> >&	getLang() const;*/
@@ -32,7 +32,7 @@ class Request
 			void	setMethod(const std::string &method);*/
 
 			/*** FUNCTIONS ****/
-			int		parse(const std::string& str);
+			void		parse(const std::string& str);
 
             private:
 
