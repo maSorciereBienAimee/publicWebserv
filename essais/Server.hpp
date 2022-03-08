@@ -23,9 +23,8 @@ class Server
 	void connect();
 	void init_epoll();
 	void loop();
-	void processNewLine(std::string, int i);
-	void processTransferEncoding(std::string);
-	void processContentLength(std::string);
+	std::string processNewLine(std::string, int i);
+	std::string processContentLength(std::string);
 	std::string chunkDecoder(std::string str);
 	void nonblock(int sockfd); // !je crois qu'on a pas le droit a cela
 	std::vector<std::string> _server;

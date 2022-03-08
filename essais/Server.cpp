@@ -109,29 +109,24 @@ void Server::addFd()
 	}
 }
 
-void Server::processNewLine(std::string request, int i)
+std::string Server::processNewLine(std::string request, int i)
 {
 	int n;
-	int size = 1024;
+	int size = 24;
+	std::string bufStr;
 	char buf[size];
 	n = 1;
-	//while (request.find("\r\n\r\n") != std::string::npos)
-	while (n > 0)
+	while (request.find("\r\n\r\n") == std::string::npos)
 	{
 		n = recv(this->events[i].data.fd, buf, size - 1, 0);
 		request += buf;
+		memset(buf, '\0', size);
 	}
+	return (request);
 }
 
 /*
-void Server::processTransferEncoding(std::string request)
-{
-
-}
-*/
-
-/*
-void Server::processContentLength(std::string request)
+std::string Server::processContentLength(std::string request)
 {
 
 }
@@ -170,7 +165,7 @@ std::string Server::chunkDecoder(std::string str)
 void Server::readData(int i)
 {
 	int n;
-	int size = 1024;
+	int size = 24;
 	char buf[size];
 	std::string request;
 	int inutile;
@@ -193,9 +188,9 @@ void Server::readData(int i)
 		if (request.find("Transfer-Encoding") != std::string::npos)
 			request = chunkDecoder(request);
 //		else if (request.find("Content-Length") != std::string::npos)
-		//	this->processContentLength(request);
+		//	request = this->processContentLength(request);
 		else
-			this->processNewLine(request, i);
+			request = this->processNewLine(request, i);
 		
 		this->pseudoReponse(request, i);
 		close(this->events[i].data.fd);
