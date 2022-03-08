@@ -137,6 +137,36 @@ void Server::processContentLength(std::string request)
 }
 */
 
+std::string Server::chunkDecoder(std::string str)
+{
+    //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
+	std::string	head = str.substr(0,str.find("\r\n\r\n") + 4);
+    //FROM AFTER NEW LINE TO END OF MESSAGE
+	std::string	coded = str.substr(str.find("\r\n\r\n") + 4, str.length() - 1);
+	
+    std::string	subchunk = coded;
+	std::string	body;
+	// GET CHUNK SIZE FROM BASE 16 
+    int			chunksize = strtol(coded.c_str(), NULL, 16);
+	size_t		i = 0;
+
+	while (chunksize)
+	{
+        //FIND END OF INITAL CHUNKSIZE LABEL
+		i = coded.find("\r\n", i) + 2;
+        // SKIP PAST INITIAL SIZE \R\N LABEL
+		body += coded.substr(i, chunksize);
+		//SIZE ADDED IS CHUNKSIZE + THE \R\N AT END WHICH ISN'T INCLUDED IN CHUNKSIZE
+        i += chunksize + 2;
+		//TAKE NEXT 100
+        subchunk = coded.substr(i, coded.length() - i);
+		//GET SIZE OF NEXT CHUNK
+        chunksize = strtol(subchunk.c_str(), NULL, 16);
+	}
+	std::string decoded = head + body + "\r\n\r\n";
+    return (decoded);
+}
+
 void Server::readData(int i)
 {
 	int n;
@@ -160,11 +190,11 @@ void Server::readData(int i)
 	else
 	{
 		request += buf;
-//		if (request.find("Transfer-Encoding") != std::string::npos)
-		//	this->processTransferEncoding(request);
+		if (request.find("Transfer-Encoding") != std::string::npos)
+			request = chunkDecoder(request);
 //		else if (request.find("Content-Length") != std::string::npos)
 		//	this->processContentLength(request);
-//		else
+		else
 			this->processNewLine(request, i);
 		
 		this->pseudoReponse(request, i);

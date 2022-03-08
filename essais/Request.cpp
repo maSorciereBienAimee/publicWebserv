@@ -78,13 +78,16 @@ void Request::parse(const std::string &str)
         ptr_end = tmp.find_first_of('\n');
         
     }
+    std::cout << "tmp here: " << tmp << std::endl;
     //SKIP OVER EMPTY LINES
-    while (tmp.find_first_of('\n') == 1)
+    while (tmp.find_first_of("\r\n") == 0)
     {
+        std::cout << "here" << std::endl;
         tmp = tmp.erase(0, 1);
     }
     //COLLECT BODY
-    _body = tmp.substr(0, tmp.find_first_of('\n'));
+    std::cout << "position until " << (int)tmp.find_first_of('\r') << std::endl;
+    _body = tmp.substr(0, tmp.length() - 4);
     printer();
 }
 
