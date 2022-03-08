@@ -111,3 +111,12 @@ void Request::printer(void)
     std::cout << "BODY" << std::endl;
     std::cout << "|" << _body << "|" << std::endl;
 }
+
+std::string const &Request::getMethod() const
+{
+	return (this->_method);
+}
+std::string const &Request::getPath() const
+{
+	return (this->_path);
+}
