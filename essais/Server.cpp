@@ -139,8 +139,8 @@ std::string Server::processContent(std::string request, int i)
 	if (check == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
 	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
 	{
@@ -152,8 +152,8 @@ std::string Server::processContent(std::string request, int i)
 		}
 		std::cout << "find last of is" << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
 		std::cout << "error with recv" << std::endl;
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
 	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
 		return (chunkDecoder(request));
@@ -204,22 +204,22 @@ void Server::readData(int i)
 	if (n == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
 	else if (n < 0) //IF WE HAVE LARGER BUFFER DO WE NEED TO ADD: && request.find_last_of("\r\n\r\n") != request.length() - 4
 	{
 		std::cout << "error with recv" << std::endl;
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
 	else
 	{
 		request += buf;
 		request = this->processContent(request, i);
 		this->pseudoReponse(request, i);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 		close(this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
 }
 
@@ -261,7 +261,7 @@ void Server::pseudoReponse(std::string request, int i) //destinee a etre suprime
 	is.read (b,length);
 	std::string bufStr(b);
 	Request Req(request);
-	std::string goodresponse = "HTTP/1.1 200 ok\nContent-Type: text/html\nConnection: keep-alive\nContent-Length: " + lenstr +"\n\n" + bufStr;
+	std::string goodresponse = "HTTP/1.1 200 ok\nContent-Type: text/html\nContent-Length: " + lenstr +"\n\n" + bufStr;
 	free(b);
 	char badrequest[1024] = {"HTTP/1.1 400 Bad Request\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Bad Request</TITLE></HEAD><BODY>\r\n<H1>Bad Request</H1>\r\n</BODY></HTML>\r\n\r\n"};
 	char badresponse[1024] = {"HTTP/1.1 404 Not Found\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Not Found</TITLE></HEAD><BODY>\r\n<H1>Not Found</H1>\r\n</BODY></HTML>\r\n\r\n"};
