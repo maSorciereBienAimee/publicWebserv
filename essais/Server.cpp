@@ -139,8 +139,8 @@ std::string Server::processContent(std::string request, int i)
 	if (check == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		close (this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (this->events[i].data.fd);
 	}
 	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
 	{
@@ -152,8 +152,8 @@ std::string Server::processContent(std::string request, int i)
 		}
 		std::cout << "find last of is" << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
 		std::cout << "error with recv" << std::endl;
-		close (this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (this->events[i].data.fd);
 	}
 	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
 		return (chunkDecoder(request));
@@ -204,22 +204,22 @@ void Server::readData(int i)
 	if (n == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		close (this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (this->events[i].data.fd);
 	}
 	if (n < 0) //IF WE HAVE LARGER BUFFER DO WE NEED TO ADD: && request.find_last_of("\r\n\r\n") != request.length() - 4
 	{
 		std::cout << "error with recv" << std::endl;
-		close (this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (this->events[i].data.fd);
 	}
 	else
 	{
 		request += buf;
 		request = this->processContent(request, i);
 		this->pseudoReponse(request, i);
-		close(this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close(this->events[i].data.fd);
 	}
 }
 
