@@ -4,7 +4,17 @@
 #include <iostream>
 #include <string>
 #include <exception>
+#include <vector>
 
+
+
+namespace tools
+{
+     //just for help
+    void    printContent(std::vector<std::string> content);
+    bool    isSpaces(std::string str);
+    
+}
 
 struct OurExcetpion : public std::exception
 {
@@ -14,6 +24,5 @@ struct OurExcetpion : public std::exception
     ~OurExcetpion() {}
     const char * what() const throw() { return _str.c_str(); }
 };
-
 
 #endif

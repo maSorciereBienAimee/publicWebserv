@@ -1,9 +1,15 @@
 #include "parseConfig.cpp"
 #include "parseConfig.hpp"
+#include "serverBlock.cpp"
+#include "serverBlock.hpp"
+
 
 int main(int argc, char **argv)
 {
 	parseConfig confFile;
+	std::vector<serverBlock> servers;
+
+
 	if (argc != 2)
 	{
 		std::cout << "Error: argument" << std::endl;
@@ -14,7 +20,7 @@ int main(int argc, char **argv)
 	{
 		try
 		{
-			confFile.parsing(argv[1]);
+			confFile.parsing(argv[1], servers);
 		}
 		catch(const OurExcetpion& e)
 		{
@@ -22,5 +28,7 @@ int main(int argc, char **argv)
 		}
 		
 	}
+
+
 	return (0);
 }
