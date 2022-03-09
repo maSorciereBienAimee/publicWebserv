@@ -23,7 +23,7 @@ class Server
 	void connect();
 	void init_epoll();
 	void loop();
-	std::string processNewLine(std::string, int i);
+	std::string processContent(std::string, int i);
 	std::string processContentLength(std::string);
 	std::string chunkDecoder(std::string str);
 	void nonblock(int sockfd); // !je crois qu'on a pas le droit a cela

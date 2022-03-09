@@ -109,31 +109,62 @@ void Server::addFd()
 	}
 }
 
-std::string Server::processNewLine(std::string request, int i)
+std::string Server::processContentLength(std::string request)
 {
-	int n;
+	std::string tmp = request.substr(request.find("Content-Length: ") + 15, request.length());
+	int index = request.find("\r\n\r\n");
+	std::string tmp1 = tmp.substr(0, index - 1);
+	std::string body = request.substr(index + 4, request.length() - (index + 4));
+
+	if (body.length() != atoi(tmp1.c_str()))
+		std::cout << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << std::endl; 
+	return(request + "\r\n\r\n");
+}
+
+
+std::string Server::processContent(std::string request, int i)
+{
 	int size = 24;
 	std::string bufStr;
 	char buf[size];
-	n = 1;
-	while (request.find("\r\n\r\n") == std::string::npos)
+	int check = 0;
+	check = recv(this->events[i].data.fd, buf, size - 1, 0);
+	while (check > 0)
 	{
-		n = recv(this->events[i].data.fd, buf, size - 1, 0);
 		request += buf;
 		memset(buf, '\0', size);
+		check = recv(this->events[i].data.fd, buf, size - 1, 0);
 	}
+	request += buf;
+	if (check == 0)
+	{
+		std::cout << "connexion close by client" << std::endl;
+		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+	}
+	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
+	{
+		int i = 0;
+		while (i < request.length() - 1)
+		{
+			std::cout << i << "is: " << request[i] << std::endl;
+			i++;
+		}
+		std::cout << "find last of is" << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
+		std::cout << "error with recv" << std::endl;
+		close (this->events[i].data.fd);
+		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+	}
+	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
+		return (chunkDecoder(request));
+	if (request.find("Content-Length: ") != std::string::npos)
+		return(processContentLength(request));
 	return (request);
 }
 
-/*
-std::string Server::processContentLength(std::string request)
-{
-
-}
-*/
-
 std::string Server::chunkDecoder(std::string str)
 {
+	std::cout << "CHUNK DECODER" << std::endl;
     //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
 	std::string	head = str.substr(0,str.find("\r\n\r\n") + 4);
     //FROM AFTER NEW LINE TO END OF MESSAGE
@@ -176,7 +207,7 @@ void Server::readData(int i)
 		close (this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
 	}
-	if (n < 0)
+	if (n < 0) //IF WE HAVE LARGER BUFFER DO WE NEED TO ADD: && request.find_last_of("\r\n\r\n") != request.length() - 4
 	{
 		std::cout << "error with recv" << std::endl;
 		close (this->events[i].data.fd);
@@ -185,13 +216,7 @@ void Server::readData(int i)
 	else
 	{
 		request += buf;
-		if (request.find("Transfer-Encoding") != std::string::npos)
-			request = chunkDecoder(request);
-//		else if (request.find("Content-Length") != std::string::npos)
-		//	request = this->processContentLength(request);
-		else
-			request = this->processNewLine(request, i);
-		
+		request = this->processContent(request, i);
 		this->pseudoReponse(request, i);
 		close(this->events[i].data.fd);
 		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);

@@ -78,16 +78,20 @@ void Request::parse(const std::string &str)
         ptr_end = tmp.find_first_of('\n');
         
     }
-    std::cout << "tmp here: " << tmp << std::endl;
     //SKIP OVER EMPTY LINES
     while (tmp.find_first_of("\r\n") == 0)
-    {
-        std::cout << "here" << std::endl;
         tmp = tmp.erase(0, 1);
-    }
     //COLLECT BODY
-    std::cout << "position until " << (int)tmp.find_first_of('\r') << std::endl;
+    const std::string con_key = "Content-Length";
     _body = tmp.substr(0, tmp.length() - 4);
+    //CHECK LENGTH
+    if (_headers.find(con_key) != _headers.end())
+    {
+        if (_body.length() == (atoi(_headers[con_key].c_str())))
+            std::cout << "Content-Lenght is correct" << std::endl;
+        else
+            std::cout << "TODO: error? Len is: " << (_body.length()) << " Should be: " << (atoi(_headers[con_key].c_str())) << std::endl;
+    }
     printer();
 }
 
