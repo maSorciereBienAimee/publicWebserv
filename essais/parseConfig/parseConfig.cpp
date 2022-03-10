@@ -10,6 +10,64 @@ parseConfig::parseConfig(const parseConfig& cpy)
 parseConfig &parseConfig::operator=(const parseConfig& other){ return *this; }
 
 
+/******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
+
+
+void	parseConfig::commonParsingValues(std::string &value)
+{
+	if (value[value.size() -1] != ';')
+		throw OurExcetpion("Missing ';' at the end of the line");
+	value = value.substr(0, value.size() -1);
+	std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
+}
+
+void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
+{
+
+	//std::cout << "VALUE = " << value << "\n";
+	commonParsingValues(value);
+}
+
+void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+	
+}
+
+void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+
+}
+
+void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+	
+}
+
+void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+	
+}
+
+void	parseConfig::parseAndSetCgiBin(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+
+}
+
+void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+	
+}
+
+/******_________________________________________******/
+
+
+
 /*  Push the  file line by line in content
 	Splitting the file per ';' '{' '}'
 */
@@ -22,7 +80,7 @@ std::vector<std::string> parseConfig::parseLine(std::string line, std::vector<st
 		{ }
 	for (; line[i]; i++)
 	{
-		if (line[0] == '#')
+		if (line[i] == '#')
 			return (content);
 		if (line[i] == '{')
 		{
@@ -57,7 +115,7 @@ std::vector<std::string> parseConfig::parseLine(std::string line, std::vector<st
 			line = &line[i + 1];
 			i = -1;
 		}
-		if (!line[i + 1] && tools::isSpaces(line))
+		else if (!line[i + 1] && (!tools::isSpaces(line)) && line[0] != '#')
 		{
 			content.push_back(line);
 			return (content);
@@ -100,10 +158,89 @@ bool	parseConfig::isServerBlock(std::string line)
 		return (false);
 }
 
+void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server)
+{
+	if (attribut.compare("listen ") == 0)
+		parseAndSetPort(value, server);
+	else if (attribut.compare("index ") == 0)
+		parseAndSetIndex(value, server);
+	else if (attribut.compare("host ") == 0)
+		parseAndSetHost(value, server);
+	else if (attribut.compare("server_name ") == 0)
+		parseAndSetServerName(value, server);
+	else if (attribut.compare("cgi_extension ") == 0)
+		parseAndSetCgiExt(value, server);
+	else if (attribut.compare("cgi_bin ") == 0)
+		parseAndSetCgiBin(value, server);
+	else if (attribut.compare("error ") == 0)
+		parseAndSetError(value, server);
+}
+
+int		parseConfig::getAttributName(std::string const &line, std::string &attribut, std::string& value, serverBlock &server)
+{
+	int 	i = 0;
+	size_t 	pos;
+	IT 		it;
+
+ 	std::vector<std::string> atts = {"listen ", "index ", "root ", "host ", "server_name ", "cgi_extension ", "cgi_bin ", "error "};
+	for (it = atts.begin(); it != atts.end(); it++)
+	{
+		pos = line.find((*it));
+		if (pos != std::string::npos)
+		{
+			//std::cout << (line) << "\n";
+
+			attribut = (*it).substr(0, (*it).length());
+			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+			value = (line).substr(attribut.length(), line.length() - attribut.length());
+		//	std::cout << " Value = " << "'"<<  value << "'" << "\n";
+			getValueServerBlock(((*it).length() + 1), attribut, value, server);
+			return ((*it).length());
+		}
+	}
+	// std::cout << "LINE = " << line << "\n";
+	if (it == atts.end())
+		throw OurExcetpion("Directive in server block not allowed here");
+	return (0);
+}
+
+void	parseConfig::setServerConfig(std::string const &line, serverBlock &server)
+{
+	int posEnd;
+	std::string attributName;
+	std::string value;
+	// std::cout << "line  =  (should be listem 80 )" << line << "\n"; 
+
+	posEnd = getAttributName(line, attributName, value, server);
+//	std::cout << "in setServerConfig " << attributName << "\n";
+		
+
+}
 
 void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers)
 {
-	std::cout << "ici\n";
+	//std::cout << "ici\n";
+	serverBlock server;
+
+	 
+	for(int bracket = 0; start != end;)
+	{
+		if (isServerBlock(*start))
+			throw OurExcetpion("Server block not allowed here");
+		//if (locationBlock)
+		//check location block
+
+		else
+		{
+			setServerConfig((*start), server);
+			
+		}
+		// std::cout << "LINE in SET ON : " << (*start) << "\n";
+		start++;
+	}
+	// once we get all the config from one server we push back the server 
+	// with updated info in the vector<serverBLock> servers
+	servers.push_back(server);
 }
 
 /*
@@ -139,7 +276,10 @@ void	parseConfig::setServers(std::vector<std::string> &content, std::vector<serv
 				--it: to be at the end of the server block w/ the last '}'
 			*/
 			if (bracket == 0)
+			{
 				setOneServer(start, --it, servers);
+				// std::cout << "IT -- = " << (*it) << "\n";
+			}
 			else
 				throw OurExcetpion("ERROR: server block : missing a bracket");
 		}
@@ -147,7 +287,7 @@ void	parseConfig::setServers(std::vector<std::string> &content, std::vector<serv
 			throw OurExcetpion("ERROR: server block" + *it + ": unexpected line");
 		// if (it != content.end())
 		// {
-		// 	std::cout << "is it nessecary ??\n";
+		// 	//std::cout << "is it nessecary ??\n";
         //     it++;
 		// }
 	}
@@ -173,13 +313,22 @@ void parseConfig::parsing(std::string path, std::vector<serverBlock> &servers)
 			throw  OurExcetpion("ERROR: empty file");
 	}
 
-   tools::printContent(content);
 	//delete all empty lines
+	for (IT it = content.begin(); it != content.end(); it++)
+	{
+		if ((*it).empty())
+ 			content.erase(it);
+	}
+	//remove duplicate spaces
+	for (IT it = content.begin(); it != content.end(); it++)
+	{
+		(*it) =  tools::removeDuplicateSpaces(*it);
+	}
+		tools::printContent(content);
 	/*
 		setup the servers by finding each blocks which is a server block
 		then pushback each in std::vector<serverBlock>
 	*/
 	setServers(content, servers);
-	
-
 }
+

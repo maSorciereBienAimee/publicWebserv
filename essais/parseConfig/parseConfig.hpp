@@ -27,8 +27,21 @@ class parseConfig  {
 	void						setServers(std::vector<std::string> &content, std::vector<serverBlock> &servers);
 	bool						isServerBlock(std::string line);
 	void 						setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers);
-
+	void						setServerConfig(std::string const &line, serverBlock &server);
+	int							getAttributName(std::string const &line, std::string  &attribut, std::string& value, serverBlock &server);
+	void 						getValueServerBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server);
 	
+	
+	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
+	void	commonParsingValues(std::string &value);
+	void	parseAndSetPort(std::string &value, serverBlock &server);
+	void	parseAndSetIndex(std::string &value, serverBlock &server);
+	void	parseAndSetServerName(std::string &value, serverBlock &server);
+	void	parseAndSetHost(std::string &value, serverBlock &server);
+	void	parseAndSetCgiExt(std::string &value, serverBlock &server);
+	void	parseAndSetCgiBin(std::string &value, serverBlock &server);
+	void	parseAndSetError(std::string &value, serverBlock &server);
+
 	protected:
    
 
