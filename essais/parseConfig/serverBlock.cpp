@@ -16,7 +16,7 @@ serverBlock serverBlock::operator=(const serverBlock& other)
 	return  (*this);
 }
 
-void						serverBlock::setHost(const uint32_t port) { this->_port = port; }
+void						serverBlock::setHost(const uint32_t host) { this->_host = host; }
 void						serverBlock::setName(const std::string name) { this->_name = name; }		
 void						serverBlock::setPort(const uint16_t port) { this->_port = port; }
 void						serverBlock::setIndex(std::vector<std::string> const &index) { this->_index = index; }

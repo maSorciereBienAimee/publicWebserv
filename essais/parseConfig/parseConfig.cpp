@@ -10,22 +10,29 @@ parseConfig::parseConfig(const parseConfig& cpy)
 parseConfig &parseConfig::operator=(const parseConfig& other){ return *this; }
 
 
-/******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
-
+/******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******
+/ * 			DON'T FORGET TO PUT VALUE IN CONST						*/
 
 void	parseConfig::commonParsingValues(std::string &value)
 {
 	if (value[value.size() -1] != ';')
-		throw OurExcetpion("Missing ';' at the end of the line");
+		throw OurExcetpion("ERROR: Missing ';' at the end of the line");
 	value = value.substr(0, value.size() -1);
-	std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
+	//std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
 }
 
 void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 {
-
-	//std::cout << "VALUE = " << value << "\n";
+	int val;
 	commonParsingValues(value);
+	for (int i = 0; value[i]; i++)
+		if (!isdigit(value[i]))
+			throw OurExcetpion("ERROR: PORT: only digit value expected");
+	val = atoi(value.c_str());
+	if (val < 0 || val > 65535)
+		throw OurExcetpion("ERROR: PORT: range [0 - 65535] expected");
+	server.setPort(val);
+	//std::cout << "PORT value in serverblock is [" << server.getPort() << "]\n"; 
 }
 
 void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
@@ -37,13 +44,60 @@ void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
 void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
 {
 	commonParsingValues(value);
-
+	for (int i = 0; value[i]; i++)
+		if (isspace(value[i]))
+			throw OurExcetpion("ERROR: NAME: [string] expected");
+	server.setName(value);
+	//std::cout << "NAME value in serverblock is [" << server.getName() << "]\n"; 
 }
 
+//MUST BE nb.nb.nb.nb 
+//with nb >= 0  && nb <= 255
 void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 {
 	commonParsingValues(value);
+	std::vector<std::string> nb;
+	std::string value_toadd;
+	int i = 0;
 	
+	for (int i = 0; value[i]; i++)
+	{
+		if (isspace(value[i]))
+			throw OurExcetpion("ERROR: HOST: [0.0.0.0] format expected");
+	}
+	while (value[i])
+	{
+		if (value[i] == '.' && value[i + 1])
+		{
+			nb.push_back(value_toadd);
+			value_toadd.clear();
+			i++;
+		}
+		value_toadd += value[i];
+		i++;
+	}
+	nb.push_back(value_toadd);
+	
+	int count = 0;
+	for (IT it = nb.begin(); it != nb.end(); it++, count++)
+	{
+		if ((*it).size() > 3)
+			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+		if (atoi((*it).c_str()) < 0 || atoi((*it).c_str()) > 255)
+			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+		for (int i = 0; (*it)[i]; i++)
+		{
+			if (!isdigit((*it)[i]))
+			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+		}
+	}
+	if (count != 4)
+			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected");
+	//CCLAUDE FT to convert str in IP 
+	unsigned int val = 	tools::strToIp(value);
+	server.setHost(val);
+	std::cout << "HOST value in serverblock is [" << server.getHost() << "]\n"; 
+
 }
 
 void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
@@ -324,7 +378,7 @@ void parseConfig::parsing(std::string path, std::vector<serverBlock> &servers)
 	{
 		(*it) =  tools::removeDuplicateSpaces(*it);
 	}
-		tools::printContent(content);
+		tools::printVector(content);
 	/*
 		setup the servers by finding each blocks which is a server block
 		then pushback each in std::vector<serverBlock>

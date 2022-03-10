@@ -29,7 +29,7 @@ class serverBlock {
 		serverBlock 				operator=(const serverBlock& other);
 
 
-		void						setHost(const uint32_t port);
+		void						setHost(const uint32_t host);
 		void						setName(const std::string name);
 		void						setPort(const uint16_t port);
 		void						setIndex(std::vector<std::string> const &index);

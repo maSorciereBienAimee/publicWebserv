@@ -6,15 +6,17 @@
 #include <exception>
 #include <vector>
 #include <sstream>
+#include <limits>
 
 
 
 namespace tools
 {
 	 //just for help
-	void            printContent(std::vector<std::string> content);
+	void            printVector(std::vector<std::string> content);
 	bool            isSpaces(std::string str);
-	std::string     removeDuplicateSpaces(std::string const &str);	
+	std::string     removeDuplicateSpaces(std::string const &str);
+	unsigned int    strToIp(std::string strIp);
 	
 }
 
