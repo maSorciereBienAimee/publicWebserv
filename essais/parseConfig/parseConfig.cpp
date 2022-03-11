@@ -260,7 +260,73 @@ bool	parseConfig::isLocationBlock(std::string const &line)
 	return (true);
 }	
 
+/******_ GET && SET ATTRIBUTES LOCATION BLOCK___******/
+
+
 /******_________________________________________******/
+/******_________ PASRING LOCATION BLOCK_________******/
+
+std::string	parseConfig::parseLocationPath(std::string const& line)
+{
+	if (line == "location")
+		throw OurExcetpion("ERROR: LOCATION PATH:argument for path expected");
+	std::string path = line.substr(9, line.length() - 9);
+	//std::cout << "line is  [" << path << "]\n";
+	for (int i = 0; i < path.length(); i++)
+		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
+			throw OurExcetpion("ERROR: LOCATION PATH:only one path expected");
+
+	return (path);
+}
+
+int		parseConfig::getValuesLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location)
+{
+	int 	i = 0;
+	size_t 	pos;
+	IT 		it;
+
+ 	std::vector<std::string> atts = {"index ", "methods ", "root ", "cgi_extension ", "cgi_bin ",
+	 "redirection ", "autoindex ", "auth_basic ", "auth_basic_user_file ", "clinet_max_body_size "}; 
+	for (it = atts.begin(); it != atts.end(); it++)
+	{
+		pos = line.find((*it));
+		if (pos != std::string::npos)
+		{
+			attribut = (*it).substr(0, (*it).length());
+			std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+			value = (line).substr(attribut.length(), line.length() - attribut.length());
+			//std::cout << " Value = " << "'"<<  value << "'" << "\n";
+			//getValueServerBlock(((*it).length() + 1), attribut, value, server);
+			return ((*it).length());
+		}
+	}
+	// std::cout << "LINE = " << line << "\n";
+	if (it == atts.end())
+		throw OurExcetpion("Directive in server block not allowed here");
+	return (0);
+}
+
+void	parseConfig::setLocationConfig(std::string &line, serverLocation &location, serverBlock &server)
+{
+	int posEnd;
+	std::string attributName;
+	std::string value;
+	posEnd = getValuesLocation(line, attributName, value, server, location);
+}
+
+void	parseConfig::setLocationBlock(IT start, IT end, serverBlock &server, std::string path)
+{
+	serverLocation location;
+	for (start != end; start++)
+	{
+		if (isServerBlock(*start) || isLocationBlock(*start))
+			throw OurExcetpion("ERROR: LOCATION BLOCK: no location block or server block allowed");
+		setLocationConfig((*start), location, server);
+
+	}
+
+	std::cout << "GET LOCATION\n";
+}
 
 
 /*  Push the  file line by line in content
@@ -331,10 +397,24 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 			throw OurExcetpion("Server block not allowed here");
 		if (isLocationBlock(*start))
 		{
-			std::cout << "YES IT IS :) \n";
+			std::string pathLocation = parseLocationPath(*start);
+			start++; //should be bracket
+			if ((*start).find('{') != std::string::npos)
+				start++, bracket++;
+			else
+				throw OurExcetpion("ERROR: LOCATION BLOCK: openning bracket expected");
+			IT beginBlock = start;
+			while (start != end && bracket != 0)
+			{
+				if ((*start).find('}') != std::string::npos)
+					bracket--;
+				start++;
+			}
+			if (bracket == 0)
+				setLocationBlock(beginBlock, --start, server, pathLocation);
+			else
+				throw OurExcetpion("ERROR: LOCATION BLOCK: closing bracket expected");
 		}
-		//check location block
-
 		else
 		{
 			setServerConfig((*start), server);

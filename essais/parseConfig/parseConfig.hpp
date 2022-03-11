@@ -37,9 +37,13 @@ class parseConfig  {
 	
 	/******_____LOCATION BLOCK PARSING______******/
 	bool 						isLocationBlock(std::string const &line);
+	std::string					parseLocationPath(std::string const& path);
+	void						setLocationBlock(IT start, IT end, serverBlock &server, std::string path);
+	void						setLocationConfig(std::string &line, serverLocation &location, serverBlock &server);
+	int							getValuesLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
 
 	protected:
-	
+
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
 	void						commonParsingValues(std::string &value);
 	void						parseAndSetPort(std::string& value, serverBlock &server);
@@ -49,6 +53,8 @@ class parseConfig  {
 	void						parseAndSetCgiExt(std::string &value, serverBlock &server);
 	void						parseAndSetCgiBin(std::string &value, serverBlock &server);
 	void						parseAndSetError(std::string &value, serverBlock &server);
+
+	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM LOCATION BLOCK______******/
    
 
 };
