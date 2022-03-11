@@ -37,8 +37,44 @@ void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 
 void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
 {
+	std::vector <std::string> 	values;
+	size_t 						sep = 0;
+	size_t						start = 0;
+	std::string					valueToadd;
+	std::string					newVal;
+	int i = 0;
 	commonParsingValues(value);
 	
+	for (int i = 0; value[i]; i++)
+		if (value[i] == ',' && value[i] && value[i + 1]  != ' ')
+			throw OurExcetpion("ERROR: INDEX: invalid char after ','"); //maybe not necessary
+	while(value[i])
+	{
+		if (value[i] != ',' && value[i + 1] == ' ')
+			throw OurExcetpion("ERROR: INDEX: invalid char after ','");
+		while (value[i] == ' ')
+			i++;
+		newVal += value[i];
+		i++;
+	}
+	i = 0;
+	while (newVal[i])
+	{
+
+		if (newVal[i] == ',')
+		{
+			if (!isalpha(newVal[i + 1]))
+				throw OurExcetpion("ERROR: INDEX: invalid char after ','");
+			values.push_back(valueToadd);
+			valueToadd.clear();
+			i++;
+		}
+		valueToadd += newVal[i];
+		i++;
+	}
+	values.push_back(valueToadd);
+	server.setIndex(values);
+	//tools::printVector(server.getIndex());
 }
 
 void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
@@ -55,11 +91,17 @@ void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
 //with nb >= 0  && nb <= 255
 void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 {
-	commonParsingValues(value);
 	std::vector<std::string> nb;
 	std::string value_toadd;
 	int i = 0;
 	
+	commonParsingValues(value);
+	if (value == "localhost")
+	{
+		unsigned int val = 	tools::strToIp(value);
+		server.setHost(val);
+		return ;
+	}
 	for (int i = 0; value[i]; i++)
 	{
 		if (isspace(value[i]))
@@ -96,8 +138,7 @@ void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 	//CCLAUDE FT to convert str in IP 
 	unsigned int val = 	tools::strToIp(value);
 	server.setHost(val);
-	std::cout << "HOST value in serverblock is [" << server.getHost() << "]\n"; 
-
+	//std::cout << "HOST value in serverblock is [" << server.getHost() << "]\n"; 
 }
 
 void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
@@ -118,67 +159,7 @@ void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
 	
 }
 
-/******_________________________________________******/
-
-
-
-/*  Push the  file line by line in content
-	Splitting the file per ';' '{' '}'
-*/
-std::vector<std::string> parseConfig::parseLine(std::string line, std::vector<std::string> content)
-{
-	int i;
-	std::string tmp;
-
-	for (i = 0; isspace(line[i]); i++)
-		{ }
-	for (; line[i]; i++)
-	{
-		if (line[i] == '#')
-			return (content);
-		if (line[i] == '{')
-		{
-		   // std::cout << "line in if " << line << std::endl;
-			tmp = line.substr(0, i);
-			//checker if need to check spaces and empty()
-			//if (!tools::isSpaces(tmp) || tmp.empty())
-				content.push_back(tmp);
-			content.push_back("{");
-			if (!line[i + 1])
-				return (content);
-			line = &line[i + 1];
-			i = -1;
-		}
-		else if (line[i] == '}')
-		{
-			tmp = line.substr(0, i);
-		//	if (!tools::isSpaces(tmp) || tmp.empty())
-				content.push_back(tmp);
-			content.push_back("}");
-			if (!line[i + 1])
-				return (content);
-			line = &line[i + 1];
-			i = -1;
-		}
-		else if (line[i] == ';')
-		{
-			tmp = line.substr(0, i + 1);
-			content.push_back(tmp);
-			if (!line[i + 1])
-				return (content);
-			line = &line[i + 1];
-			i = -1;
-		}
-		else if (!line[i + 1] && (!tools::isSpaces(line)) && line[0] != '#')
-		{
-			content.push_back(line);
-			return (content);
-		}
-	}
-   
-	return (content);
-}
-
+/******_____ IN SERVER BLOCK______*******/
 
 /* check if server line is valid */
 bool	parseConfig::isServerBlock(std::string line)
@@ -242,8 +223,6 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 		pos = line.find((*it));
 		if (pos != std::string::npos)
 		{
-			//std::cout << (line) << "\n";
-
 			attribut = (*it).substr(0, (*it).length());
 			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
@@ -253,8 +232,8 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 		}
 	}
 	// std::cout << "LINE = " << line << "\n";
-	if (it == atts.end())
-		throw OurExcetpion("Directive in server block not allowed here");
+	// if (it == atts.end())
+	// 	throw OurExcetpion("Directive in server block not allowed here");
 	return (0);
 }
 
@@ -263,17 +242,86 @@ void	parseConfig::setServerConfig(std::string const &line, serverBlock &server)
 	int posEnd;
 	std::string attributName;
 	std::string value;
-	// std::cout << "line  =  (should be listem 80 )" << line << "\n"; 
-
 	posEnd = getAttributName(line, attributName, value, server);
 //	std::cout << "in setServerConfig " << attributName << "\n";
-		
+}
 
+/******_____ IN LOCATION BLOCK______*******/
+
+bool	parseConfig::isLocationBlock(std::string const &line)
+{
+	int i = 0;
+	if (!line.compare(i, 8, "location"))
+		i += 8;
+	else
+		return (false);
+	if (line.size() > 8 && !isspace(line[8]))
+		throw OurExcetpion("ERROR: LOCATION BLOCK: space between lacation and location path expected");
+	return (true);
+}	
+
+/******_________________________________________******/
+
+
+/*  Push the  file line by line in content
+	Splitting the file per ';' '{' '}'
+*/
+std::vector<std::string> parseConfig::parseLine(std::string line, std::vector<std::string> content)
+{
+	int i;
+	std::string tmp;
+
+	for (i = 0; isspace(line[i]); i++)
+		{ }
+	for (; line[i]; i++)
+	{
+		if (line[i] == '#')
+			return (content);
+		if (line[i] == '{')
+		{
+		   // std::cout << "line in if " << line << std::endl;
+			tmp = line.substr(0, i);
+			//checker if need to check spaces and empty()
+			//if (!tools::isSpaces(tmp) || tmp.empty())
+				content.push_back(tmp);
+			content.push_back("{");
+			if (!line[i + 1])
+				return (content);
+			line = &line[i + 1];
+			i = -1;
+		}
+		else if (line[i] == '}')
+		{
+			tmp = line.substr(0, i);
+		//	if (!tools::isSpaces(tmp) || tmp.empty())
+				content.push_back(tmp);
+			content.push_back("}");
+			if (!line[i + 1])
+				return (content);
+			line = &line[i + 1];
+			i = -1;
+		}
+		else if (line[i] == ';')
+		{
+			tmp = line.substr(0, i + 1);
+			content.push_back(tmp);
+			if (!line[i + 1])
+				return (content);
+			line = &line[i + 1];
+			i = -1;
+		}
+		else if (!line[i + 1] && (!tools::isSpaces(line)) && line[0] != '#')
+		{
+			content.push_back(line);
+			return (content);
+		}
+	}
+   
+	return (content);
 }
 
 void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers)
 {
-	//std::cout << "ici\n";
 	serverBlock server;
 
 	 
@@ -281,7 +329,10 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 	{
 		if (isServerBlock(*start))
 			throw OurExcetpion("Server block not allowed here");
-		//if (locationBlock)
+		if (isLocationBlock(*start))
+		{
+			std::cout << "YES IT IS :) \n";
+		}
 		//check location block
 
 		else

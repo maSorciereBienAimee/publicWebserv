@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "serverLocation.hpp"
 
 /* 	
 	Class which contains one server block
@@ -20,6 +21,7 @@ class serverBlock {
 		std::string					_name;
 		uint16_t					_port;
 		std::vector<std::string> 	_index;
+		std::vector<serverLocation>	_locations;
 
 	public: 
 

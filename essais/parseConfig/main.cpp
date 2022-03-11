@@ -2,7 +2,8 @@
 #include "parseConfig.hpp"
 #include "serverBlock.cpp"
 #include "serverBlock.hpp"
-
+#include "serverLocation.hpp"
+#include "serverLocation.cpp"
 
 int main(int argc, char **argv)
 {

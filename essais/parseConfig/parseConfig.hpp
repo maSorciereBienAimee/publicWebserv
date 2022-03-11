@@ -26,19 +26,23 @@ class parseConfig  {
 	void                        parsing(std::string path, std::vector<serverBlock> &servers);
 	std::vector<std::string>    parseLine(std::string line, std::vector<std::string> content);
 	void						setServers(std::vector<std::string> &content, std::vector<serverBlock> &servers);
-	bool						isServerBlock(std::string line);
 	void 						setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers);
+	
+	
+	/******_____SERVER BLOCK PARSING______******/
 	void						setServerConfig(std::string const &line, serverBlock &server);
 	int							getAttributName(std::string const &line, std::string  &attribut, std::string& value, serverBlock &server);
 	void 						getValueServerBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server);
+	bool						isServerBlock(std::string line);
 	
-	
-	
+	/******_____LOCATION BLOCK PARSING______******/
+	bool 						isLocationBlock(std::string const &line);
 
 	protected:
+	
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
 	void						commonParsingValues(std::string &value);
-	void						parseAndSetPort(std::string &value, serverBlock &server);
+	void						parseAndSetPort(std::string& value, serverBlock &server);
 	void						parseAndSetIndex(std::string &value, serverBlock &server);
 	void						parseAndSetServerName(std::string &value, serverBlock &server);
 	void						parseAndSetHost(std::string &value, serverBlock &server);

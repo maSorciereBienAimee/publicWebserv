@@ -24,7 +24,9 @@ void						serverBlock::setIndex(std::vector<std::string> const &index) { this->_
 uint32_t					serverBlock::getHost(void) const { return (this->_host); }
 std::string					serverBlock::getName(void) const { return (this->_name); }
 uint16_t					serverBlock::getPort(void) const { return (this->_port); }
-std::vector<std::string> 	serverBlock::getIndex(void) const { return (this->_index); }
+std::vector<std::string> 	serverBlock::getIndex(void) const { 
+
+	return (this->_index); }
 
 
 bool serverBlock::operator==(const serverBlock& other)
