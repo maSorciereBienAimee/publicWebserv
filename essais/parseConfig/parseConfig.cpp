@@ -317,12 +317,13 @@ void	parseConfig::setLocationConfig(std::string &line, serverLocation &location,
 void	parseConfig::setLocationBlock(IT start, IT end, serverBlock &server, std::string path)
 {
 	serverLocation location;
-	for (start != end; start++)
+	for (; start != end;)
 	{
 		if (isServerBlock(*start) || isLocationBlock(*start))
 			throw OurExcetpion("ERROR: LOCATION BLOCK: no location block or server block allowed");
 		setLocationConfig((*start), location, server);
-
+		if (start != end)
+            start++;
 	}
 
 	std::cout << "GET LOCATION\n";
