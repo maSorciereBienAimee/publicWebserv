@@ -285,15 +285,35 @@ int		parseConfig::getValuesLocation(std::string const &line, std::string &attrib
 	size_t 	pos;
 	IT 		it;
 
- 	std::vector<std::string> atts = {"index ", "methods ", "root ", "cgi_extension ", "cgi_bin ",
+ 	std::vector<std::string> atts = {"methods ", "root ", "cgi_extension ", "cgi_bin ",
 	 "redirection ", "autoindex ", "auth_basic ", "auth_basic_user_file ", "clinet_max_body_size "}; 
+	
+	
+	size_t posx = line.find("index");
+	if (posx != std::string::npos)
+	{
+		attribut = (line).substr(0, 5);
+		// << " Attribut = " << "'"<<  attribut << "'" << "\n";
+		value = (line).substr(attribut.length(), line.length() - attribut.length());
+		//std::cout << " Value = " << "'"<<  value << "'" << "\n";
+		//getValueServerBlock(((*it).length() + 1), attribut, value, server);
+		return ((line).length());
+	}
+	
 	for (it = atts.begin(); it != atts.end(); it++)
 	{
 		pos = line.find((*it));
 		if (pos != std::string::npos)
 		{
+			//tests pb detection avec index et autoindex 
+			// size_t posx = line.find("index");
+			// if (posx != std::string::npos)
+			// 	attribut = (line).substr(0, (line).length());
+
+			// fin du test
+			
 			attribut = (*it).substr(0, (*it).length());
-			std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
 			//std::cout << " Value = " << "'"<<  value << "'" << "\n";
 			//getValueServerBlock(((*it).length() + 1), attribut, value, server);
@@ -301,8 +321,8 @@ int		parseConfig::getValuesLocation(std::string const &line, std::string &attrib
 		}
 	}
 	// std::cout << "LINE = " << line << "\n";
-	if (it == atts.end())
-		throw OurExcetpion("Directive in server block not allowed here");
+	// if (it == atts.end())
+	// 	throw OurExcetpion("Directive in server block not allowed here");
 	return (0);
 }
 
@@ -510,7 +530,7 @@ void parseConfig::parsing(std::string path, std::vector<serverBlock> &servers)
 	{
 		(*it) =  tools::removeDuplicateSpaces(*it);
 	}
-		tools::printVector(content);
+		//tools::printVector(content);
 	/*
 		setup the servers by finding each blocks which is a server block
 		then pushback each in std::vector<serverBlock>

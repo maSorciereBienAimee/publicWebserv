@@ -30,6 +30,7 @@ class serverBlock {
 		serverBlock(const serverBlock& cpy);
 		serverBlock 				operator=(const serverBlock& other);
 
+		serverBlock	const &				getServerBlock();
 
 		void						setHost(const uint32_t host);
 		void						setName(const std::string name);

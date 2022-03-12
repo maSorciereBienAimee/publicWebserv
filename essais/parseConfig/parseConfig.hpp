@@ -42,7 +42,7 @@ class parseConfig  {
 	void						setLocationConfig(std::string &line, serverLocation &location, serverBlock &server);
 	int							getValuesLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
 
-	protected:
+	private:
 
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
 	void						commonParsingValues(std::string &value);

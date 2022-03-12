@@ -1,12 +1,44 @@
 #include "Server.hpp"
 #include <iostream>
-#include "Request.hpp"
+
+//just to test
+void    Server::printServerBlock(std::vector<serverBlock> content)
+	{
+		std::vector<serverBlock>::iterator it;
+		std::cout << "_____ServerBlock IS______\n";
+		for (it = content.begin(); it != content.end(); it++)
+		{
+			std::cout<< "HOST : " << (*it).getHost() << "\n";
+			std::cout<< "PORT : " << (*it).getPort() << "\n";
+			std::cout<< "NAME : " << (*it).getName() << "\n";
+			tools::printVector((*it).getIndex());
+		}
+		std::cout << "___________\n";		
+}
 
 Server::Server()
 {
 	this->listenfd = -1;
 	this->epfd = -1;
 	this->events = (struct epoll_event *)calloc(MAX_CLIENT, sizeof(struct epoll_event));
+}
+
+Server::Server(const std::string &path)
+{
+	try
+	{
+		config.parsing(path, servers);
+	}
+	catch(const OurExcetpion& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+
+	for (std::vector<serverBlock>::iterator it = servers.begin(); it != servers.end(); it++)
+	{
+		serverBlock server = it->getServerBlock(); 
+	}
+	printServerBlock(servers);
 }
 
 Server::~Server()

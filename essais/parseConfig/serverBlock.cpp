@@ -6,6 +6,11 @@ serverBlock::~serverBlock() {}
 
 serverBlock::serverBlock(const serverBlock& cpy) : _port(cpy._port), _index(cpy._index), _name(cpy._name), _host(cpy._host) {}
 
+serverBlock		const & serverBlock::getServerBlock()
+{
+	return (*this);
+}
+
 
 serverBlock serverBlock::operator=(const serverBlock& other)
 {

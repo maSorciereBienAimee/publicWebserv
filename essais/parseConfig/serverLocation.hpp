@@ -10,7 +10,7 @@ class serverLocation
 {
 
    
-	protected:
+	private:
 	
 		std::vector<std::string>	_index;
 		std::vector<std::string>	_methods;

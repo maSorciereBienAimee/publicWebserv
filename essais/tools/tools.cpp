@@ -13,6 +13,8 @@ namespace tools
 		
 	}
 
+	
+
 	bool    isSpaces(std::string str)
 	{
 	
