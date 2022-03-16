@@ -1,60 +1,26 @@
 #include "Server.hpp"
 #include <iostream>
 
-//just to test
-void    Server::printServerBlock(std::vector<serverBlock> content)
-	{
-		std::vector<serverBlock>::iterator it;
-		std::cout << "_____ServerBlock IS______\n";
-		for (it = content.begin(); it != content.end(); it++)
-		{
-			std::cout<< "HOST : " << (*it).getHost() << "\n";
-			std::cout<< "PORT : " << (*it).getPort() << "\n";
-			std::cout<< "NAME : " << (*it).getName() << "\n";
-			tools::printVector((*it).getIndex());
-		}
-		std::cout << "___________\n";		
-}
-
 Server::Server()
 {
 	this->listenfd = -1;
-	this->epfd = -1;
-	this->events = (struct epoll_event *)calloc(MAX_CLIENT, sizeof(struct epoll_event));
 }
-
-Server::Server(const std::string &path)
+Server::Server(serverBlock block)
 {
-	try
-	{
-		config.parsing(path, servers);
-	}
-	catch(const OurExcetpion& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
-
-	for (std::vector<serverBlock>::iterator it = servers.begin(); it != servers.end(); it++)
-	{
-		serverBlock server = it->getServerBlock(); 
-	}
-	printServerBlock(servers);
+	this->listenfd = -1;
+	this->infoConfig = block;
 }
 
 Server::~Server()
 {
 	if (this->listenfd != -1)
 			close(this->listenfd);
-	if (this->epfd != -1)
-			close(this->epfd);
 }
 
 void Server::clear_fd()
 {
 	if (this->listenfd != -1)
 			close(this->listenfd);
-	if (this->epfd != -1)
-			close(this->epfd);
 }
 
 
@@ -65,13 +31,11 @@ void Server::connect()
 
 	if ((this->listenfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			exit(1);
-	
 	setsockopt(this->listenfd, SOL_SOCKET, SO_REUSEADDR, &reuse_addr, sizeof(reuse_addr));
-	
 	memset(srv.sin_zero, '\0', sizeof(srv.sin_zero));
 	srv.sin_family = AF_INET;
-	srv.sin_addr.s_addr = INADDR_ANY;
-	srv.sin_port = htons(PORT);
+	srv.sin_addr.s_addr = htonl(this->infoConfig.getHost());
+	srv.sin_port = htons(this->infoConfig.getPort());
 	if (bind(this->listenfd, (struct sockaddr *) &srv, sizeof(srv)) < 0)
 	{
 		std::cout << "Bind address already in use \n";
@@ -84,61 +48,6 @@ void Server::connect()
 		exit(1);
 	}
 	
-}
-
-void Server::init_epoll()
-{
-	struct epoll_event ev;
-
-	this->epfd = epoll_create(MAX_CLIENT);
-	if (!this->epfd)
-	{
-		clear_fd();
-		exit(1);
-	}
-	ev.events = EPOLLIN | EPOLLERR | EPOLLHUP;
-	ev.data.fd = this->listenfd;
-	if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, listenfd, &ev) < 0)
-	{
-		clear_fd();
-		exit(1);
-	}
-}
-
-void Server::loop()
-{
-	int res;
-	while (1)
-	{
-		usleep(8000);
-		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, 0);
-		for (int i = 0; i < res; i++)
-		{
-			if(this->events[i].data.fd == this->listenfd)
-				Server::addFd();
-			else
-				Server::readData(i);
-		}
-	}
-}
-
-void Server::addFd()
-{
-	int clifd;
-	struct epoll_event ev;
-
-	clifd = accept(this->listenfd, NULL, NULL);
-	if (clifd > 0)
-	{
-			Server::nonblock(clifd);
-		ev.events = EPOLLIN | EPOLLET;
-		ev.data.fd = clifd;
-		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, clifd, &ev) < 0)
-		{
-			clear_fd();
-			exit(1);
-		}
-	}
 }
 
 std::string Server::processContentLength(std::string request)
@@ -154,25 +63,25 @@ std::string Server::processContentLength(std::string request)
 }
 
 
-std::string Server::processContent(std::string request, int i)
+std::string Server::processContent(std::string request, int fd, int epfd)
 {
 	int size = 24;
 	std::string bufStr;
 	char buf[size];
 	int check = 0;
-	check = recv(this->events[i].data.fd, buf, size - 1, 0);
+	check = recv(fd, buf, size - 1, 0);
 	while (check > 0)
 	{
 		request += buf;
 		memset(buf, '\0', size);
-		check = recv(this->events[i].data.fd, buf, size - 1, 0);
+		check = recv(fd, buf, size - 1, 0);
 	}
 	request += buf;
 	if (check == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		close (this->events[i].data.fd);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
 	{
@@ -184,8 +93,8 @@ std::string Server::processContent(std::string request, int i)
 		}
 		std::cout << "find last of is" << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
 		std::cout << "error with recv" << std::endl;
-		close (this->events[i].data.fd);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
 		return (chunkDecoder(request));
@@ -225,33 +134,33 @@ std::string Server::chunkDecoder(std::string str)
     return (decoded);
 }
 
-void Server::readData(int i)
+void Server::readData(int fd, int epfd)
 {
 	int n;
 	int size = 24;
 	char buf[size];
 	std::string request;
 	int inutile;
-	n = recv(this->events[i].data.fd, buf, size - 1, 0);
+	n = recv(fd, buf, size - 1, 0);
 	if (n == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
-		close (this->events[i].data.fd);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	else if (n < 0) //IF WE HAVE LARGER BUFFER DO WE NEED TO ADD: && request.find_last_of("\r\n\r\n") != request.length() - 4
 	{
 		std::cout << "error with recv" << std::endl;
-		close (this->events[i].data.fd);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	else
 	{
 		request += buf;
-		request = this->processContent(request, i);
-		this->pseudoReponse(request, i);
-		close(this->events[i].data.fd);
-		epoll_ctl(this->epfd, EPOLL_CTL_DEL, this->events[i].data.fd, NULL);
+		request = this->processContent(request, fd, epfd);
+		this->pseudoReponse(request, fd);
+		close(fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 }
 
@@ -274,7 +183,7 @@ void Server::nonblock(int sockfd)
 }
 
 
-void Server::pseudoReponse(std::string request, int i) //destinee a etre suprimee quand la class reponse sera faite
+void Server::pseudoReponse(std::string request, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
 	std::ifstream is ("index.html", std::ifstream::binary);
 	if (!is)
@@ -300,9 +209,14 @@ void Server::pseudoReponse(std::string request, int i) //destinee a etre suprime
 		
 		
 		if (Req.getMethod() != "GET")	
-			send(this->events[i].data.fd, badrequest, strlen(badrequest), 0);	
+			send(fd, badrequest, strlen(badrequest), 0);	
 		else if (Req.getPath() == "/" || Req.getPath() == "/index.html")
-			send(this->events[i].data.fd, goodresponse.c_str(), strlen(goodresponse.c_str()), 0);
+			send(fd, goodresponse.c_str(), strlen(goodresponse.c_str()), 0);
 		else
-			send(this->events[i].data.fd, badresponse, strlen(badresponse), 0);
+			send(fd, badresponse, strlen(badresponse), 0);
 } //fin de la fonction  a supprimer quand Response sera faite
+
+int Server::getListen() const
+{
+	return (this->listenfd);
+}

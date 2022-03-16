@@ -1,0 +1,53 @@
+server {
+	        listen  8000;
+            host           localhost;
+			root                	/var/www;
+			
+			server_name localhost:8001;
+			index	                		index.html,      indexxxx.html;
+		
+
+
+# 	location 	/
+# {
+
+# 		index			index.html index.php index.nginx-debian.html;
+# 		autoindex		on;
+# 		methods			GET,POST,DELETE;
+# 		cgi_extension	.php;
+# 		cgi_bin			/usr/bin/php-cgi;
+# 	}
+
+	# location /jj {
+	# 	methods			GET,POST,DELETE;
+
+	# 	redirection http://localhost:8001/html;
+	# }
+
+
+	# location /bonjourr {
+	# 	index			index.html;
+	# 	autoindex		on;
+	# 	methods			GET,POST;
+	# 	cgi_extension	.php;
+	# 	cgi_bin			/usr/bin/php-cgi;
+	# }
+
+	# location /test {
+	# 	index			index.html;
+	# 	autoindex		on;
+	# 	methods			POST, GET;
+	# 	cgi_extension	.php;
+	# 	cgi_bin			/usr/bin/php-cgi;
+	# }
+}
+
+server {
+	        listen  8080;
+            host           127.0.0.1;
+		root                	/var/www;
+		
+		server_name localhost:8001;
+	index	                		index.html,      indexxxx.html;
+}
+
