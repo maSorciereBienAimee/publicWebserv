@@ -86,7 +86,7 @@ void AllServers::loop()
 	while (1)
 	{
 		usleep(8000);
-		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, -1);
+		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, 0);
 		for (int i = 0; i < res; i++)
 		{
 			if ((ret = is_it_equal(this->events[i].data.fd)) != -1)
