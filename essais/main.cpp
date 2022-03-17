@@ -1,8 +1,8 @@
-#include "Server.hpp"
-#include "AllServers.hpp"
+#include "manageServer/Server.hpp"
+#include "manageServer/AllServers.hpp"
 #include "parseConfig/parseConfig.hpp"
 #include "parseConfig/serverBlock.hpp"
-#include "Request.hpp"
+#include "request/Request.hpp"
 #include "tools/tools.hpp"
 
 void    printServerBlock(std::vector<serverBlock> content)

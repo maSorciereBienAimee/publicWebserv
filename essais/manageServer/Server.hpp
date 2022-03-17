@@ -9,10 +9,10 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include "parseConfig/parseConfig.hpp"
-#include "parseConfig/serverBlock.hpp"
-#include "Request.hpp"
-#include "tools/tools.hpp"
+#include "../parseConfig/parseConfig.hpp"
+#include "../parseConfig/serverBlock.hpp"
+#include "../request/Request.hpp"
+#include "../tools/tools.hpp"
 
 #define PORT 8080
 #define MAX_CLIENT 5000
