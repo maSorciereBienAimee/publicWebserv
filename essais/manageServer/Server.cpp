@@ -1,5 +1,6 @@
 #include "Server.hpp"
 #include <iostream>
+#include "../response/Response.hpp"
 
 Server::Server()
 {
@@ -167,7 +168,7 @@ void Server::readData(int fd, int epfd)
 
 void Server::pseudoReponse(std::string request, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
-	std::ifstream is ("index.html", std::ifstream::binary);
+	/*std::ifstream is ("index.html", std::ifstream::binary);
 	if (!is)
 	{
 		clear_fd();
@@ -182,20 +183,23 @@ void Server::pseudoReponse(std::string request, int fd) //destinee a etre suprim
 	ss << length;
 	std::string lenstr= ss.str();
 	is.read (b,length);
-	std::string bufStr(b);
-	Request Req(request);
-	std::string goodresponse = "HTTP/1.1 200 ok\nContent-Type: text/html\nContent-Length: " + lenstr +"\n\n" + bufStr;
-	free(b);
-	char badrequest[1024] = {"HTTP/1.1 400 Bad Request\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Bad Request</TITLE></HEAD><BODY>\r\n<H1>Bad Request</H1>\r\n</BODY></HTML>\r\n\r\n"};
-	char badresponse[1024] = {"HTTP/1.1 404 Not Found\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Not Found</TITLE></HEAD><BODY>\r\n<H1>Not Found</H1>\r\n</BODY></HTML>\r\n\r\n"};
-		
-		
-		if (Req.getMethod() != "GET")	
+	std::string bufStr(b);*/
+	Request marco(request);
+	//std::string goodresponse = "HTTP/1.1 200 ok\nContent-Type: text/html\nContent-Length: " + lenstr +"\n\n" + bufStr;
+	//free(b);
+	//char badrequest[1024] = {"HTTP/1.1 400 Bad Request\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Bad Request</TITLE></HEAD><BODY>\r\n<H1>Bad Request</H1>\r\n</BODY></HTML>\r\n\r\n"};
+	//char badresponse[1024] = {"HTTP/1.1 404 Not Found\r\n\r\n<HTML><HEAD><meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\r\n<TITLE>Not Found</TITLE></HEAD><BODY>\r\n<H1>Not Found</H1>\r\n</BODY></HTML>\r\n\r\n"};
+	
+	//std::string the_page = marcho.buildfile();
+	Response polo(marco, 200);
+	std::string the_reply = polo.getReply();
+	send(fd, the_reply.c_str(), the_reply.length(), 0);
+		/*if (Req.getMethod() != "GET")	
 			send(fd, badrequest, strlen(badrequest), 0);	
 		else if (Req.getPath() == "/" || Req.getPath() == "/index.html")
 			send(fd, goodresponse.c_str(), strlen(goodresponse.c_str()), 0);
 		else
-			send(fd, badresponse, strlen(badresponse), 0);
+			send(fd, badresponse, strlen(badresponse), 0);*/
 } //fin de la fonction  a supprimer quand Response sera faite
 
 int Server::getListen() const

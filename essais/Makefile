@@ -1,6 +1,7 @@
 THE_SOURCE = 	main.cpp \
 				manageServer/Server.cpp \
 				manageServer/AllServers.cpp \
+				response/Response.cpp \
 				request/Request.cpp \
 				tools/tools.cpp \
 				parseConfig/parseConfig.cpp \

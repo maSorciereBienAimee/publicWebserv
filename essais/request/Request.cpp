@@ -1,5 +1,10 @@
 #include "Request.hpp"
 
+Request::Request(void) : _orig_req("")
+{
+    return;
+}
+
 Request::Request(const std::string& str) : _orig_req(str)
 {
 	this->parse(str);

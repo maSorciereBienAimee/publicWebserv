@@ -9,6 +9,7 @@
 class Request
 {
 		public:
+			Request(void);
 			Request(const std::string& str);
 			~Request();
 			Request&	operator=(const Request&);
@@ -33,6 +34,7 @@ class Request
 
 			/*** FUNCTIONS ****/
 			void		parse(const std::string& str);
+
 
             private:
 

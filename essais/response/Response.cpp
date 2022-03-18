@@ -1,39 +1,85 @@
 #include "Response.hpp"
+#include <iostream>
+#include <string>
+#include "../manageServer/Server.hpp"
+#include <sys/stat.h>
 
-Response::Response(void) {}
-
-Response::Response(Request R, Config C, int F) : request(R), fd(F), config(C)
+Response::Response(void) 
 {
-	initDefaultError();
+	return;
 }
 
-Response::~Response() {}
-
-Response::launch()
+//(peut etre on va avoir besoin plus tard):,config(C), fd(F)
+Response::Response(Request R, int F) : request(R)
 {
-	std::reponse;
-
-	if (this->request.method == "GET")
-		reponse = responseGet();
-	if (this->request.method == "DELETE")
-		reponse = responseGet();
-	if (this->request.method == "POST")
-		reponse = responseGet();
-	send(fd, reponse, strlen(reponse), 0);
+	initErrors();
+	launch();
+	return;
 }
 
-void getHeader(int size)
+Response::~Response() 
 {
-	std::stringstream ss;
-	ss << length;
-	std::string lenstr= ss.str();
+	return;
+}
+
+void Response::launch()
+{
+	std::string reponse;
+
+	if (this->request.getMethod() == "GET")
+		_get(request);
+	else if (this->request.getMethod() == "DELETE")
+		_delete(request.getPath());
+	else if (this->request.getMethod() == "POST")
+		_post(request);
+	setHeaders();
+}
+
+std::string Response::getReply()
+{
+	std::string reply = _header + "\r\n\r\n" + this->body;
+	std::cout << "REPLY IS:\n" << reply << std::endl;
+	return (reply);
+}
+
+void    Response::_delete(std::string path)
+{
+    struct stat check;
+
+	path.erase(path.begin(), path.begin() + 1);
+	status = 200;
+	if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+    {
+        if (remove(path.c_str()) == 0)
+		{
+		   std::pair<std::string, std::string> p1("optiona_header_check", "WORKING");
+		   this->extra_headers.insert(p1);
+           status = 200;
+		   readIn("deleted_200.html");
+		   return;
+		}
+    }
+	status = 403;
+	readIn("file_not_found.html");
+	return;
+}
+
+void Response::setHeaders()
+{
+	std::map<std::string, std::string>::iterator it = this->extra_headers.begin();
+	this->_header = "HTTP/1.1 ";
+	_header += (errors[this->status]) + "\n";
+	_header += "server: DreamTeamServer/1.0\n";
+	for (int i = 0; i < this->extra_headers.size(); i++)
+	{
+		_header += (it->first + ": " + it->second + "\n");
+		it++;
+	}
+	_header += "Content-Length: " + body_len;
 	
-	std::string header = "HTTP/1.1 " + this->errors[this->status] + "\n";
-   header += "Content-Type: " + this->type + "\n"; // ?? ou recuperer
-	header += "Content-Length: " + lenstr;
 }
 
-int getBody()
+/*int Response::getBody()
 {
 	std::ifstream is (this->request.getPath(), std::ifstream::binary);
 	if (!is)
@@ -49,21 +95,49 @@ int getBody()
 	b[length] = '\0';
 	is.read (b,length);
 	std::string bufStr(b);
-	this->body = bufstr;
+	this->body = bufStr;
 	return (length)	
-}
+}*/
 
-std::string responseGet()
+void Response::readIn(std::string file)
 {
-	std::string response;
-	int sizeBody = getBody();
-	getHeaders(sizeBody);
-	response = this->header + "\r\n\r\n" + this->body;
-	return (response);
+	std::ifstream is (file, std::ifstream::binary);
+	if (!is)
+	{
+		this->status = 400;
+		this->body = "";
+		return;
+	}
+	is.seekg (0, is.end);
+	int length = is.tellg();
+	is.seekg (0, is.beg);
+	char * b = (char *)malloc(sizeof(char) * (length + 1));
+	b[length] = '\0';
+	std::stringstream ss;
+	ss << length;
+	this->body_len = ss.str();
+	is.read (b,length);
+	std::string bufStr(b);
+	this->body = bufStr;
+	
+}
+
+void Response::_get(Request R)
+{
+	(void)R;
+	this->status = 200;
+	readIn("index.html");
+}
+
+void Response::_post(Request R)
+{
+	(void)R;
+	status = 200;
+	readIn("index.html");
 }
 
 
-void initErrors()
+void Response::initErrors()
 {
 	errors[100] = "100 Continue";
 	errors[101] = "101 Switching Protocols";
