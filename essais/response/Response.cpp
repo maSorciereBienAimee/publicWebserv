@@ -32,6 +32,8 @@ void Response::launch()
 		_delete(request.getPath());
 	else if (this->request.getMethod() == "POST")
 		_post(request);
+	if (status != 200) //peut etre a changer si on utilise d'autres code 2xx
+		setBody();
 	setHeaders();
 }
 
@@ -61,7 +63,6 @@ void    Response::_delete(std::string path)
     }
 	status = 403;
 	this->body_message = "file_not_found.html";
-	setBody();
 	return;
 }
 
@@ -89,7 +90,9 @@ void Response::setBody()
 	this->body = "<!DOCTYPE html>\n<html><style>\nhtml {\ndisplay: table;\nmargin: auto;\n}\n</style>\n<body>\n<h1>";
 	this->body += (code + " " + body_message);
  	this->body += "</h1>\n<img src='https://ih1.redbubble.net/image.3330216512.5449/st,small,507x507-pad,600x600,f8f8f8.jpg'></body>\n</html>";
-	this->body_len = body.length();
+	std::stringstream conv2;
+	conv2 << body.length();
+	this->body_len = conv2.str();
 }
 
 void Response::readIn(std::string file)
@@ -118,13 +121,13 @@ void Response::readIn(std::string file)
 
 void Response::_get(Request R)
 {
+	status = 200;
 	if (R.getPath() != "")
 	{
 		struct stat check;
 
 		std::string path = R.getPath();
 		path.erase(path.begin(), path.begin() + 1);
-		status = 200;
 		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     	{
 			this->status = 200;
@@ -134,7 +137,6 @@ void Response::_get(Request R)
 		{
 			this->status = 404;
 			this->body_message = "File not found";
-			setBody();
 		}
 	}
 	else //no file specified so home page??
