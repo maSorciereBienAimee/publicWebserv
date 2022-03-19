@@ -60,7 +60,8 @@ void    Response::_delete(std::string path)
 		}
     }
 	status = 403;
-	readIn("file_not_found.html");
+	this->body_message = "file_not_found.html";
+	setBody();
 	return;
 }
 
@@ -76,28 +77,20 @@ void Response::setHeaders()
 		it++;
 	}
 	_header += "Content-Length: " + body_len;
-	
 }
 
-/*int Response::getBody()
+void Response::setBody()
 {
-	std::ifstream is (this->request.getPath(), std::ifstream::binary);
-	if (!is)
-	{
-		this->status = 400; // ou selon l'erreur
-		this->body = "";
-		return (-1);
-	}
-	is.seekg (0, is.end);
-	int length = is.tellg();
-	is.seekg (0, is.beg);
-	char * b = (char *)malloc(sizeof(char) * (length + 1));
-	b[length] = '\0';
-	is.read (b,length);
-	std::string bufStr(b);
-	this->body = bufStr;
-	return (length)	
-}*/
+	std::string code;
+	std::stringstream conv;
+	conv << status;
+	code = conv.str();
+
+	this->body = "<!DOCTYPE html>\n<html><style>\nhtml {\ndisplay: table;\nmargin: auto;\n}\n</style>\n<body>\n<h1>";
+	this->body += (code + " " + body_message);
+ 	this->body += "</h1>\n<img src='https://ih1.redbubble.net/image.3330216512.5449/st,small,507x507-pad,600x600,f8f8f8.jpg'></body>\n</html>";
+	this->body_len = body.length();
+}
 
 void Response::readIn(std::string file)
 {
@@ -106,6 +99,7 @@ void Response::readIn(std::string file)
 	{
 		this->status = 400;
 		this->body = "";
+		setBody();
 		return;
 	}
 	is.seekg (0, is.end);
@@ -124,9 +118,31 @@ void Response::readIn(std::string file)
 
 void Response::_get(Request R)
 {
-	(void)R;
-	this->status = 200;
-	readIn("index.html");
+	if (R.getPath() != "")
+	{
+		struct stat check;
+
+		std::string path = R.getPath();
+		path.erase(path.begin(), path.begin() + 1);
+		status = 200;
+		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+    	{
+			this->status = 200;
+			readIn("index.html");
+		}
+		else
+		{
+			this->status = 404;
+			this->body_message = "File not found";
+			setBody();
+		}
+	}
+	else //no file specified so home page??
+	{
+		this->status = 200;
+		readIn("index.html");
+	}
+	
 }
 
 void Response::_post(Request R)

@@ -21,7 +21,8 @@ class Response
 	
 	private :
 	
-	std::string _header; 
+	std::string _header;
+	std::string body_message;
 	std::string body;
 	std::string body_len;
 	std::string reply;
