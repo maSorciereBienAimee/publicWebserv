@@ -122,8 +122,9 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
-	if (R.getPath() != "")
+	if (R.getPath() != "/")
 	{
+		std::cout << "PATH IS" << R.getPath() << std::endl;
 		struct stat check;
 
 		std::string path = R.getPath();
