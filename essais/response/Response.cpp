@@ -12,6 +12,9 @@ Response::Response(void)
 //(peut etre on va avoir besoin plus tard):,config(C), fd(F)
 Response::Response(Request R, int F) : request(R)
 {
+	if (F == 400)
+		this->body_message = "Bad request";
+	status = F;
 	initErrors();
 	launch();
 	return;
@@ -25,21 +28,29 @@ Response::~Response()
 void Response::launch()
 {
 	std::string reponse;
-
-	if (this->request.getMethod() == "GET")
-		_get(request);
-	else if (this->request.getMethod() == "DELETE")
-		_delete(request.getPath());
-	else if (this->request.getMethod() == "POST")
-		_post(request);
-	if (status != 200) //peut etre a changer si on utilise d'autres code 2xx
+	if (status == 200)
+	{
+		if (this->request.getMethod() == "GET")
+			_get(request);
+		else if (this->request.getMethod() == "DELETE")
+			_delete(request.getPath());
+		else if (this->request.getMethod() == "POST")
+			_post(request);
+		else
+			_other(request);
+	}
+	//200 has index page and others have no body
+	if (status != 200 && status != 404 && status != 304 && !(status > 99 && status < 200)) //peut etre a changer si on utilise d'autres code 2xx
 		setBody();
 	setHeaders();
 }
 
 std::string Response::getReply()
 {
-	std::string reply = _header + "\r\n\r\n" + this->body;
+	std::string reply = _header;
+	//THESE CODES SHOULD NOT INCLUDE BODY... SHOULD THEY INCLUDE THE /r/n/r/n though?
+	if (status != 404 && status != 304 && !(status > 99 && status < 200))
+		reply += "\r\n\r\n" + this->body;
 	std::cout << "REPLY IS:\n" << reply << std::endl;
 	return (reply);
 }
@@ -66,6 +77,13 @@ void    Response::_delete(std::string path)
 	return;
 }
 
+void	Response::_other(Request req)
+{
+	status = 501;
+	this->body_message = "Server does not accept this method";
+	return;
+}
+
 void Response::setHeaders()
 {
 	std::map<std::string, std::string>::iterator it = this->extra_headers.begin();
@@ -77,7 +95,8 @@ void Response::setHeaders()
 		_header += (it->first + ": " + it->second + "\n");
 		it++;
 	}
-	_header += "Content-Length: " + body_len;
+	if (status != 404 && status != 304 && !(status > 99 && status < 200))
+		_header += "Content-Length: " + body_len;
 }
 
 void Response::setBody()

@@ -15,6 +15,7 @@ class Response
 	void setBody();
 	void _get(Request R);
 	void _post(Request R);
+	void _other(Request R);
 	std::string getReply();
 	void readIn(std::string file);
 	void initErrors();

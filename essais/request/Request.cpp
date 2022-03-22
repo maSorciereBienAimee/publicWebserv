@@ -2,11 +2,13 @@
 
 Request::Request(void) : _orig_req("")
 {
+    status = 200;
     return;
 }
 
 Request::Request(const std::string& str) : _orig_req(str)
 {
+    status = 200;
 	this->parse(str);
 }
 
@@ -87,17 +89,22 @@ void Request::parse(const std::string &str)
     while (tmp.find_first_of("\r\n") == 0)
         tmp = tmp.erase(0, 1);
     //COLLECT BODY
-    const std::string con_key = "Content-Length";
+    
     _body = tmp.substr(0, tmp.length() - 4);
+    error_checker();
+    
+    printer();
+}
+
+void Request::error_checker(void)
+{
+    const std::string con_key = "Content-Length";
     //CHECK LENGTH
     if (_headers.find(con_key) != _headers.end())
     {
-        if (_body.length() == (atoi(_headers[con_key].c_str())))
-            std::cout << "Content-Lenght is correct" << std::endl;
-        else
-            std::cout << "TODO: error? Len is: " << (_body.length()) << " Should be: " << (atoi(_headers[con_key].c_str())) << std::endl;
+        if (_body.length() != (atoi(_headers[con_key].c_str())))
+            this->status = 400;
     }
-    printer();
 }
 
 void Request::printer(void)
@@ -131,4 +138,8 @@ std::string const &Request::getMethod() const
 std::string const &Request::getPath() const
 {
 	return (this->_path);
+}
+int const &Request::getStatus() const
+{
+	return (this->status);
 }

@@ -6,7 +6,6 @@ THE_SOURCE = 	main.cpp \
 				tools/tools.cpp \
 				parseConfig/parseConfig.cpp \
 				parseConfig/serverBlock.cpp \
-				parseConfig/serverConf.cpp \
 				parseConfig/serverLocation.cpp \
 				
 SRCS = $(THE_SOURCE)

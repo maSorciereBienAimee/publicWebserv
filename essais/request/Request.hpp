@@ -18,6 +18,8 @@ class Request
 			const std::map<std::string, std::string>&			getHeaders() const;
 			const std::string&									getMethod() const;
 			const std::string&									getPath() const;
+			const int&											getStatus() const;
+			void error_checker(void);
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;
@@ -42,7 +44,8 @@ class Request
             std::string									_method;
 			std::string									_version;
 			std::map<std::string, std::string>			_headers;
-             std::string								_path;
+            std::string									_path;
+			int											status;
 			//std::map<std::string, std::string>			_env_for_cgi;
 			int											_ret;
 			std::string									_body;
