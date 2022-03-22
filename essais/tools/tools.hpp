@@ -17,7 +17,8 @@ namespace tools
 	bool            isSpaces(std::string str);
 	std::string     removeDuplicateSpaces(std::string const &str);
 	unsigned int    strToIp(std::string strIp);
-	
+	bool 			isValidDirectiveLocation(std::string const &dir);
+	bool 			isValidDirective(std::string const &dir);
 }
 
 struct OurExcetpion : public std::exception

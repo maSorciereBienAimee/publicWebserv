@@ -32,6 +32,31 @@ class serverLocation
 		~serverLocation();
 		serverLocation &operator=(const serverLocation &other);
 
+		void	setIndex(std::vector<std::string> const &index);
+		void	setAI(bool autoindex);
+		void	setAuthBasic(bool auth);
+
+		void	setMethods(std::vector<std::string> const &methods);
+		void	setLocationPath(std::string const& path);
+		void	setBody(int size);
+		void	setCgiExt(std::string ext);
+		void	setCgiBin(std::string path);
+		void	setRedir(std::string path);
+		void	setAuthUsrFile(std::string path);
+
+
+		bool						getAI(void) const;
+		bool						getAuthBasic(void) const;
+		std::vector<std::string> 	getIndex(void) const;
+		std::vector<std::string> 	getMethods(void) const;
+		std::string					getLocationPath(void) const;
+		int							getBody(void) const;
+		std::string					getCgiExt(void) const;
+		std::string					getCgiBin(void) const;
+		std::string					getRedir(void) const;
+		std::string					getAuthUsrFile(void) const;
+		
+		
 };
 
 

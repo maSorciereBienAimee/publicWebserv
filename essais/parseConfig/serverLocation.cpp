@@ -26,3 +26,27 @@ serverLocation &serverLocation::operator=(const serverLocation &other) {
 }
 
 serverLocation::~serverLocation(){ return ; }
+
+void						serverLocation::setAI(bool autoindex) { this->_auto_index = autoindex; }
+void						serverLocation::setAuthBasic(bool auth) { this->_auth_basic = auth; }
+void						serverLocation::setIndex(std::vector<std::string> const &index) { this->_index = index; }
+void						serverLocation::setMethods(std::vector<std::string> const &methods) { this->_methods = methods; }
+void						serverLocation::setLocationPath(std::string const& path) {this->_location_path = path; }
+void						serverLocation::setBody(int size) { this->_body_size = size; }
+void						serverLocation::setCgiExt(std::string ext) { this->_cgi_ext = ext; }
+void						serverLocation::setCgiBin(std::string path) { this->_cgi_bin = path; }
+void						serverLocation::setRedir(std::string path) { this->_redirection = path; }
+void						serverLocation::setAuthUsrFile(std::string path) { this->_auth_basic_file = path; }
+
+
+bool						serverLocation::getAI(void) const { return (this->_auto_index); }
+bool						serverLocation::getAuthBasic(void) const { return (this->_auth_basic); }
+std::vector<std::string> 	serverLocation::getIndex(void) const { return (this->_index); } 
+std::vector<std::string> 	serverLocation::getMethods(void) const { return (this->_methods); } 
+std::string					serverLocation::getLocationPath(void) const { return (this->_location_path); }
+int							serverLocation::getBody(void) const { return (this->_body_size); }
+std::string					serverLocation::getCgiExt(void) const { return (this->_cgi_ext); }
+std::string					serverLocation::getCgiBin(void) const { return (this->_cgi_bin); }
+std::string					serverLocation::getRedir(void) const { return (this->_redirection); }
+std::string					serverLocation::getAuthUsrFile(void) const { return (this->_auth_basic_file); }
+

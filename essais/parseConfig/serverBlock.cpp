@@ -4,11 +4,16 @@ serverBlock::serverBlock() : _port(80), _index(), _name(), _host(0) {}
 
 serverBlock::~serverBlock() {}
 
-serverBlock::serverBlock(const serverBlock& cpy) : _port(cpy._port), _index(cpy._index), _name(cpy._name), _host(cpy._host) {}
+serverBlock::serverBlock(const serverBlock& cpy) : _port(cpy._port), _index(cpy._index), _name(cpy._name), _host(cpy._host), _locations(cpy._locations) {}
 
 serverBlock		const & serverBlock::getServerBlock()
 {
 	return (*this);
+}
+
+std::vector<serverLocation> const & 		serverBlock::getLocation()
+{
+	return _locations;
 }
 
 
@@ -18,6 +23,7 @@ serverBlock serverBlock::operator=(const serverBlock& other)
 	_name = other._name;
 	_port = other._port;
 	_index = other._index;
+	_locations = other._locations;
 	return  (*this);
 }
 

@@ -21,17 +21,22 @@ class serverBlock {
 		std::string					_name;
 		uint16_t					_port;
 		std::vector<std::string> 	_index;
-		std::vector<serverLocation>	_locations;
+		// TO DO 
+		std::string					_cgi_ext_s;
+		std::string					_cgi_bin_s;
+		std::string				    _error;
+		std::string				    _server_root;
 
 	public: 
+		std::vector<serverLocation>				_locations;
 
 		serverBlock();
 		~serverBlock();
 		serverBlock(const serverBlock& cpy);
-		serverBlock 				operator=(const serverBlock& other);
-
-		serverBlock	const &				getServerBlock();
-
+		serverBlock 									operator=(const serverBlock& other);
+		serverBlock	const &								getServerBlock();
+		std::vector<serverLocation> const & 			getLocation();
+		
 		void						setHost(const uint32_t host);
 		void						setName(const std::string name);
 		void						setPort(const uint16_t port);
@@ -41,7 +46,7 @@ class serverBlock {
 		std::string					getName(void) const;
 		uint16_t					getPort(void) const;
 		std::vector<std::string> 	getIndex(void) const;
-
+		
 		bool operator==(const serverBlock& other);
 };
 

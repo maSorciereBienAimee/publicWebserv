@@ -12,7 +12,7 @@ THE_SOURCE = 	main.cpp \
 SRCS = $(THE_SOURCE)
 OBJS = $(addprefix ${OBJDIR}/,${SRCS:.cpp=.o})
 
-NAME = ft_containers
+NAME = webserv
 DEPF = -MMD -MP
 DEP = ${OBJS:.o=.d}
 OBJDIR = helper_files

@@ -13,8 +13,6 @@ namespace tools
 		
 	}
 
-	
-
 	bool    isSpaces(std::string str)
 	{
 	
@@ -59,5 +57,22 @@ namespace tools
 		}
 		unsigned final = *(reinterpret_cast<unsigned int *>(m));
 		return final;
-		}
+	}
+
+	bool isValidDirective(std::string const &dir)
+    {
+        if (dir == "index" || dir == "root" || dir == "server_name"
+        || dir == "listen" || dir == "host" || dir == "error"
+        || dir == "cgi_extension" || dir == "cgi_bin")
+            return (true);
+        return (false);
+    }
+    bool isValidDirectiveLocation(std::string const &dir)
+    {
+        if (dir == "index" || dir == "methods" || dir == "cgi_extension"
+        || dir == "cgi_bin" || dir == "language" || dir == "autoindex" || dir == "root"
+        || dir == "client_max_body_size" || dir == "auth_basic" || dir == "auth_basic_user_file" || dir == "redirection")
+            return (true);
+        return (false);
+    }
 }

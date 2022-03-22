@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <sstream>
 #include <fstream>
+#include <algorithm>
 #include "../tools/tools.hpp"
 #include "serverBlock.hpp"
 
@@ -27,7 +28,8 @@ class parseConfig  {
 	std::vector<std::string>    parseLine(std::string line, std::vector<std::string> content);
 	void						setServers(std::vector<std::string> &content, std::vector<serverBlock> &servers);
 	void 						setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers);
-	
+	std::string	 				parsingPath(std::string str);
+
 	
 	/******_____SERVER BLOCK PARSING______******/
 	void						setServerConfig(std::string const &line, serverBlock &server);
@@ -40,7 +42,8 @@ class parseConfig  {
 	std::string					parseLocationPath(std::string const& path);
 	void						setLocationBlock(IT start, IT end, serverBlock &server, std::string path);
 	void						setLocationConfig(std::string &line, serverLocation &location, serverBlock &server);
-	int							getValuesLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
+	int							getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
+	void 						getValuesLocationBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server, serverLocation &location);
 
 	private:
 
@@ -56,7 +59,16 @@ class parseConfig  {
 
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM LOCATION BLOCK______******/
    
-
+	void						parseAndSetAILoc(std::string &value, serverLocation &location);
+	void						parseAndSetMethodsLoc(std::string &value, serverLocation &location);
+	void						parseAndSetRootLoc(std::string &value, serverLocation &location);
+	void						parseAndSetCgiExtLoc(std::string &value, serverLocation &location);
+	void						parseAndSetCgiBinLoc(std::string &value, serverLocation &location);
+	void						parseAndSetRedirLoc(std::string &value, serverLocation &location);
+	void						parseAndSetIndexLoc(std::string &value, serverLocation &location);
+	void						parseAndSetAuthLoc(std::string &value, serverLocation &location);
+	void						parseAndSetAuthUsrLoc(std::string &value, serverLocation &location);
+	void						parseAndSetBodyLoc(std::string &value, serverLocation &location);
 };
 
 
