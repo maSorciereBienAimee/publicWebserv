@@ -13,6 +13,30 @@ namespace tools
 		
 	}
 
+	void    printLocationBlock(std::vector<serverLocation> content)
+	{
+		std::vector<serverLocation>::iterator it;
+		std::cout << "_____LocationBlock IS______\n";
+		for (it = content.begin(); it != content.end(); it++)
+		{
+			std::cout<< "LOCATION PATH LOC : " << (*it).getLocationPath() << "\n";
+			std::cout<< "BODY SIZE LOC : " << (*it).getBody() << "\n";
+			std::cout<< "AUTOINDEX LOC : " << (*it).getAI() << "\n";
+			std::cout<< "AUTH BASIC LOC : " << (*it).getAuthBasic() << "\n";
+			std::cout<< "AUTH USER FILE LOC : " << (*it).getAuthUsrFile() << "\n";
+			std::cout<< "CGIEXT LOC : " << (*it).getCgiExt() << "\n";
+			std::cout<< "CGIBIN LOC : " << (*it).getCgiBin() << "\n";
+			std::cout<< "REDIRECTION LOC : " << (*it).getRedir() << "\n";
+			std::cout<< "ROOT LOC : " << (*it).getRootLoc() << "\n";
+			std::cout<< "INDEX content : \n";
+			printVector((*it).getIndex());
+			std::cout<< "METHODS content : \n";
+			printVector((*it).getMethods());
+
+		}
+		std::cout << "___________\n";		
+}
+
 	bool    isSpaces(std::string str)
 	{
 	

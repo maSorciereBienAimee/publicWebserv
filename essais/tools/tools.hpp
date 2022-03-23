@@ -7,6 +7,10 @@
 #include <vector>
 #include <sstream>
 #include <limits>
+#include "../parseConfig/parseConfig.hpp"
+#include "../parseConfig/serverLocation.hpp"
+#include "../parseConfig/serverBlock.hpp"
+
 
 
 
@@ -14,6 +18,7 @@ namespace tools
 {
 	 //just for help
 	void            printVector(std::vector<std::string> content);
+	void    		printLocationBlock(std::vector<serverLocation> content);
 	bool            isSpaces(std::string str);
 	std::string     removeDuplicateSpaces(std::string const &str);
 	unsigned int    strToIp(std::string strIp);

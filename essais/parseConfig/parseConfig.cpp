@@ -19,18 +19,6 @@ void	parseConfig::commonParsingValues(std::string &value)
 //	std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
 }
 
-// std::string	parseConfig::parsingPath(std::string str)
-// {
-// 	size_t 			i = 0;
-// 	std::string 	path;
-
-//     std::string::iterator end_pos = std::remove(str.begin(), str.end(), ' ');
-// 	str.erase(end_pos, str.end());
-// 	std::cout << "STR PATH  ["<< str << "]\n";
-// 	return (path);
-// }
-
-
 /******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******
 / * 			DON'T FORGET TO PUT VALUE IN CONST						*/
 
@@ -41,6 +29,10 @@ void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 	for (int i = 0; value[i]; i++)
 		if (!isdigit(value[i]))
 			throw OurExcetpion("ERROR: PORT: only digit value expected");
+
+	server.setPortStr(value);
+	//std::cout << "PORT STR value in serverblock is [" << server.getPortStr() << "]\n"; 
+
 	val = atoi(value.c_str());
 	if (val < 0 || val > 65535)
 		throw OurExcetpion("ERROR: PORT: range [0 - 65535] expected");
@@ -93,7 +85,7 @@ void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
 	commonParsingValues(value);
 	for (int i = 0; value[i]; i++)
 		if (isspace(value[i]))
-			throw OurExcetpion("ERROR: NAME: [string] expected");
+			throw OurExcetpion("ERROR: SERVER NAME: [string] expected");
 	server.setName(value);
 	//std::cout << "NAME value in serverblock is [" << server.getName() << "]\n"; 
 }
@@ -109,6 +101,7 @@ void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 	commonParsingValues(value);
 	if (value == "localhost")
 	{
+		server.setHostStr(value);
 		unsigned int val = 	tools::strToIp(value);
 		server.setHost(val);
 		return ;
@@ -146,41 +139,84 @@ void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 	}
 	if (count != 4)
 			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected");
+	server.setHostStr(value);
+	//std::cout << "HOST STR value in serverblock is [" << server.getHostStr() << "]\n"; 
+
 	//CCLAUDE FT to convert str in IP 
 	unsigned int val = 	tools::strToIp(value);
 	server.setHost(val);
 	//std::cout << "HOST value in serverblock is [" << server.getHost() << "]\n"; 
 }
 
+void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurExcetpion("ERROR: server block :root server one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setRootServer(value);
+	//std::cout << "ROOT SERVER = [" << server.getRootServer() << "]\n";
+
+}
+
 void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
 {
-	// commonParsingValues(value);
-	// size_t i = 0;
-    // std::string extension;
-	// while (value[i])
-	// {
-	// 	if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-	// 		throw OurExcetpion("ERROR: location block : cgi_extension, one argument expected");
-	// 	i++;
-	// }
-	// i = 0;
-    // for (; i < value.size() && !isspace(value[i]); i++)
-    //     extension += value[i];
-	// server.setCgiExt(extension);
-	// std::cout << "LOCATION CGI_EXT = [" << location.getCgiExt() << "]\n";
+	commonParsingValues(value);
+	size_t i = 0;
+    std::string extension;
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurExcetpion("ERROR: server block : cgi_extension, one argument expected");
+		i++;
+	}
+	i = 0;
+    for (; i < value.size() && !isspace(value[i]); i++)
+        extension += value[i];
+	server.setCgiExt(extension);
+	//std::cout << "SERVER CGI_EXT = [" << server.getCgiExt() << "]\n";
 	
 }
 
 void	parseConfig::parseAndSetCgiBin(std::string &value, serverBlock &server)
 {
-	commonParsingValues(value);
+	int i = 0;
 
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurExcetpion("ERROR: server block : cgi_bin one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setCgiBin(value);
+	//std::cout << "CGI_BIN SERVER = [" << server.getCgiBin() << "]\n";(value);
 }
 
 void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
 {
+	int i = 0;
+
 	commonParsingValues(value);
-	
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurExcetpion("ERROR: server block : error one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setError(value);
+	//std::cout << "ERROR = [" << server.getError() << "]\n";
 }
 
 /******_____ IN SERVER BLOCK______*******/
@@ -233,6 +269,8 @@ void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std
 		parseAndSetCgiBin(value, server);
 	else if (attribut.compare("error ") == 0)
 		parseAndSetError(value, server);
+	else if (attribut.compare("root ") == 0)
+		parseAndServerRoot(value, server);
 }
 
 int		parseConfig::getAttributName(std::string const &line, std::string &attribut, std::string& value, serverBlock &server)
@@ -305,7 +343,7 @@ void	parseConfig::parseAndSetAILoc(std::string &value, serverLocation &location)
 	else
 		throw OurExcetpion("ERROR : location block : autoindex  'on' or 'off' expected");
 
-	std::cout << "AUTOINDEX value in locationblock is [" << location.getAI() << "]\n"; 
+	//std::cout << "AUTOINDEX value in locationblock is [" << location.getAI() << "]\n"; 
 }
 
 void	parseConfig::parseAndSetMethodsLoc(std::string &value, serverLocation &location)
@@ -375,8 +413,8 @@ void	parseConfig::parseAndSetRootLoc(std::string &value, serverLocation &locatio
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
-	location.setLocationPath(value);
-	//std::cout << "LOCATION PATH = [" << location.getLocationPath() << "]\n";
+	location.setRootLoc(value);
+	//std::cout << "LOCATION PATH = [" << location.getRootLoc() << "]\n";
 }
 
 void	parseConfig::parseAndSetCgiExtLoc(std::string &value, serverLocation &location)
@@ -394,7 +432,7 @@ void	parseConfig::parseAndSetCgiExtLoc(std::string &value, serverLocation &locat
     for (; i < value.size() && !isspace(value[i]); i++)
         extension += value[i];
 	location.setCgiExt(extension);
-	std::cout << "LOCATION CGI_EXT = [" << location.getCgiExt() << "]\n";
+	//std::cout << "LOCATION CGI_EXT = [" << location.getCgiExt() << "]\n";
 }
 void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &location)
 {
@@ -410,7 +448,7 @@ void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &locat
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
 	location.setCgiBin(value);
-	std::cout << "LOCATION CGI_BIN = [" << location.getCgiBin() << "]\n";
+//	std::cout << "LOCATION CGI_BIN = [" << location.getCgiBin() << "]\n";
 
 
 }
@@ -422,13 +460,13 @@ void	parseConfig::parseAndSetRedirLoc(std::string &value, serverLocation &locati
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : CGI_BIN one path expected");
+			throw OurExcetpion("ERROR: location block : redirection one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
 	location.setRedir(value);
-	std::cout << "LOCATION REDIRECTION = [" << location.getRedir() << "]\n";
+	//std::cout << "LOCATION REDIRECTION = [" << location.getRedir() << "]\n";
 
 
 }
@@ -465,8 +503,8 @@ void	parseConfig::parseAndSetAuthLoc(std::string &value, serverLocation &locatio
 	else if (value == "off")
 		location.setAuthBasic(false);
 	else
-		throw OurExcetpion("ERROR : location block : autoindex  'on' or 'off' expected");
-	std::cout << "AUTH BASIC value in locationblock is [" << location.getAuthBasic() << "]\n"; 
+		throw OurExcetpion("ERROR : location block : Auth Basic  'on' or 'off' expected");
+//	std::cout << "AUTH BASIC value in locationblock is [" << location.getAuthBasic() << "]\n"; 
 	
 
 }
@@ -478,13 +516,13 @@ void	parseConfig::parseAndSetAuthUsrLoc(std::string &value, serverLocation &loca
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : CGI_BIN one path expected");
+			throw OurExcetpion("ERROR: location block : Auth User File one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
 	location.setAuthUsrFile(value);
-	std::cout << "LOCATION AUTH_USER_FILE = [" << location.getAuthUsrFile() << "]\n";
+	//std::cout << "LOCATION AUTH_USER_FILE = [" << location.getAuthUsrFile() << "]\n";
 }
 void	parseConfig::parseAndSetBodyLoc(std::string &value, serverLocation &location)
 {
@@ -502,7 +540,7 @@ void	parseConfig::parseAndSetBodyLoc(std::string &value, serverLocation &locatio
 	}
 	int val = ::atoi(value.c_str());
 	location.setBody(val);
-	std::cout << "BODY SIZE = [" << location.getBody() << "]\n"; 
+	//std::cout << "BODY SIZE = [" << location.getBody() << "]\n"; 
 }
 
 void 	parseConfig::getValuesLocationBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server, serverLocation &location)
@@ -590,9 +628,11 @@ void	parseConfig::setLocationConfig(std::string &line, serverLocation &location,
 	posEnd = getAttsLocation(line, attributName, value, server, location);
 }
 
-void	parseConfig::setLocationBlock(IT start, IT end, serverBlock &server, std::string path)
+void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std::string path)
 {
 	serverLocation location;
+
+	//std::string locPath = parseLocationPath(path);
 	for (; start != end;)
 	{
 		if (isServerBlock(*start) || isLocationBlock(*start))
@@ -602,15 +642,15 @@ void	parseConfig::setLocationBlock(IT start, IT end, serverBlock &server, std::s
             start++;
 	}
 	
-    // for (Locations::const_iterator it = server._locations.begin(); it != server._locations.end(); it++)
-    //     if (it->get_location_path() == location_path)
-    //         throw MyException("Directive: 'location' : duplicate symbols");
+    for (std::vector<serverLocation>::const_iterator it = server._locations.begin(); it != server._locations.end(); it++)
+        if (it->getLocationPath() == path)
+            throw OurExcetpion("Directive: 'location' : duplicate symbols");
 
         
-    // location.set_location_path(location_path);
+    // location.setLocationPath(path);
 
-    server._locations.push_back(location);
-	std::cout << "GET LOCATION\n";
+    // server._locations.push_back(location);
+	//tools::printLocationBlock(server._locations);
 }
 
 

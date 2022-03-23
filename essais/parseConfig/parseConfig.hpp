@@ -11,8 +11,12 @@
 #include <algorithm>
 #include "../tools/tools.hpp"
 #include "serverBlock.hpp"
+#include "serverLocation.hpp"
 
 #define IT std::vector<std::string>::iterator
+
+class serverBlock;
+class serverLocation;
 
 class parseConfig  {
 
@@ -40,7 +44,7 @@ class parseConfig  {
 	/******_____LOCATION BLOCK PARSING______******/
 	bool 						isLocationBlock(std::string const &line);
 	std::string					parseLocationPath(std::string const& path);
-	void						setLocationBlock(IT start, IT end, serverBlock &server, std::string path);
+	void						setLocationBlock(IT &start, IT &end, serverBlock &server, std::string path);
 	void						setLocationConfig(std::string &line, serverLocation &location, serverBlock &server);
 	int							getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
 	void 						getValuesLocationBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server, serverLocation &location);
@@ -56,6 +60,7 @@ class parseConfig  {
 	void						parseAndSetCgiExt(std::string &value, serverBlock &server);
 	void						parseAndSetCgiBin(std::string &value, serverBlock &server);
 	void						parseAndSetError(std::string &value, serverBlock &server);
+	void						parseAndServerRoot(std::string &value, serverBlock &server);
 
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM LOCATION BLOCK______******/
    

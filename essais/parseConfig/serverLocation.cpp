@@ -37,6 +37,7 @@ void						serverLocation::setCgiExt(std::string ext) { this->_cgi_ext = ext; }
 void						serverLocation::setCgiBin(std::string path) { this->_cgi_bin = path; }
 void						serverLocation::setRedir(std::string path) { this->_redirection = path; }
 void						serverLocation::setAuthUsrFile(std::string path) { this->_auth_basic_file = path; }
+void						serverLocation::setRootLoc(std::string path) { this->_root = path; }
 
 
 bool						serverLocation::getAI(void) const { return (this->_auto_index); }
@@ -49,4 +50,5 @@ std::string					serverLocation::getCgiExt(void) const { return (this->_cgi_ext);
 std::string					serverLocation::getCgiBin(void) const { return (this->_cgi_bin); }
 std::string					serverLocation::getRedir(void) const { return (this->_redirection); }
 std::string					serverLocation::getAuthUsrFile(void) const { return (this->_auth_basic_file); }
+std::string					serverLocation::getRootLoc(void) const { return (this->_root); }
 

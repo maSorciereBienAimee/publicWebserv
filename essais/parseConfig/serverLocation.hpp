@@ -5,6 +5,9 @@
 #include <string>
 #include <iostream>
 #include "../tools/tools.hpp"
+#include "parseConfig.hpp"
+#include "serverBlock.hpp"
+
 
 class serverLocation
 {
@@ -17,7 +20,7 @@ class serverLocation
 		std::string					_root;
 		std::string					_cgi_ext;
 		std::string					_cgi_bin;
-		std::string				    _language;
+		std::string				    _language; //not implemented
 		std::string				    _auth_basic_file;
 		std::string				    _location_path;
 		bool      			    	_auto_index;
@@ -43,6 +46,7 @@ class serverLocation
 		void	setCgiBin(std::string path);
 		void	setRedir(std::string path);
 		void	setAuthUsrFile(std::string path);
+		void	setRootLoc(std::string path);
 
 
 		bool						getAI(void) const;
@@ -55,6 +59,7 @@ class serverLocation
 		std::string					getCgiBin(void) const;
 		std::string					getRedir(void) const;
 		std::string					getAuthUsrFile(void) const;
+		std::string					getRootLoc(void) const;
 		
 		
 };

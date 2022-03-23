@@ -9,6 +9,8 @@ int main(int argc, char **argv)
 {
 	parseConfig confFile;
 	std::vector<serverBlock> servers;
+	//std::vector<serverLocation> locations;
+
 
 	if (argc != 2)
 	{
