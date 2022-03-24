@@ -647,9 +647,9 @@ void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std:
             throw OurExcetpion("Directive: 'location' : duplicate symbols");
 
         
-    // location.setLocationPath(path);
+    location.setLocationPath(path);
 
-    // server._locations.push_back(location);
+    server._locations.push_back(location);
 	//tools::printLocationBlock(server._locations);
 }
 

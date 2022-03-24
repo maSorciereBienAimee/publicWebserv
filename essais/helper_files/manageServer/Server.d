@@ -8,7 +8,8 @@ helper_files/manageServer/Server.o: manageServer/Server.cpp \
   manageServer/../parseConfig/../tools/../parseConfig/serverBlock.hpp \
   manageServer/../request/Request.hpp manageServer/../tools/tools.hpp \
   manageServer/../response/Response.hpp \
-  manageServer/../response/../request/Request.hpp
+  manageServer/../response/../request/Request.hpp \
+  manageServer/../tools//tools.hpp
 
 manageServer/Server.hpp:
 
@@ -33,3 +34,5 @@ manageServer/../tools/tools.hpp:
 manageServer/../response/Response.hpp:
 
 manageServer/../response/../request/Request.hpp:
+
+manageServer/../tools//tools.hpp:

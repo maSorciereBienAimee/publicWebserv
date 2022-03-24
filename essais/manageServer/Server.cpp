@@ -1,6 +1,7 @@
 #include "Server.hpp"
 #include <iostream>
 #include "../response/Response.hpp"
+#include "../tools//tools.hpp"
 
 Server::Server()
 {
@@ -10,12 +11,9 @@ Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
 	this->infoConfig = block;
-	std::vector<serverLocation> locate = block.getLocation();
+	std::vector<serverLocation> locate;
 	std::cout << "yo, les locations sont " << std::endl;
-	for (std::vector<serverLocation>::iterator it = locate.begin(); it != locate.end(); it++)
-	{
-		std::cout << it->getLocationPath() << std::endl;
-	}
+	tools::printLocationBlock(block.getLocation());
 }
 
 Server::~Server()
