@@ -30,7 +30,7 @@ Request&	Request::operator=(const Request& copy)
         i++;
         it++;
     }
-    
+
 	return *this;
 }
 
@@ -39,13 +39,17 @@ const std::map<std::string, std::string> &Request::getHeaders(void) const
     return (_headers);
 }
 
-void Request::parse(const std::string &str)
+int Request::parseRequestLine(const std::string &str)
 {
     /*** LINE1 PARSING ***/
-    std::string line;
-    int end = str.find_first_of('\r');
-    //COLLECT FIRST LINE ONLY
-    line = str.substr(0, end);
+    std::string line = "";
+    int end = 0;
+    while (line.length() == 0) //IGNORE IF EMPTY LINES b4 FIRST LINE AS PER RFC RECOMMENDATION
+    {
+        end = str.find_first_of('\r');
+        //COLLECT FIRST LINE ONLY
+        line = str.substr(0, end);
+    }
     int break_1 = line.find_first_of(' ');
     //METHOD IS FROM 0 UNTIL FIRST SPACE
     _method = line.substr(0, break_1);
@@ -58,8 +62,11 @@ void Request::parse(const std::string &str)
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);
-    
-    
+	return end;
+}
+
+std::string Request::parseHeaders(const std::string &str, int end)
+{
     /*** HEADERS ***/
     std::string tmp = str;
     std::string key;
@@ -81,16 +88,24 @@ void Request::parse(const std::string &str)
         _headers.insert(tmp_pair);
         tmp = tmp.erase(0, ptr_end + 1);
         ptr_end = tmp.find_first_of('\n');
-        
+
     }
+    return tmp;
+}
+
+void Request::parse(const std::string &str)
+{
+	int ref = 0;
+    std::string tmp;
+    ref = parseRequestLine(str);
+    tmp = parseHeaders(str, ref);
     //SKIP OVER EMPTY LINES
     while (tmp.find_first_of("\r\n") == 0)
         tmp = tmp.erase(0, 1);
     //COLLECT BODY
-    
     _body = tmp.substr(0, tmp.length() - 4);
     error_checker();
-    
+    //TMP:PRINTER
     printer();
 }
 

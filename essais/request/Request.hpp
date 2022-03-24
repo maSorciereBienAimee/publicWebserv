@@ -19,6 +19,8 @@ class Request
 			const std::string&									getPath() const;
 			const int&											getStatus() const;
 			void error_checker(void);
+			int parseRequestLine(const std::string & str);
+			std::string parseHeaders(const std::string &str, int end);
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;
