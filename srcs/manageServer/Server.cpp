@@ -9,6 +9,7 @@ Server::Server()
 }
 Server::Server(serverBlock block)
 {
+	tools::printServerBlock(block);
 	this->listenfd = -1;
 	this->infoConfig = block;
 }
@@ -182,7 +183,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 //	myCgi.init(marco, infoConfig);
 
 	std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
-
+	tools::printServerBlock(infoConfig);
 	Response polo(marco, status, myCgi);
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);

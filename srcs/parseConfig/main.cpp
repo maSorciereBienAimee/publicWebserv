@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 		{
 			confFile.parsing(argv[1], servers);
 		}
-		catch(const OurExcetpion& e)
+		catch(const OurException& e)
 		{
 			std::cerr << e.what() << '\n';
 		}	

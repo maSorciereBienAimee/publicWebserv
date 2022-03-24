@@ -23,7 +23,7 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
         {
                 config.parsing(path, this->serverBlocks);                                      //launch parsing of the config file and stock data of each server in a vector<serverBlock>
         }
-        catch(const OurExcetpion& e)
+        catch(const OurException& e)
         {
                 std::cerr << e.what() << '\n';
         }

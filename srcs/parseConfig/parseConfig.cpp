@@ -14,7 +14,7 @@ parseConfig &parseConfig::operator=(const parseConfig& other){ return *this; }
 void	parseConfig::commonParsingValues(std::string &value)
 {
 	if (value[value.size() -1] != ';')
-		throw OurExcetpion("ERROR: Missing ';' at the end of the line");
+		throw OurException("ERROR: Missing ';' at the end of the line");
 	value = value.substr(0, value.size() -1);
 //	std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
 }
@@ -28,14 +28,14 @@ void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 	commonParsingValues(value);
 	for (int i = 0; value[i]; i++)
 		if (!isdigit(value[i]))
-			throw OurExcetpion("ERROR: PORT: only digit value expected");
+			throw OurException("ERROR: PORT: only digit value expected");
 
 	server.setPortStr(value);
 	//std::cout << "PORT STR value in serverblock is [" << server.getPortStr() << "]\n"; 
 
 	val = atoi(value.c_str());
 	if (val < 0 || val > 65535)
-		throw OurExcetpion("ERROR: PORT: range [0 - 65535] expected");
+		throw OurException("ERROR: PORT: range [0 - 65535] expected");
 	server.setPort(val);
 	//std::cout << "PORT value in serverblock is [" << server.getPort() << "]\n"; 
 }
@@ -50,11 +50,11 @@ void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
 	
 	for (int i = 0; value[i]; i++)
 		if (value[i] == ',' && value[i] && value[i + 1]  != ' ')
-			throw OurExcetpion("ERROR: INDEX: invalid char after ','"); //maybe not necessary
+			throw OurException("ERROR: INDEX: invalid char after ','"); //maybe not necessary
 	while(value[i])
 	{
 		if (value[i] != ',' && value[i + 1] == ' ')
-			throw OurExcetpion("ERROR: INDEX: invalid char after ','");
+			throw OurException("ERROR: INDEX: invalid char after ','");
 		while (value[i] == ' ')
 			i++;
 		newVal += value[i];
@@ -67,7 +67,7 @@ void	parseConfig::parseAndSetIndex(std::string &value, serverBlock &server)
 		if (newVal[i] == ',')
 		{
 			if (!isalpha(newVal[i + 1]))
-				throw OurExcetpion("ERROR: INDEX: invalid char after ','");
+				throw OurException("ERROR: INDEX: invalid char after ','");
 			values.push_back(valueToadd);
 			valueToadd.clear();
 			i++;
@@ -85,7 +85,7 @@ void	parseConfig::parseAndSetServerName(std::string &value, serverBlock &server)
 	commonParsingValues(value);
 	for (int i = 0; value[i]; i++)
 		if (isspace(value[i]))
-			throw OurExcetpion("ERROR: SERVER NAME: [string] expected");
+			throw OurException("ERROR: SERVER NAME: [string] expected");
 	server.setName(value);
 	//std::cout << "NAME value in serverblock is [" << server.getName() << "]\n"; 
 }
@@ -109,7 +109,7 @@ void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 	for (int i = 0; value[i]; i++)
 	{
 		if (isspace(value[i]))
-			throw OurExcetpion("ERROR: HOST: [0.0.0.0] format expected");
+			throw OurException("ERROR: HOST: [0.0.0.0] format expected");
 	}
 	while (value[i])
 	{
@@ -128,17 +128,17 @@ void	parseConfig::parseAndSetHost(std::string &value, serverBlock &server)
 	for (IT it = nb.begin(); it != nb.end(); it++, count++)
 	{
 		if ((*it).size() > 3)
-			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+			throw OurException("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
 		if (atoi((*it).c_str()) < 0 || atoi((*it).c_str()) > 255)
-			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+			throw OurException("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
 		for (int i = 0; (*it)[i]; i++)
 		{
 			if (!isdigit((*it)[i]))
-			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
+			throw OurException("ERROR: HOST:[0.0.0.0] format expected | range [0-255]");
 		}
 	}
 	if (count != 4)
-			throw OurExcetpion("ERROR: HOST:[0.0.0.0] format expected");
+			throw OurException("ERROR: HOST:[0.0.0.0] format expected");
 	server.setHostStr(value);
 	//std::cout << "HOST STR value in serverblock is [" << server.getHostStr() << "]\n"; 
 
@@ -156,7 +156,7 @@ void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: server block :root server one path expected");
+			throw OurException("ERROR: server block :root server one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -174,7 +174,7 @@ void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: server block : cgi_extension, one argument expected");
+			throw OurException("ERROR: server block : cgi_extension, one argument expected");
 		i++;
 	}
 	i = 0;
@@ -193,7 +193,7 @@ void	parseConfig::parseAndSetCgiBin(std::string &value, serverBlock &server)
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: server block : cgi_bin one path expected");
+			throw OurException("ERROR: server block : cgi_bin one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -210,7 +210,7 @@ void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: server block : error one path expected");
+			throw OurException("ERROR: server block : error one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -236,14 +236,14 @@ bool	parseConfig::isServerBlock(std::string line)
 		while (i < pos)
 		{
 			if (!isspace(line[i]))
-				throw OurExcetpion("ERROR : ServerBlock : server line invalid");
+				throw OurException("ERROR : ServerBlock : server line invalid");
 			i++;
 		}
 		i += 6;
 		while(i < line.length())
 		{
 			if (!isspace(line[i]))
-				throw OurExcetpion("ERROR : ServerBlock : server line invalid");
+				throw OurException("ERROR : ServerBlock : server line invalid");
 			i++;
 		}
 	}
@@ -287,7 +287,7 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 		j++;
 	}
 	if (!line.empty() && !tools::isValidDirective(dir))
-		throw OurExcetpion("ERROR: server block, invalid directive");
+		throw OurException("ERROR: server block, invalid directive");
 	
 	for (it = atts.begin(); it != atts.end(); it++)
 	{
@@ -304,7 +304,7 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 	}
 	// std::cout << "LINE = " << line << "\n";
 	// if (it == atts.end())
-	// 	throw OurExcetpion("Directive in server block not allowed here");
+	// 	throw OurException("Directive in server block not allowed here");
 	return (0);
 }
 
@@ -327,7 +327,7 @@ bool	parseConfig::isLocationBlock(std::string const &line)
 	else
 		return (false);
 	if (line.size() > 8 && !isspace(line[8]))
-		throw OurExcetpion("ERROR: LOCATION BLOCK: space between lacation and location path expected");
+		throw OurException("ERROR: LOCATION BLOCK: space between lacation and location path expected");
 	return (true);
 }	
 
@@ -341,7 +341,7 @@ void	parseConfig::parseAndSetAILoc(std::string &value, serverLocation &location)
 	else if (value == "off")
 		location.setAI(false);
 	else
-		throw OurExcetpion("ERROR : location block : autoindex  'on' or 'off' expected");
+		throw OurException("ERROR : location block : autoindex  'on' or 'off' expected");
 
 	//std::cout << "AUTOINDEX value in locationblock is [" << location.getAI() << "]\n"; 
 }
@@ -391,10 +391,10 @@ void	parseConfig::parseAndSetMethodsLoc(std::string &value, serverLocation &loca
 		else if ((*it) == "DELETE")
 			d++;
 		else
-			throw OurExcetpion("ERROR: location block: methods GET POST or DELETE expected");
+			throw OurException("ERROR: location block: methods GET POST or DELETE expected");
 	}
 	if (p > 1 || g > 1 || d > 1)
-		throw OurExcetpion("ERROR : location block: method too many arguments");
+		throw OurException("ERROR : location block: method too many arguments");
 	location.setMethods(methods);
 	//tools::printVector(location.getMethods());
 
@@ -408,7 +408,7 @@ void	parseConfig::parseAndSetRootLoc(std::string &value, serverLocation &locatio
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : root one path expected");
+			throw OurException("ERROR: location block : root one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -425,7 +425,7 @@ void	parseConfig::parseAndSetCgiExtLoc(std::string &value, serverLocation &locat
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : cgi_extension, one argument expected");
+			throw OurException("ERROR: location block : cgi_extension, one argument expected");
 		i++;
 	}
 	i = 0;
@@ -442,7 +442,7 @@ void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &locat
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : CGI_BIN one path expected");
+			throw OurException("ERROR: location block : CGI_BIN one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -460,7 +460,7 @@ void	parseConfig::parseAndSetRedirLoc(std::string &value, serverLocation &locati
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : redirection one path expected");
+			throw OurException("ERROR: location block : redirection one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -482,7 +482,7 @@ void	parseConfig::parseAndSetIndexLoc(std::string &value, serverLocation &locati
 		if (value[i] == ' ')
 		{
 			if (!isalpha(value[i + 1]))
-				throw OurExcetpion("ERROR: INDEX: invalid char after ','");
+				throw OurException("ERROR: INDEX: invalid char after ','");
 			values.push_back(valueToadd);
 			valueToadd.clear();
 			i++;
@@ -503,7 +503,7 @@ void	parseConfig::parseAndSetAuthLoc(std::string &value, serverLocation &locatio
 	else if (value == "off")
 		location.setAuthBasic(false);
 	else
-		throw OurExcetpion("ERROR : location block : Auth Basic  'on' or 'off' expected");
+		throw OurException("ERROR : location block : Auth Basic  'on' or 'off' expected");
 //	std::cout << "AUTH BASIC value in locationblock is [" << location.getAuthBasic() << "]\n"; 
 	
 
@@ -516,7 +516,7 @@ void	parseConfig::parseAndSetAuthUsrLoc(std::string &value, serverLocation &loca
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block : Auth User File one path expected");
+			throw OurException("ERROR: location block : Auth User File one path expected");
 		i++;
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
@@ -532,9 +532,9 @@ void	parseConfig::parseAndSetBodyLoc(std::string &value, serverLocation &locatio
 	while (value[i])
 	{
 		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
-			throw OurExcetpion("ERROR: location block: body size, only one argument expected");
+			throw OurException("ERROR: location block: body size, only one argument expected");
 		if (value[i] != ' ' && !isdigit(value[i]))
-			throw OurExcetpion("ERROR: location block: body size, only digits expected");
+			throw OurException("ERROR: location block: body size, only digits expected");
 		
 		i++;
 	}
@@ -574,12 +574,12 @@ void 	parseConfig::getValuesLocationBlock(int pos, std::string const& attribut, 
 std::string	parseConfig::parseLocationPath(std::string const& line)
 {
 	if (line == "location")
-		throw OurExcetpion("ERROR: LOCATION PATH:argument for path expected");
+		throw OurException("ERROR: LOCATION PATH:argument for path expected");
 	std::string path = line.substr(9, line.length() - 9);
 	//std::cout << "line is  [" << path << "]\n";
 	for (int i = 0; i < path.length(); i++)
 		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
-			throw OurExcetpion("ERROR: LOCATION PATH:only one path expected");
+			throw OurException("ERROR: LOCATION PATH:only one path expected");
 
 	return (path);
 }
@@ -599,7 +599,7 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 		j++;
 	}
 	if (!line.empty() && !tools::isValidDirectiveLocation(dir))
-			throw OurExcetpion("ERROR: location block, invalid directive");
+			throw OurException("ERROR: location block, invalid directive");
  
 	for (it = atts.begin(); it != atts.end(); it++)
 	{
@@ -616,7 +616,7 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 	}
 	// std::cout << "LINE = " << line << "\n";
 	// if (it == atts.end())
-	// 	throw OurExcetpion("Directive in server block not allowed here");
+	// 	throw OurException("Directive in server block not allowed here");
 	return (0);
 }
 
@@ -636,7 +636,7 @@ void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std:
 	for (; start != end;)
 	{
 		if (isServerBlock(*start) || isLocationBlock(*start))
-			throw OurExcetpion("ERROR: LOCATION BLOCK: no location block or server block allowed");
+			throw OurException("ERROR: LOCATION BLOCK: no location block or server block allowed");
 		setLocationConfig((*start), location, server);
 		if (start != end)
             start++;
@@ -644,7 +644,7 @@ void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std:
 	
     for (std::vector<serverLocation>::const_iterator it = server._locations.begin(); it != server._locations.end(); it++)
         if (it->getLocationPath() == path)
-            throw OurExcetpion("Directive: 'location' : duplicate symbols");
+            throw OurException("Directive: 'location' : duplicate symbols");
 
         
     location.setLocationPath(path);
@@ -719,7 +719,7 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 	for(int bracket = 0; start != end;)
 	{
 		if (isServerBlock(*start))
-			throw OurExcetpion("Server block not allowed here");
+			throw OurException("Server block not allowed here");
 		if (isLocationBlock(*start))
 		{
 			std::string pathLocation = parseLocationPath(*start);
@@ -727,7 +727,7 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 			if ((*start).find('{') != std::string::npos)
 				start++, bracket++;
 			else
-				throw OurExcetpion("ERROR: LOCATION BLOCK: openning bracket expected");
+				throw OurException("ERROR: LOCATION BLOCK: openning bracket expected");
 			IT beginBlock = start;
 			while (start != end && bracket != 0)
 			{
@@ -738,7 +738,7 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 			if (bracket == 0)
 				setLocationBlock(beginBlock, --start, server, pathLocation);
 			else
-				throw OurExcetpion("ERROR: LOCATION BLOCK: closing bracket expected");
+				throw OurException("ERROR: LOCATION BLOCK: closing bracket expected");
 		}
 		else
 		{
@@ -770,7 +770,7 @@ void	parseConfig::setServers(std::vector<std::string> &content, std::vector<serv
 			if ((*it).find('{') != std::string::npos)
 				bracket++, it++;
 			else
-				throw OurExcetpion("ERROR: server block: no opening bracket");
+				throw OurException("ERROR: server block: no opening bracket");
 			IT start = it;
 			while (it != content.end() && bracket != 0)
 			{
@@ -791,10 +791,10 @@ void	parseConfig::setServers(std::vector<std::string> &content, std::vector<serv
 				// std::cout << "IT -- = " << (*it) << "\n";
 			}
 			else
-				throw OurExcetpion("ERROR: server block : missing a bracket");
+				throw OurException("ERROR: server block : missing a bracket");
 		}
 		else
-			throw OurExcetpion("ERROR: server block" + *it + ": unexpected line");
+			throw OurException("ERROR: server block" + *it + ": unexpected line");
 		// if (it != content.end())
 		// {
 		// 	//std::cout << "is it nessecary ??\n";
@@ -813,14 +813,14 @@ void parseConfig::parsing(std::string path, std::vector<serverBlock> &servers)
 	{
 		std::ostringstream oss;
 		oss << "ERROR: can't open file" << path;
-		throw   OurExcetpion(oss.str().c_str());
+		throw   OurException(oss.str().c_str());
 	}
 	else
 	{
 		while (std::getline(fd, line))
 			content = parseLine(line, content);
 		if (content.empty())
-			throw  OurExcetpion("ERROR: empty file");
+			throw  OurException("ERROR: empty file");
 	}
 
 	//delete all empty lines

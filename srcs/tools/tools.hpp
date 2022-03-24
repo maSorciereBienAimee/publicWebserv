@@ -19,6 +19,7 @@ class serverLocation;
 namespace tools
 {
 	 //just for help
+	void    							printServerBlock(serverBlock content);
 	void           						 printVector(std::vector<std::string> content);
 	void    							printLocationBlock(std::vector<serverLocation> content);
 	bool           						 isSpaces(std::string str);
@@ -33,12 +34,12 @@ namespace tools
 }
 
 
-struct OurExcetpion : public std::exception
+struct OurException : public std::exception
 {
 	std::string _str;
 
-	OurExcetpion(std::string str): _str(str){}
-	~OurExcetpion() {}
+	OurException(std::string str): _str(str){}
+	~OurException() {}
 	const char * what() const throw() { return _str.c_str(); }
 };
 

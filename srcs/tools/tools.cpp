@@ -13,6 +13,24 @@ namespace tools
 		
 	}
 
+	void    printServerBlock(serverBlock content)
+	{
+		std::cout << "_____ServerBlock IS______\n";
+		
+			std::cout<< "HOST : " << content.getHost() << "\n";
+			std::cout<< "NAME : " << content.getName() << "\n";
+			std::cout<< "HOST STR : " << content.getHostStr() << "\n";
+			std::cout<< "PORT : " << content.getPort() << "\n";
+			std::cout<< "PORT STR : " << content.getPortStr() << "\n";
+			std::cout<< "ROOT SERVER : " << content.getRootServer() << "\n";
+			std::cout<< "ERROR : " << content.getError() << "\n";
+			std::cout<< "CGI BIN : " << content.getCgiBin() << "\n";
+			std::cout<< "CGI EXT : " << content.getCgiExt() << "\n";
+			std::cout<< "INDEX content : \n";
+			printVector(content.getIndex());
+		std::cout << "___________\n";		
+	}
+
 	void    printLocationBlock(std::vector<serverLocation> content)
 	{
 		std::vector<serverLocation>::iterator it;
