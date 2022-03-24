@@ -21,6 +21,7 @@ class Request
 			void error_checker(void);
 			int parseRequestLine(const std::string & str);
 			std::string parseHeaders(const std::string &str, int end);
+			void	pathDecoder(std::string path);
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;

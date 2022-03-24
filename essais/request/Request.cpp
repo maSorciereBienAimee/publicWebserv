@@ -39,6 +39,30 @@ const std::map<std::string, std::string> &Request::getHeaders(void) const
     return (_headers);
 }
 
+void Request::pathDecoder(std::string path)
+{
+    std::string ret;
+    char c;
+    int i;
+    int x;
+    for (i=0; i < path.length(); i++)
+    {
+        if (path[i] == '%')
+        {
+            sscanf(path.substr(i + 1,2).c_str(), "%x", &x);
+            c = static_cast<char>(x);
+            ret += c;
+            if (i + 2 <= path.length())
+                i = i + 2;
+            else
+                i++;
+        }
+        else
+            ret += path[i];
+    }
+    this->_path = ret;
+}
+
 int Request::parseRequestLine(const std::string &str)
 {
     /*** LINE1 PARSING ***/
@@ -59,6 +83,7 @@ int Request::parseRequestLine(const std::string &str)
     int break_2 = line.find_first_of(' ');
     //PATH IS FROM 0 UNTIL FIRST SPACE
     _path = line.substr(0, break_2);
+    pathDecoder(_path);
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);
