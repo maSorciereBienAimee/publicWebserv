@@ -4,10 +4,10 @@
 #include "../manageServer/Server.hpp"
 #include <sys/stat.h>
 
-Response::Response(void) 
-{
-	return;
-}
+//Response::Response(void) 
+//{
+//	return;
+//}
 
 //(peut etre on va avoir besoin plus tard):,config(C), fd(F)
 Response::Response(Request R, int F) : request(R)

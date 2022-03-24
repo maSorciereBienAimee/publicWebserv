@@ -6,7 +6,6 @@
 class Response
 {
 	public:
-	Response();
 	Response(Request R, int F);
 	~Response();
 	void launch();
@@ -21,6 +20,7 @@ class Response
 	void initErrors();
 	
 	private :
+	Response();
 	
 	std::string _header;
 	std::string body_message;

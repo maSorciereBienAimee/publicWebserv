@@ -1,10 +1,8 @@
 #include "Request.hpp"
 
-Request::Request(void) : _orig_req("")
-{
-    status = 200;
-    return;
-}
+//Request::Request(void) : _orig_req("yo")
+//{
+//}
 
 Request::Request(const std::string& str) : _orig_req(str)
 {

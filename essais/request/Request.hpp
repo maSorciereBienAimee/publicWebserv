@@ -9,7 +9,6 @@
 class Request
 {
 		public:
-			Request(void);
 			Request(const std::string& str);
 			~Request();
 			Request&	operator=(const Request&);
@@ -40,6 +39,7 @@ class Request
 
             private:
 
+			Request(void);
             void printer(void);
             std::string									_method;
 			std::string									_version;
