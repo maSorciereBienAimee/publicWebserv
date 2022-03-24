@@ -9,7 +9,7 @@
 class Request
 {
 		public:
-			Request(const std::string& str);
+			Request(std::string str, std::string root);
 			~Request();
 			Request&	operator=(const Request&);
 
@@ -22,6 +22,7 @@ class Request
 			int parseRequestLine(const std::string & str);
 			std::string parseHeaders(const std::string &str, int end);
 			void	pathDecoder(std::string path);
+			std::string	getRoot(void);
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;
@@ -32,8 +33,8 @@ class Request
 			const std::list<std::pair<std::string, float> >&	getLang() const;*/
 
 			/*** SETTERS **/
-			/*void	setBody(const std::string& line);
-			void	setRet(int);
+			void	setRoot(const std::string& root);
+			/*void	setRet(int);
 			void	setMethod(const std::string &method);*/
 
 			/*** FUNCTIONS ****/
@@ -56,7 +57,8 @@ class Request
 			//std::string									_path;
 			//std::string									_query;
 			//std::list<std::pair<std::string, float> >	_lang;
-			const std::string&							_orig_req;
+			const std::string							_orig_req;
+			std::string									_root;
 
 };
 

@@ -49,7 +49,7 @@ void Server::connect()
 		clear_fd();
 		exit(1);
 	}
-	
+
 }
 
 std::string Server::processContentLength(std::string request)
@@ -60,7 +60,7 @@ std::string Server::processContentLength(std::string request)
 	std::string body = request.substr(index + 4, request.length() - (index + 4));
 
 	if (body.length() != atoi(tmp1.c_str()))
-		std::cout << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << std::endl; 
+		std::cout << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << std::endl;
 	return(request + "\r\n\r\n");
 }
 
@@ -112,10 +112,10 @@ std::string Server::chunkDecoder(std::string str)
 	std::string	head = str.substr(0,str.find("\r\n\r\n") + 4);
     //FROM AFTER NEW LINE TO END OF MESSAGE
 	std::string	coded = str.substr(str.find("\r\n\r\n") + 4, str.length() - 1);
-	
+
     std::string	subchunk = coded;
 	std::string	body;
-	// GET CHUNK SIZE FROM BASE 16 
+	// GET CHUNK SIZE FROM BASE 16
     int			chunksize = strtol(coded.c_str(), NULL, 16);
 	size_t		i = 0;
 
@@ -167,19 +167,20 @@ void Server::readData(int fd, int epfd)
 }
 
 
-void Server::pseudoReponse(std::string request, int fd) //destinee a etre suprimee quand la class reponse sera faite
+void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
 	Cgi myCgi;
-	Request marco(request);
+	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
+	Request marco(req, "/website" );
 	int status = marco.getStatus();
 	/*CHECKHOST:TODO:TOADDBACKIN
-	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr(); 
+	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
 	if (marco.getPath() != this->infoConfig.getHostStr() && marco.getPath() != hp)
 		status = 400;*/
 
 	myCgi.setIsIt(tools::isItCgi(marco.getPath(), this->infoConfig.getLocation()));
 //	myCgi.init(marco, infoConfig);
-	
+
 	std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
 
 	Response polo(marco, status, myCgi);

@@ -4,7 +4,7 @@
 //{
 //}
 
-Request::Request(const std::string& str) : _orig_req(str)
+Request::Request(std::string str, std::string root) : _orig_req(str), _root(root)
 {
     status = 200;
 	this->parse(str);
@@ -84,6 +84,7 @@ int Request::parseRequestLine(const std::string &str)
     //PATH IS FROM 0 UNTIL FIRST SPACE
     _path = line.substr(0, break_2);
     pathDecoder(_path);
+    _path = _root + _path;
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);
@@ -148,6 +149,7 @@ void Request::error_checker(void)
 void Request::printer(void)
 {
     std::cout << "------REQUEST INFO RECOVERED IN REQUEST CLASS------" << std::endl;
+    std::cout << "ROOT IS: " << _root << std::endl;
     std::cout << "METHOD" << std::endl;
     std::cout  << "|" << _method <<  "|" <<std::endl;
     std::cout << "PATH" << std::endl;
@@ -180,4 +182,15 @@ std::string const &Request::getPath() const
 int const &Request::getStatus() const
 {
 	return (this->status);
+}
+
+void	Request::setRoot(const std::string& root)
+{
+    _root = root;
+    return;
+}
+
+std::string	Request::getRoot(void)
+{
+    return _root;
 }

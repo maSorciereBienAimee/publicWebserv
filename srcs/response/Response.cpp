@@ -116,6 +116,7 @@ void Response::setBody()
 
 void Response::readIn(std::string file)
 {
+	std::cout << "FILE IS: " << file << std::endl;
 	std::ifstream is (file, std::ifstream::binary);
 	if (!is)
 	{
@@ -149,7 +150,7 @@ void Response::_get(Request R)
 		this->body = myCgi.getBody();
 	}
 */
-	if (R.getPath() != "/")
+	if (R.getPath() != (R.getRoot() + '/') )
 	{
 		std::cout << "PATH IS" << R.getPath() << std::endl;
 		struct stat check;
@@ -158,8 +159,10 @@ void Response::_get(Request R)
 		path.erase(path.begin(), path.begin() + 1);
 		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     	{
-			if (path == "favicon.ico")
-				path = "favicon.html";
+			std::string root = R.getRoot();
+			root.erase(root.begin(), root.begin() + 1);
+			if (path == root + "/favicon.ico")
+				path = root + "/favicon.html";
 			readIn(path);
 			this->status = 200;
 		}
@@ -172,7 +175,7 @@ void Response::_get(Request R)
 	else //no file specified so home page??
 	{
 		this->status = 200;
-		readIn("index.html");
+		readIn("." + R.getPath() + "index.html");
 	}
 
 }
@@ -181,7 +184,7 @@ void Response::_post(Request R)
 {
 	(void)R;
 	status = 200;
-	readIn("index.html");
+	readIn("." + R.getPath() + "index.html");
 }
 
 
