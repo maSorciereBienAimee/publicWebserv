@@ -2,11 +2,12 @@
 #define RESPONSE_HPP
 #include <map>
 #include "../request/Request.hpp"
+#include "../cgi/Cgi.hpp"
 
 class Response
 {
 	public:
-	Response(Request R, int F);
+	Response(Request R, int F, Cgi myCgi);
 	~Response();
 	void launch();
 	void	_delete(std::string path);
@@ -34,6 +35,7 @@ class Response
 	std::map<int, std::string> errors;
 	Request request;
 	int fd;
+	Cgi _cgi;
 };
 
 #endif

@@ -1,5 +1,5 @@
 #include "tools.hpp"
-#include "../parseConfig/serverBlock.hpp"
+#include "../parseConfig/serverLocation.hpp"
 namespace tools
 {
 
@@ -100,7 +100,7 @@ namespace tools
         return (false);
     }
 
-	int	isItCgi(std::string path, serverBlock info)
+	int	isItCgi(std::string path, std::vector<serverLocation> location)
 	{
 		int i = path.size();
 		std::string str = path;
@@ -120,29 +120,20 @@ namespace tools
 			}
 			str.erase(it, str.end());
 			withoutExt = str;
-			newPath = "/" + str + "*" + ext;
+			if (withoutExt == "")
+					withoutExt = "/";
+			newPath = str + "/" + "*" + ext;
 		}
-		std::vector<serverLocation> location = info.getLocation();
-		std::cout << "tools location begin" << std::endl;
 		for (std::vector<serverLocation>::iterator it = location.begin(); it != location.end(); it++)
 		{
-			std::cout << "it->getLocationPath = " << it->getLocationPath();
-			std::cout << " newPath = " << newPath;
-			std::cout << " it->getCgiExt = " << it->getCgiExt();
-			std::cout << " ext = " << ext << std::endl;
-			if (it->getLocationPath() == newPath && it->getCgiExt() == ext)
+			if ((*it).getLocationPath() == newPath && (*it).getCgiExt() == ext)
 					return (1);
 		}
 		for (std::vector<serverLocation>::iterator it = location.begin(); it != location.end(); it++)
 		{
-			std::cout << "it->getLocationPath = " << it->getLocationPath();
-			std::cout << " withoutExt = " << withoutExt;
-			std::cout << " it->getCgiExt = " << it->getCgiExt();
-			std::cout << " ext = " << ext << std::endl;
-			if (it->getLocationPath() == withoutExt && it->getCgiExt() == ext)
+			if ((*it).getLocationPath() == withoutExt && (*it).getCgiExt() == ext)
 					return (1);
 		}
-		std::cout << "tools location end" << std::endl;
 		return (0);
 	}
 

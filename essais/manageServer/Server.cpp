@@ -11,9 +11,6 @@ Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
 	this->infoConfig = block;
-	std::vector<serverLocation> locate;
-	std::cout << "yo, les locations sont " << std::endl;
-	tools::printLocationBlock(block.getLocation());
 }
 
 Server::~Server()
@@ -172,17 +169,20 @@ void Server::readData(int fd, int epfd)
 
 void Server::pseudoReponse(std::string request, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
-	int isCgi;
+	Cgi myCgi;
 	Request marco(request);
 	int status = marco.getStatus();
 	/*CHECKHOST:TODO:TOADDBACKIN
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr(); 
 	if (marco.getPath() != this->infoConfig.getHostStr() && marco.getPath() != hp)
 		status = 400;*/
-	isCgi = tools::isItCgi(marco.getPath(), this->infoConfig);
-	std::cout << "isCGI = " << isCgi << std::endl;
 
-	Response polo(marco, status);
+	myCgi.setIsIt(tools::isItCgi(marco.getPath(), this->infoConfig.getLocation()));
+//	myCgi.init(marco, infoConfig);
+	
+	std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
+
+	Response polo(marco, status, myCgi);
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
 

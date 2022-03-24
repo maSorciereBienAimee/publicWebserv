@@ -7,7 +7,10 @@ helper_files/manageServer/AllServers.o: manageServer/AllServers.cpp \
   manageServer/../parseConfig/serverBlock.hpp \
   manageServer/../parseConfig/serverLocation.hpp \
   manageServer/../parseConfig/../tools/../parseConfig/serverBlock.hpp \
-  manageServer/../request/Request.hpp manageServer/../tools/tools.hpp
+  manageServer/../request/Request.hpp manageServer/../tools/tools.hpp \
+  manageServer/../cgi/Cgi.hpp manageServer/../cgi/../tools/tools.hpp \
+  manageServer/../cgi/../request/Request.hpp \
+  manageServer/../cgi/../parseConfig/serverBlock.hpp
 
 manageServer/AllServers.hpp:
 
@@ -30,3 +33,11 @@ manageServer/../parseConfig/../tools/../parseConfig/serverBlock.hpp:
 manageServer/../request/Request.hpp:
 
 manageServer/../tools/tools.hpp:
+
+manageServer/../cgi/Cgi.hpp:
+
+manageServer/../cgi/../tools/tools.hpp:
+
+manageServer/../cgi/../request/Request.hpp:
+
+manageServer/../cgi/../parseConfig/serverBlock.hpp:

@@ -13,8 +13,8 @@
 #include "../parseConfig/serverBlock.hpp"
 #include "../request/Request.hpp"
 #include "../tools/tools.hpp"
+#include "../cgi/Cgi.hpp"
 
-#define PORT 8080
 #define MAX_CLIENT 5000
 
 class Server

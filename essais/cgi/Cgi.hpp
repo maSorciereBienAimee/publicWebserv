@@ -17,10 +17,12 @@ class Cgi
 	void run(Request R);
 	std::string getBody();
 	int getStatus();
-
+	void setIsIt(int n);
+	int getIsIt() const;
 	private:
 	std::string	_body;
 	int			_status;
+	int			_isItCgi;
 };
 
 #endif

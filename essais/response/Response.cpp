@@ -10,7 +10,7 @@
 //}
 
 //(peut etre on va avoir besoin plus tard):,config(C), fd(F)
-Response::Response(Request R, int F) : request(R)
+Response::Response(Request R, int F, Cgi myCgi) : request(R), _cgi(myCgi)
 {
 	if (F == 400)
 		this->body_message = "Bad request";
@@ -141,6 +141,14 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
+/*	if (_cgi.getIsIt() == 1)
+	{
+		myCgi.init(R);
+		myCgi.run();
+		this->status = myCgi.getStatus();
+		this->body = myCgi.getBody();
+	}
+*/
 	if (R.getPath() != "/")
 	{
 		std::cout << "PATH IS" << R.getPath() << std::endl;

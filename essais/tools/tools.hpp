@@ -29,7 +29,7 @@ namespace tools
 	std::map<std::string, std::string>	mime();
 	std::string							getMimeType(std::string fileName);
 	std::string							getExtension(std::string filename);
-	int									isItCgi(std::string path, serverBlock info);
+	int									isItCgi(std::string path, std::vector<serverLocation> info);
 }
 
 

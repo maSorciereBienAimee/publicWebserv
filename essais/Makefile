@@ -7,7 +7,8 @@ THE_SOURCE = 	main.cpp \
 				parseConfig/parseConfig.cpp \
 				parseConfig/serverBlock.cpp \
 				parseConfig/serverLocation.cpp \
-				
+				cgi/Cgi.cpp
+
 SRCS = $(THE_SOURCE)
 OBJS = $(addprefix ${OBJDIR}/,${SRCS:.cpp=.o})
 
