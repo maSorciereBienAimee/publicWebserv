@@ -31,6 +31,7 @@ namespace tools
 	std::string							getMimeType(std::string fileName);
 	std::string							getExtension(std::string filename);
 	int									isItCgi(std::string path, std::vector<serverLocation> info);
+	serverLocation							whichLocation(std::string req, serverBlock block);
 }
 
 

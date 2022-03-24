@@ -171,6 +171,7 @@ void Server::readData(int fd, int epfd)
 void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
 	Cgi myCgi;
+	serverLocation synthese = tools::whichLocation(req, this->infoConfig);
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 	Request marco(req, "/website" );
 	int status = marco.getStatus();

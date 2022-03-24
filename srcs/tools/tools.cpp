@@ -268,4 +268,31 @@ namespace tools
 			return (_mimeMap);
 	}
 
+serverLocation	whichLocation(std::string req, serverBlock block)
+{
+	std::cout << req << std::endl;
+	serverLocation loc;
+	std::string path;
+	int deb = 0;
+	int fin;
+	std::string::iterator it = req.begin();
+	while (*it != ' ')
+	{
+		it++;
+		deb++;
+	}
+	it++;
+	deb++;
+	std::string::iterator it2 = it;
+	fin = deb;
+	while (*it2 != ' ')
+	{
+		it2++;
+		fin++;
+	}
+	path = req.substr(deb, fin - deb);
+	std::cout << "PATH IN WHICHLOCATION " << path << std::endl;
+	return (loc);
+}
+
 }
