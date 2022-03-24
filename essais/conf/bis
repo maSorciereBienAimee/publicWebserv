@@ -8,15 +8,14 @@ server {
 		
 
 
-# 	location 	/
-# {
+ 	location 	/ {
 
-# 		index			index.html index.php index.nginx-debian.html;
-# 		autoindex		on;
-# 		methods			GET,POST,DELETE;
-# 		cgi_extension	.php;
-# 		cgi_bin			/usr/bin/php-cgi;
-# 	}
+ 		index			index.html index.php index.nginx-debian.html;
+ 		autoindex		on;
+ 		methods			GET,POST,DELETE;
+ 		cgi_extension	.php;
+ 		cgi_bin			/usr/bin/php-cgi;
+ 	}
 
 	# location /jj {
 	# 	methods			GET,POST,DELETE;
@@ -25,13 +24,13 @@ server {
 	# }
 
 
-	# location /bonjourr {
-	# 	index			index.html;
-	# 	autoindex		on;
-	# 	methods			GET,POST;
-	# 	cgi_extension	.php;
-	# 	cgi_bin			/usr/bin/php-cgi;
-	# }
+ location /bonjourr {
+ 	index			index.html;
+ 	autoindex		on;
+ 	methods			GET,POST;
+ 	cgi_extension	.php;
+ 	cgi_bin			/usr/bin/php-cgi;
+ }
 
 	# location /test {
 	# 	index			index.html;

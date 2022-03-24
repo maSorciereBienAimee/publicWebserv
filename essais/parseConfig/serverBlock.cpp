@@ -8,6 +8,9 @@ serverBlock::serverBlock(const serverBlock& cpy) : _port(cpy._port), _index(cpy.
 
 serverBlock		const & serverBlock::getServerBlock()
 {
+	std::cout << "yo" << std::endl;
+	for (std::vector<serverLocation>::iterator it = _locations.begin(); it !=_locations.end(); it++)
+			std::cout << it->getLocationPath() << std::endl;
 	return (*this);
 }
 
