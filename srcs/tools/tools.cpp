@@ -6,7 +6,7 @@ namespace tools
 	void    printVector(std::vector<std::string> content)
 	{
 		std::vector<std::string>::iterator it;
-		std::cout << "_____CONTENT IS______\n";
+		//std::cout << "_____CONTENT IS______\n";
 		for (it = content.begin(); it != content.end(); it++)
 			std::cout << (*it) << "\n";
 		std::cout << "___________\n";
@@ -26,8 +26,15 @@ namespace tools
 			std::cout<< "ERROR : " << content.getError() << "\n";
 			std::cout<< "CGI BIN : " << content.getCgiBin() << "\n";
 			std::cout<< "CGI EXT : " << content.getCgiExt() << "\n";
+			std::cout<< "AUTOINDEX : " << content.getAI_s() << "\n";
+			std::cout<< "BODY SIZE : " << content.getBody_s() << "\n";
+			std::cout<< "AUTH BASIC : " << content.getAuthBasic_s() << "\n";
+			std::cout<< "AUTH USR FILE : " << content.getAuthUsrFile_s() << "\n";
+			std::cout<< "REDIRECTION : " << content.getRedir_s() << "\n";
 			std::cout<< "INDEX content : \n";
 			printVector(content.getIndex());
+			std::cout<< "METHODS content : \n";
+			printVector(content.getMethods_s());
 		std::cout << "___________\n";		
 	}
 
@@ -105,7 +112,9 @@ namespace tools
     {
         if (dir == "index" || dir == "root" || dir == "server_name"
         || dir == "listen" || dir == "host" || dir == "error"
-        || dir == "cgi_extension" || dir == "cgi_bin")
+        || dir == "cgi_extension" || dir == "cgi_bin" 
+		|| dir == "methods" || dir == "client_max_body_size" || dir == "auth_basic" 
+		|| dir == "auth_basic_user_file" || dir == "redirection" )
             return (true);
         return (false);
     }

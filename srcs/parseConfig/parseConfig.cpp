@@ -31,12 +31,13 @@ void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 			throw OurException("ERROR: PORT: only digit value expected");
 
 	server.setPortStr(value);
-	//std::cout << "PORT STR value in serverblock is [" << server.getPortStr() << "]\n"; 
-
 	val = atoi(value.c_str());
 	if (val < 0 || val > 65535)
 		throw OurException("ERROR: PORT: range [0 - 65535] expected");
 	server.setPort(val);
+	server.setAI_s(0);
+	//std::cout << "PORT STR value in serverblock is [" << server.getPortStr() << "]\n"; 
+	//std::cout << "PORT value in serverblock is [" << server.getAI_s() << "]\n"; 
 	//std::cout << "PORT value in serverblock is [" << server.getPort() << "]\n"; 
 }
 
@@ -163,7 +164,6 @@ void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
 	value.erase(end_pos, value.end());
 	server.setRootServer(value);
 	//std::cout << "ROOT SERVER = [" << server.getRootServer() << "]\n";
-
 }
 
 void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
@@ -182,7 +182,6 @@ void	parseConfig::parseAndSetCgiExt(std::string &value, serverBlock &server)
         extension += value[i];
 	server.setCgiExt(extension);
 	//std::cout << "SERVER CGI_EXT = [" << server.getCgiExt() << "]\n";
-	
 }
 
 void	parseConfig::parseAndSetCgiBin(std::string &value, serverBlock &server)
@@ -217,6 +216,137 @@ void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
 	value.erase(end_pos, value.end());
 	server.setError(value);
 	//std::cout << "ERROR = [" << server.getError() << "]\n";
+}
+
+void	parseConfig::parseAndSetRedirServer(std::string &value, serverBlock &server)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurException("ERROR: location block : redirection one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setRedir_s(value);
+	//std::cout << "SERVER REDIRECTION = [" << server.getRedir_s() << "]\n";
+}
+
+void	parseConfig::parseAndSetAuthUsrServer(std::string &value, serverBlock &server)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurException("ERROR: location block : Auth User File one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setAuthUsrFile_s(value);
+	std::cout << "SERVER AUTH_USER_FILE = [" << server.getAuthUsrFile_s() << "]\n";
+}
+
+void	parseConfig::parseAndSetAuthServer(std::string &value, serverBlock &server)
+{
+	commonParsingValues(value);
+	if (value == "on")
+		server.setAuthBasic_s(true);
+	else if (value == "off")
+		server.setAuthBasic_s(false);
+	else
+		throw OurException("ERROR : location block : Auth Basic  'on' or 'off' expected");
+	//std::cout << "AUTH BASIC value in Server block is [" << server.getAuthBasic_s() << "]\n";
+}
+
+void	parseConfig::parseAndSetBodyServer(std::string &value, serverBlock &server)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurException("ERROR: location block: body size, only one argument expected");
+		if (value[i] != ' ' && !isdigit(value[i]))
+			throw OurException("ERROR: location block: body size, only digits expected");
+		
+		i++;
+	}
+	int val = ::atoi(value.c_str());
+	server.setBody_s(val);
+	//std::cout << "BODY SIZE SERVER = [" << server.getBody_s() << "]\n"; 
+}
+
+void	parseConfig::parseAndSetMethodsServer(std::string &value, serverBlock &server)
+{
+	//methods available : GET POST DELETE
+	// NEED the 3 methods to work ??
+	int									i = 0;
+	std::vector<std::string> 			methods;
+	std::string							valueToAdd;
+	std::string							newVal;
+	std::vector<std::string>::iterator	it;
+	
+	commonParsingValues(value);
+	//remove spaces
+	while (value[i])
+	{
+		if (value[i] == ' ')
+			i++;
+		newVal += value[i];
+		i++;
+	}
+	// get the values and push it in vector methods
+	i = 0;
+	while (newVal[i])
+	{
+		if (newVal[i] == ',')
+		{
+			methods.push_back(valueToAdd);
+			valueToAdd.clear();
+			i++;
+		}
+		valueToAdd += newVal[i];
+		i++;
+	}
+	methods.push_back(valueToAdd);
+
+	//check the values and if there is no double
+	int p = 0, g = 0, d = 0;
+	for (it = methods.begin(); it != methods.end(); it++)
+	{
+		if ((*it) == "POST")
+			p++;
+		else if ((*it) == "GET")
+			g++;
+		else if ((*it) == "DELETE")
+			d++;
+		else
+			throw OurException("ERROR: location block: methods GET POST or DELETE expected");
+	}
+	if (p > 1 || g > 1 || d > 1)
+		throw OurException("ERROR : location block: method too many arguments");
+	server.setMethods_s(methods);
+	//tools::printVector(server.getMethods_s());
+}
+
+std::string	parseConfig::parseLocationPath(std::string const& line)
+{
+	if (line == "location")
+		throw OurException("ERROR: LOCATION PATH:argument for path expected");
+	std::string path = line.substr(9, line.length() - 9);
+	//std::cout << "line is  [" << path << "]\n";
+	for (int i = 0; i < path.length(); i++)
+		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
+			throw OurException("ERROR: LOCATION PATH:only one path expected");
+
+	return (path);
 }
 
 /******_____ IN SERVER BLOCK______*******/
@@ -271,6 +401,18 @@ void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std
 		parseAndSetError(value, server);
 	else if (attribut.compare("root ") == 0)
 		parseAndServerRoot(value, server);
+	else if (attribut.compare("methods ") == 0)
+		parseAndSetMethodsServer(value, server);
+	else if (attribut.compare("methods ") == 0)
+		parseAndSetMethodsServer(value, server);
+	 else if (attribut.compare("client_max_body_size ") == 0)
+	 	parseAndSetBodyServer(value, server);
+	else if (attribut.compare("auth_basic ") == 0)
+	 	parseAndSetAuthServer(value, server);
+	else if (attribut.compare("auth_basic_user_file ") == 0)
+		parseAndSetAuthUsrServer(value, server);
+	else if (attribut.compare("redirection ") == 0)
+		parseAndSetRedirServer(value, server);
 }
 
 int		parseConfig::getAttributName(std::string const &line, std::string &attribut, std::string& value, serverBlock &server)
@@ -279,7 +421,7 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 	size_t 						pos;
 	IT 							it;
 	std::string					dir;
- 	std::vector<std::string> 	atts = {"listen ", "index ", "root ", "host ", "server_name ", "cgi_extension ", "cgi_bin ", "error "};
+ 	std::vector<std::string> 	atts = {"listen ", "index ", "root ", "host ", "server_name ", "cgi_extension ", "cgi_bin ", "error ", "methods ", "client_max_body_size ", "auth_basic ", "auth_basic_user_file ", "redirection "};
 	
 	while(line[j] && line[j] != ' ')
 	{
@@ -295,7 +437,7 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 		if (pos != std::string::npos)
 		{
 			attribut = (*it).substr(0, (*it).length());
-			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+		//	std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
 		//	std::cout << " Value = " << "'"<<  value << "'" << "\n";
 			getValueServerBlock(((*it).length() + 1), attribut, value, server);
@@ -342,7 +484,6 @@ void	parseConfig::parseAndSetAILoc(std::string &value, serverLocation &location)
 		location.setAI(false);
 	else
 		throw OurException("ERROR : location block : autoindex  'on' or 'off' expected");
-
 	//std::cout << "AUTOINDEX value in locationblock is [" << location.getAI() << "]\n"; 
 }
 
@@ -397,9 +538,8 @@ void	parseConfig::parseAndSetMethodsLoc(std::string &value, serverLocation &loca
 		throw OurException("ERROR : location block: method too many arguments");
 	location.setMethods(methods);
 	//tools::printVector(location.getMethods());
-
-
 }
+
 void	parseConfig::parseAndSetRootLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -434,6 +574,7 @@ void	parseConfig::parseAndSetCgiExtLoc(std::string &value, serverLocation &locat
 	location.setCgiExt(extension);
 	//std::cout << "LOCATION CGI_EXT = [" << location.getCgiExt() << "]\n";
 }
+
 void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -449,9 +590,8 @@ void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &locat
 	value.erase(end_pos, value.end());
 	location.setCgiBin(value);
 //	std::cout << "LOCATION CGI_BIN = [" << location.getCgiBin() << "]\n";
-
-
 }
+
 void	parseConfig::parseAndSetRedirLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -467,9 +607,8 @@ void	parseConfig::parseAndSetRedirLoc(std::string &value, serverLocation &locati
 	value.erase(end_pos, value.end());
 	location.setRedir(value);
 	//std::cout << "LOCATION REDIRECTION = [" << location.getRedir() << "]\n";
-
-
 }
+
 void	parseConfig::parseAndSetIndexLoc(std::string &value, serverLocation &location)
 {
 	std::vector <std::string> 	values;
@@ -493,8 +632,8 @@ void	parseConfig::parseAndSetIndexLoc(std::string &value, serverLocation &locati
 	values.push_back(valueToadd);
 	location.setIndex(values);
 	//tools::printVector(location.getIndex());
-
 }
+
 void	parseConfig::parseAndSetAuthLoc(std::string &value, serverLocation &location)
 {
 	commonParsingValues(value);
@@ -504,10 +643,9 @@ void	parseConfig::parseAndSetAuthLoc(std::string &value, serverLocation &locatio
 		location.setAuthBasic(false);
 	else
 		throw OurException("ERROR : location block : Auth Basic  'on' or 'off' expected");
-//	std::cout << "AUTH BASIC value in locationblock is [" << location.getAuthBasic() << "]\n"; 
-	
-
+//	std::cout << "AUTH BASIC value in locationblock is [" << location.getAuthBasic() << "]\n";
 }
+
 void	parseConfig::parseAndSetAuthUsrLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -524,6 +662,7 @@ void	parseConfig::parseAndSetAuthUsrLoc(std::string &value, serverLocation &loca
 	location.setAuthUsrFile(value);
 	//std::cout << "LOCATION AUTH_USER_FILE = [" << location.getAuthUsrFile() << "]\n";
 }
+
 void	parseConfig::parseAndSetBodyLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -570,19 +709,6 @@ void 	parseConfig::getValuesLocationBlock(int pos, std::string const& attribut, 
 
 /******_________________________________________******/
 /******_________ PASRING LOCATION BLOCK_________******/
-
-std::string	parseConfig::parseLocationPath(std::string const& line)
-{
-	if (line == "location")
-		throw OurException("ERROR: LOCATION PATH:argument for path expected");
-	std::string path = line.substr(9, line.length() - 9);
-	//std::cout << "line is  [" << path << "]\n";
-	for (int i = 0; i < path.length(); i++)
-		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
-			throw OurException("ERROR: LOCATION PATH:only one path expected");
-
-	return (path);
-}
 
 int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location)
 {
@@ -652,7 +778,6 @@ void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std:
     server._locations.push_back(location);
 	//tools::printLocationBlock(server._locations);
 }
-
 
 /*  Push the  file line by line in content
 	Splitting the file per ';' '{' '}'
@@ -841,4 +966,3 @@ void parseConfig::parsing(std::string path, std::vector<serverBlock> &servers)
 	*/
 	setServers(content, servers);
 }
-

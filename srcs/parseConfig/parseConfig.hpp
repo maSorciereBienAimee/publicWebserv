@@ -61,6 +61,13 @@ class parseConfig  {
 	void						parseAndSetCgiBin(std::string &value, serverBlock &server);
 	void						parseAndSetError(std::string &value, serverBlock &server);
 	void						parseAndServerRoot(std::string &value, serverBlock &server);
+	void						parseAndSetMethodsServer(std::string &value, serverBlock &server);
+	//void						parseAndSetAIServer(std::string &value, serverBlock &server);
+	void						parseAndSetBodyServer(std::string &value, serverBlock &server);
+	void						parseAndSetAuthServer(std::string &value, serverBlock &server);
+	void						parseAndSetAuthUsrServer(std::string &value, serverBlock &server);
+	void						parseAndSetRedirServer(std::string &value, serverBlock &server);
+
 
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM LOCATION BLOCK______******/
    

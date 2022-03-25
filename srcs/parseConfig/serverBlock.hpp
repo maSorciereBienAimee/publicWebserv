@@ -29,6 +29,13 @@ class serverBlock {
 		std::string					_cgi_bin_s;
 		std::string				    _error;
 		std::string				    _server_root;
+		//NEW
+		std::vector<std::string>	_methods_s; //ok
+		bool      			    	_auto_index_s; //ok set in the ft setAndSarsePort()
+		int							_body_size_s; //ok
+		bool    			    	_auth_basic_s; //ok
+		std::string				    _auth_basic_file_s; //ok
+		std::string                 _redirection_s; //ok
 
 	public: 
 
@@ -37,8 +44,8 @@ class serverBlock {
 		serverBlock();
 		~serverBlock();
 		serverBlock(const serverBlock& cpy);
-		serverBlock 									operator=(const serverBlock& other);
-		serverBlock	const &								getServerBlock();
+		serverBlock 								operator=(const serverBlock& other);
+		serverBlock	const &							getServerBlock();
 		std::vector<serverLocation> const& 			getLocation() const;
 		void										setHost(const uint32_t host);
 		void										setHostStr(std::string const& str);
@@ -50,6 +57,15 @@ class serverBlock {
 		void										setError(std::string const& str);
 		void										setCgiBin(std::string const& str);
 		void										setCgiExt(std::string const& ext);
+		void										setMethods_s(std::vector<std::string> const &methods);
+		void										setAI_s(bool autoindex);
+		void										setBody_s(int size);
+		void										setAuthBasic_s(bool auth);
+		void										setAuthUsrFile_s(std::string path);
+		void										setRedir_s(std::string path);
+
+
+
 
 		uint32_t									getHost(void) const;
 		std::string	 const&							getName(void) const;
@@ -61,6 +77,13 @@ class serverBlock {
 		std::string	const&							getError(void) const;
 		std::string	const&							getCgiBin(void) const;
 		std::string	const&							getCgiExt(void) const;
+
+		std::vector<std::string> 					getMethods_s(void) const;
+		bool										getAI_s(void) const;
+		int											getBody_s(void) const;
+		bool										getAuthBasic_s(void) const;
+		std::string									getAuthUsrFile_s(void) const;
+		std::string									getRedir_s(void) const;
 
 		bool operator==(const serverBlock& other);
 };
