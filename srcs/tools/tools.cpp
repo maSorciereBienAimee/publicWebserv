@@ -205,35 +205,32 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 			// 		return (ret);
 			// }
 		}
-		else
+		int i = path.size();
+		std::string str = path;
+		std::string ext = tools::getExtension(path);
+		std::string newPath = path;
+		std::string withoutExt = path;
+		std::string::iterator it = str.begin();
+		while (it != str.end())
+			it++;
+		for (; *it != '/'; it--)
 		{
-			int i = path.size();
-			std::string str = path;
-			std::string ext = tools::getExtension(path);
-			std::string newPath = path;
-			std::string withoutExt = path;
-			std::string::iterator it = str.begin();
-			while (it != str.end())
-				it++;
-			for (; *it != '/'; it--)
-			{
-				i--;
-				if (it == str.begin())
-					break;
-			}
-			str.erase(it, str.end());
-			withoutExt = str;
-			if (withoutExt == "")
-					withoutExt = "/";
-			if (ext != "")
-			{
-				newPath = str + "/" + "*" + ext;
-				if (searchInConfig(newPath, location, &ret) == 1)
-					return (ret);
-			}
-			if (searchInConfig(withoutExt, location, &ret) == 1)
+			i--;
+			if (it == str.begin())
+				break;
+		}
+		str.erase(it, str.end());
+		withoutExt = str;
+		if (withoutExt == "")
+				withoutExt = "/";
+		if (ext != "")
+		{
+			newPath = str + "/" + "*" + ext;
+			if (searchInConfig(newPath, location, &ret) == 1)
 				return (ret);
 		}
+		if (searchInConfig(withoutExt, location, &ret) == 1)
+			return (ret);
 		return (ret);
 	}
 
