@@ -8,6 +8,8 @@
 #include <map>
 #include <sstream>
 #include <limits>
+#include <unistd.h>
+#include <sys/stat.h>
 #include "../parseConfig/parseConfig.hpp"
 #include "../parseConfig/serverLocation.hpp"
 #include "../parseConfig/serverBlock.hpp"
@@ -31,7 +33,10 @@ namespace tools
 	std::string							getMimeType(std::string fileName);
 	std::string							getExtension(std::string filename);
 	int									isItCgi(std::string path, std::vector<serverLocation> info);
-	serverLocation							whichLocation(std::string req, serverBlock block);
+	serverLocation						whichLocation(std::string req, serverBlock block);
+	serverLocation						searchLocation(std::string path, serverBlock block);
+	int									searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc);
+
 }
 
 

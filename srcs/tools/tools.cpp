@@ -118,8 +118,93 @@ namespace tools
         return (false);
     }
 
+
+int searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc)
+{
+	for (std::vector<serverLocation>::iterator it = location.begin(); it != location.end(); it++)
+	{
+		if ((*it).getLocationPath() == str)
+		{
+			(*loc).setIndex((*it).getIndex());
+			(*loc).setAI((*it).getAI());
+			(*loc).setAuthBasic((*it).getAuthBasic());
+			(*loc).setMethods((*it).getMethods());
+			(*loc).setBody((*it).getBody());
+			(*loc).setCgiExt((*it).getCgiExt());
+			(*loc).setCgiBin((*it).getCgiBin());
+			(*loc).setRedir((*it).getRedir());
+			(*loc).setAuthUsrFile((*it).getAuthUsrFile());
+			if ((*it).getRootLoc() != "");
+				(*loc).setRootLoc((*it).getRootLoc());
+			return (1);
+		}
+	}
+	return (0);
+}
+
+serverLocation	searchLocation(std::string path, serverBlock block)
+	{
+		struct stat	stock;
+		std::vector<serverLocation> location = block.getLocation();
+		serverLocation ret;
+		std::string	realPath = "./" + block.getRootServer() + path;
+	
+		ret.setIndex(block.getIndex());
+//		ret.setAI(block.getAutoIndex());
+//		ret.setAuthBasic(block.getAuthBasic()); ?
+//		ret.setMethods(block.getMethods());
+//		ret.setBody(block.getBody());
+		ret.setCgiExt(block.getCgiExt());
+		ret.setCgiBin(block.getCgiBin());
+//		ret.setRedir(block.getRedir());
+//		ret.setAuthUsrFile(block.getAuthUsrFile()); ?
+		ret.setRootLoc(block.getRootServer());
+
+		if (stat(realPath.c_str(), &stock) == 0)
+		{
+			if (S_ISDIR(stock.st_mode))
+			{
+				if (searchInConfig(path, location, &ret) == 1)
+						return (ret);
+			}
+			else
+			{
+				int i = path.size();
+				std::string str = path;
+				std::string ext = tools::getExtension(path);
+				std::string newPath = path;
+				std::string withoutExt = path;
+				std::string::iterator it = str.begin();
+				while (it != str.end())
+					it++;
+				for (; *it != '/'; it--)
+				{
+					i--;
+					if (it == str.begin())
+						break;
+				}
+				str.erase(it, str.end());
+				withoutExt = str;
+				if (withoutExt == "")
+						withoutExt = "/";
+				if (ext != "")
+				{
+					newPath = str + "/" + "*" + ext;
+					if (searchInConfig(newPath, location, &ret) == 1)
+						return (ret);
+				}
+				if (searchInConfig(withoutExt, location, &ret) == 1)
+					return (ret);
+			}
+		}
+		return (ret);
+	}
+
 	int	isItCgi(std::string path, std::vector<serverLocation> location)
 	{
+		/*
+		   check if directory
+		*/
 		int i = path.size();
 		std::string str = path;
 		std::string ext = tools::getExtension(path);
@@ -291,7 +376,7 @@ serverLocation	whichLocation(std::string req, serverBlock block)
 		fin++;
 	}
 	path = req.substr(deb, fin - deb);
-	std::cout << "PATH IN WHICHLOCATION " << path << std::endl;
+	loc = searchLocation(path, block);
 	return (loc);
 }
 

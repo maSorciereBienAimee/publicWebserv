@@ -1,7 +1,7 @@
 server {
 	        listen  8000;
             host           localhost;
-			root                	/var/www;
+			root                	/website;
 			
 			server_name localhost:8001;
 			index	                		index.html,      indexxxx.html;
@@ -9,7 +9,8 @@ server {
 
 
  	location 	/ {
-
+			
+		root                	/website;
  		index			index.html index.php index.nginx-debian.html;
  		autoindex		on;
  		methods			GET,POST,DELETE;

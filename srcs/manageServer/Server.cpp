@@ -173,7 +173,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	Cgi myCgi;
 	serverLocation synthese = tools::whichLocation(req, this->infoConfig);
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
-	Request marco(req, "/website" );
+	Request marco(req, synthese.getRootLoc() );
 	int status = marco.getStatus();
 	/*CHECKHOST:TODO:TOADDBACKIN
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
