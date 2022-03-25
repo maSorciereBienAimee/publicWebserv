@@ -188,6 +188,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 //	tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
 	Response polo(marco, status, myCgi, synthese);
+	std::cout << "AUTOINDEX IN SYNTHESE " << synthese.getAI() << "\n";
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
 

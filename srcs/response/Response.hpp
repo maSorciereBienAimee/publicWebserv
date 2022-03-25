@@ -40,6 +40,8 @@ class Response
 	int fd;
 	Cgi _cgi;
 	serverLocation _loc;
+	bool	_autoindex;
+
 };
 
 #endif

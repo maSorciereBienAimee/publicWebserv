@@ -158,7 +158,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::string	realPath = "./" + block.getRootServer() + path;
 	
 		ret.setIndex(block.getIndex());
-//		ret.setAI(block.getAutoIndex_s());
+		ret.setAI(block.getAI_s());
 //		ret.setAuthBasic(block.getAuthBasic_s()); ?
 //		ret.setMethods(block.getMethods_s());
 //		ret.setBody(block.getBody_s());
@@ -175,35 +175,64 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 				if (searchInConfig(path, location, &ret) == 1)
 						return (ret);
 			}
-			else
+			// else
+			// {
+			// 	int i = path.size();
+			// 	std::string str = path;
+			// 	std::string ext = tools::getExtension(path);
+			// 	std::string newPath = path;
+			// 	std::string withoutExt = path;
+			// 	std::string::iterator it = str.begin();
+			// 	while (it != str.end())
+			// 		it++;
+			// 	for (; *it != '/'; it--)
+			// 	{
+			// 		i--;
+			// 		if (it == str.begin())
+			// 			break;
+			// 	}
+			// 	str.erase(it, str.end());
+			// 	withoutExt = str;
+			// 	if (withoutExt == "")
+			// 			withoutExt = "/";
+			// 	if (ext != "")
+			// 	{
+			// 		newPath = str + "/" + "*" + ext;
+			// 		if (searchInConfig(newPath, location, &ret) == 1)
+			// 			return (ret);
+			// 	}
+			// 	if (searchInConfig(withoutExt, location, &ret) == 1)
+			// 		return (ret);
+			// }
+		}
+		else
+		{
+			int i = path.size();
+			std::string str = path;
+			std::string ext = tools::getExtension(path);
+			std::string newPath = path;
+			std::string withoutExt = path;
+			std::string::iterator it = str.begin();
+			while (it != str.end())
+				it++;
+			for (; *it != '/'; it--)
 			{
-				int i = path.size();
-				std::string str = path;
-				std::string ext = tools::getExtension(path);
-				std::string newPath = path;
-				std::string withoutExt = path;
-				std::string::iterator it = str.begin();
-				while (it != str.end())
-					it++;
-				for (; *it != '/'; it--)
-				{
-					i--;
-					if (it == str.begin())
-						break;
-				}
-				str.erase(it, str.end());
-				withoutExt = str;
-				if (withoutExt == "")
-						withoutExt = "/";
-				if (ext != "")
-				{
-					newPath = str + "/" + "*" + ext;
-					if (searchInConfig(newPath, location, &ret) == 1)
-						return (ret);
-				}
-				if (searchInConfig(withoutExt, location, &ret) == 1)
+				i--;
+				if (it == str.begin())
+					break;
+			}
+			str.erase(it, str.end());
+			withoutExt = str;
+			if (withoutExt == "")
+					withoutExt = "/";
+			if (ext != "")
+			{
+				newPath = str + "/" + "*" + ext;
+				if (searchInConfig(newPath, location, &ret) == 1)
 					return (ret);
 			}
+			if (searchInConfig(withoutExt, location, &ret) == 1)
+				return (ret);
 		}
 		return (ret);
 	}

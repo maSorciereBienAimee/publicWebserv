@@ -1,7 +1,7 @@
 #include "serverBlock.hpp"
  
 serverBlock::serverBlock() :  _host(0), _hostStr(), _portStr(), _name(), _port(80), _index(), _cgi_ext_s(), _cgi_bin_s(), _error(), _server_root(), _locations() ,
-_methods_s(), _auto_index_s(0), _body_size_s(), _auth_basic_s(), _auth_basic_file_s(), _redirection_s() {}
+_methods_s(), _auto_index_s(), _body_size_s(), _auth_basic_s(), _auth_basic_file_s(), _redirection_s() {}
 
 serverBlock::~serverBlock() {}
 
