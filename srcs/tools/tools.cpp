@@ -134,8 +134,7 @@ int searchInConfig(std::string str, std::vector<serverLocation> location, server
 			(*loc).setCgiBin((*it).getCgiBin());
 			(*loc).setRedir((*it).getRedir());
 			(*loc).setAuthUsrFile((*it).getAuthUsrFile());
-			if ((*it).getRootLoc() != "");
-				(*loc).setRootLoc((*it).getRootLoc());
+			(*loc).setRootLoc((*it).getRootLoc());
 			return (1);
 		}
 	}

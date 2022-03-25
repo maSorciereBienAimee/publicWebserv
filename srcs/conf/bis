@@ -20,12 +20,14 @@ server {
 
 	# location /jj {
 	# 	methods			GET,POST,DELETE;
+		root			/website/jj;
 
 	# 	redirection http://localhost:8001/html;
 	# }
 
 
  location /bonjourr {
+	root                	/website/bonjourr;
  	index			index.html;
  	autoindex		on;
  	methods			GET,POST;
@@ -37,6 +39,7 @@ server {
 	# 	index			index.html;
 	# 	autoindex		on;
 	# 	methods			POST, GET;
+		root			/website/test;
 	# 	cgi_extension	.php;
 	# 	cgi_bin			/usr/bin/php-cgi;
 	# }
