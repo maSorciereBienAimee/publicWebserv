@@ -158,14 +158,14 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::string	realPath = "./" + block.getRootServer() + path;
 	
 		ret.setIndex(block.getIndex());
-//		ret.setAI(block.getAutoIndex());
-//		ret.setAuthBasic(block.getAuthBasic()); ?
-//		ret.setMethods(block.getMethods());
-//		ret.setBody(block.getBody());
+//		ret.setAI(block.getAutoIndex_s());
+//		ret.setAuthBasic(block.getAuthBasic_s()); ?
+//		ret.setMethods(block.getMethods_s());
+//		ret.setBody(block.getBody_s());
 		ret.setCgiExt(block.getCgiExt());
 		ret.setCgiBin(block.getCgiBin());
-//		ret.setRedir(block.getRedir());
-//		ret.setAuthUsrFile(block.getAuthUsrFile()); ?
+//		ret.setRedir(block.getRedir_s());
+//		ret.setAuthUsrFile(block.getAuthUsrFile_s()); ?
 		ret.setRootLoc(block.getRootServer());
 
 		if (stat(realPath.c_str(), &stock) == 0)

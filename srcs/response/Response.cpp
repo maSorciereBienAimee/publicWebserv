@@ -10,10 +10,11 @@
 //}
 
 //(peut etre on va avoir besoin plus tard):,config(C), fd(F)
-Response::Response(Request R, int F, Cgi myCgi) : request(R), _cgi(myCgi)
+Response::Response(Request R, int F, Cgi myCgi, serverLocation loc) : request(R), _cgi(myCgi), _loc(loc)
 {
 	if (F == 400)
 		this->body_message = "Bad request";
+	std::cout << "AUTOINDEX IS " << loc.getAI() << "\n";
 	status = F;
 	initErrors();
 	launch();
@@ -58,6 +59,7 @@ std::string Response::getReply()
 void    Response::_delete(std::string path)
 {
     struct stat check;
+	serverBlock server;
 
 	path.erase(path.begin(), path.begin() + 1);
 	status = 200;
@@ -73,7 +75,14 @@ void    Response::_delete(std::string path)
 		}
     }
 	status = 403;
-	this->body_message = "file_not_found.html";
+	
+	if (server.getAI_s() == 1)
+	{
+		std::cout << "autoindex is 1\n";
+		this->body_message = "autoindex.html";
+	}
+	else
+		this->body_message = "file_not_found.html";
 	return;
 }
 

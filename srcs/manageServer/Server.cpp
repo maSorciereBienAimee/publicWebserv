@@ -9,7 +9,7 @@ Server::Server()
 }
 Server::Server(serverBlock block)
 {
-	tools::printServerBlock(block);
+	//tools::printServerBlock(block);
 	this->listenfd = -1;
 	this->infoConfig = block;
 }
@@ -184,8 +184,10 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 //	myCgi.init(marco, infoConfig);
 
 	std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
-	tools::printServerBlock(infoConfig);
-	Response polo(marco, status, myCgi);
+//	tools::printServerBlock(infoConfig);
+//	tools::printLocationBlock(infoConfig.getLocation());
+	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
+	Response polo(marco, status, myCgi, synthese);
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
 

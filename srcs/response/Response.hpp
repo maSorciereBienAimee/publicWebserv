@@ -3,11 +3,14 @@
 #include <map>
 #include "../request/Request.hpp"
 #include "../cgi/Cgi.hpp"
+#include "../parseConfig/parseConfig.hpp"
+#include "../parseConfig/serverLocation.hpp"
+#include "../parseConfig/serverBlock.hpp"
 
 class Response
 {
 	public:
-	Response(Request R, int F, Cgi myCgi);
+	Response(Request R, int F, Cgi myCgi, serverLocation loc);
 	~Response();
 	void launch();
 	void	_delete(std::string path);
@@ -36,6 +39,7 @@ class Response
 	Request request;
 	int fd;
 	Cgi _cgi;
+	serverLocation _loc;
 };
 
 #endif

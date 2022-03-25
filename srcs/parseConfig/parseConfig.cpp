@@ -162,6 +162,11 @@ void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
+	if (value.size() > 1)
+	{
+		std::string::iterator end_pos2 = std::remove(value.begin(), value.end(), '/');
+		value.erase(end_pos2, value.end());
+	}
 	server.setRootServer(value);
 	//std::cout << "ROOT SERVER = [" << server.getRootServer() << "]\n";
 }
@@ -249,7 +254,7 @@ void	parseConfig::parseAndSetAuthUsrServer(std::string &value, serverBlock &serv
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
 	server.setAuthUsrFile_s(value);
-	std::cout << "SERVER AUTH_USER_FILE = [" << server.getAuthUsrFile_s() << "]\n";
+	//std::cout << "SERVER AUTH_USER_FILE = [" << server.getAuthUsrFile_s() << "]\n";
 }
 
 void	parseConfig::parseAndSetAuthServer(std::string &value, serverBlock &server)
@@ -345,7 +350,8 @@ std::string	parseConfig::parseLocationPath(std::string const& line)
 	for (int i = 0; i < path.length(); i++)
 		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
 			throw OurException("ERROR: LOCATION PATH:only one path expected");
-
+	int i = path.size();
+	//std::cout << "path is : " << path << "\n";
 	return (path);
 }
 
