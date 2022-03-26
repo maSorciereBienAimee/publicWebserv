@@ -1,6 +1,7 @@
 #include "Response.hpp"
 #include <iostream>
 #include <string>
+#include <fstream>
 #include "../manageServer/Server.hpp"
 #include <sys/stat.h>
 
@@ -18,8 +19,6 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc) : request(R)
 		this->body_message = "Bad request";
 
 	_autoindex = _loc.getAI();
-	std::cout << "AUTOINDEX IS " << _autoindex << "\n";
-
 	status = F;
 	initErrors();
 	launch();
@@ -121,7 +120,27 @@ void Response::setBody()
 		std::stringstream conv2;
 		conv2 << body.length();
 		this->body_len = conv2.str();
-	}	
+	}
+	// else if (_autoindex == 1)
+	// {
+	// 	std::vector<std::string> dataAI = tools::getDirAI();
+	// 	if (dataAI.empty())
+	// 		throw OurException("Could not open directory");
+	// 	conv << status;
+	// 	code = conv.str();
+
+	// 	this->body = "<!DOCTYPE html>\n";
+	// 	this->body += (code + " " + body_message);
+	// 	for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
+	// 	{
+	// 		this->body += ((*it) + "\n\n");
+	// 	}
+		
+	// 	//this->body += "</h1>\n<img src='https://ih1.redbubble.net/image.3330216512.5449/st,small,507x507-pad,600x600,f8f8f8.jpg'></body>\n</html>";
+	// 	std::stringstream conv2;
+	// 	conv2 << body.length();
+	// 	this->body_len = conv2.str();
+	// }
 }
 
 void Response::readIn(std::string file)
@@ -179,15 +198,27 @@ void Response::_get(Request R)
 		}
 		else
 		{
-			std::cout << "IN 404 AI is " << _autoindex << "\n";
 			this->status = 404;
 			if (_autoindex == 1)
 			{
-				std::cout << "ICI\n"; 
+				
 				std::string root = R.getRoot();
 				root.erase(root.begin(), root.begin() + 1);
 				std::string path = root + "autoindex.html";
-				std::cout << "PATH IN AI IS  " << path << "\n";
+				
+				//insert data in html file
+				std::vector<std::string> data = tools::getDirAI();
+				//tools::printVector(data);
+				if (data.empty())
+					std::cout << "Could not open the directory\n";
+				std::ofstream html(path);
+				if (html.is_open())
+				{
+					for (std::vector<std::string>::iterator it = data.begin(); it != data.end(); it++)
+						html << (*it);
+				}
+				else
+					std::cout << "ISSUE WITH THE FILE\n";
 				readIn(path);
 				this->body_message = "Autoindex on";
 			}
@@ -208,6 +239,8 @@ void Response::_post(Request R)
 	status = 200;
 	readIn("." + R.getPath() + "index.html");
 }
+
+
 
 
 void Response::initErrors()

@@ -308,6 +308,29 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		return (finalRes);
 	}
 
+	std::vector<std::string>	getDirAI(void)
+	{
+		unsigned char isFile =0x8;
+		std::vector<std::string> data;
+		DIR *Dir;
+		struct dirent *DirEntry;
+		Dir = opendir("./website");
+		std::cout << "COUCOU\n";
+		if (Dir == NULL)
+		{
+			std::cout << "Could not open the directory laaaa\n";
+			return (std::vector<std::string>());
+		}
+		while((DirEntry = readdir(Dir)) != NULL)
+		{
+			if ( DirEntry->d_type == isFile)
+			{
+				data.push_back(DirEntry->d_name);
+   			}
+		}
+		closedir(Dir);
+		return (data);
+}
 
 	std::map<std::string, std::string> mime()
 	{

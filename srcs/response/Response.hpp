@@ -42,6 +42,7 @@ class Response
 	serverLocation _loc;
 	bool	_autoindex;
 
+
 };
 
 #endif

@@ -10,6 +10,9 @@
 #include <limits>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/types.h>
 #include "../parseConfig/parseConfig.hpp"
 #include "../parseConfig/serverLocation.hpp"
 #include "../parseConfig/serverBlock.hpp"
@@ -36,7 +39,7 @@ namespace tools
 	serverLocation						whichLocation(std::string req, serverBlock block);
 	serverLocation						searchLocation(std::string path, serverBlock block);
 	int									searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc);
-
+	std::vector<std::string>			getDirAI(void);
 }
 
 

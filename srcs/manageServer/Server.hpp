@@ -15,6 +15,7 @@
 #include "../tools/tools.hpp"
 #include "../cgi/Cgi.hpp"
 
+
 #define MAX_CLIENT 5000
 
 class Server
@@ -33,8 +34,7 @@ class Server
 	std::vector<std::string> _server;
 	void pseudoReponse(std::string str, int fd); // a supprimer quand response sera faite
 	int getListen() const;
-	void readData(int fd, int epfd);
-
+	void readData(int fd, int epfd);	
 	private:
 	std::string request;
 	serverBlock infoConfig;
