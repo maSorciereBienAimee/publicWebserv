@@ -175,11 +175,14 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 	Request marco(req, synthese.getRootLoc() );
 	int status = marco.getStatus();
-	/*CHECKHOST:TODO:TOADDBACKIN
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
-	if (marco.getPath() != this->infoConfig.getHostStr() && marco.getPath() != hp)
-		status = 400;*/
-
+	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+	{
+		if (this->infoConfig.getHostStr() == "127.0.0.1")
+			hp = "localhost:" + this->infoConfig.getPortStr();
+		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+			status = 400;
+	}
 	myCgi.setIsIt(tools::isItCgi(marco.getPath(), this->infoConfig.getLocation()));
 //	myCgi.init(marco, infoConfig);
 

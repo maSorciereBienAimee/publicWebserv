@@ -23,6 +23,7 @@ class Request
 			std::string parseHeaders(const std::string &str, int end);
 			void	pathDecoder(std::string path);
 			std::string	getRoot(void);
+			std::string getHost() const;
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;

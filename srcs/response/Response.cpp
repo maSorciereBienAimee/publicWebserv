@@ -4,6 +4,7 @@
 #include <fstream>
 #include "../manageServer/Server.hpp"
 #include <sys/stat.h>
+#include <vector>
 
 //Response::Response(void)
 //{
@@ -32,14 +33,15 @@ Response::~Response()
 
 void Response::launch()
 {
+	std::vector<std::string> methods = _loc.getMethods();
 	std::string reponse;
 	if (status == 200)
 	{
-		if (this->request.getMethod() == "GET")
+		if (this->request.getMethod() == "GET" && find(methods.begin(), methods.end(), "GET") != methods.end())
 			_get(request);
-		else if (this->request.getMethod() == "DELETE")
+		else if (this->request.getMethod() == "DELETE" && find(methods.begin(), methods.end(), "DELETE") != methods.end())
 			_delete(request.getPath());
-		else if (this->request.getMethod() == "POST")
+		else if (this->request.getMethod() == "POST" && find(methods.begin(), methods.end(), "POST") != methods.end())
 			_post(request);
 		else
 			_other(request);

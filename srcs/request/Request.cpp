@@ -1,5 +1,5 @@
 #include "Request.hpp"
-
+#include <stdexcept>
 //Request::Request(void) : _orig_req("yo")
 //{
 //}
@@ -85,12 +85,9 @@ int Request::parseRequestLine(const std::string &str)
     _path = line.substr(0, break_2);
     pathDecoder(_path);
     int x = _root.length() - 1;
-    std::cout << " x is " << x << "_path[0] is " << _path[0] << " root[x] is" << _root[x] << std::endl;
+    // GET RID OF DOUBLE //
     if (x > -1 && _path[0] == '/' && _root[x] == '/')
-    {
-        std::cout << "SHOULD BE HERE" << std::endl;
         _root.erase(_root.end() - 1);
-    }
     _path = _root + _path;
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
@@ -186,6 +183,26 @@ std::string const &Request::getPath() const
 {
 	return (this->_path);
 }
+
+std::string Request::getHost() const
+{
+    const std::string key = "Host";
+    if (_headers.find("Host") == _headers.end())
+    {
+        std::cout << "PROB 1" << std::endl;
+        return NULL;
+    }
+    try
+    {
+       return _headers.at(key);
+    }
+    catch (const std::exception &e)
+    {
+        std::cout << "PROB 2" << std::endl;
+         return "";
+    }
+}
+
 int const &Request::getStatus() const
 {
 	return (this->status);
