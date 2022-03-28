@@ -84,6 +84,13 @@ int Request::parseRequestLine(const std::string &str)
     //PATH IS FROM 0 UNTIL FIRST SPACE
     _path = line.substr(0, break_2);
     pathDecoder(_path);
+    int x = _root.length() - 1;
+    std::cout << " x is " << x << "_path[0] is " << _path[0] << " root[x] is" << _root[x] << std::endl;
+    if (x > -1 && _path[0] == '/' && _root[x] == '/')
+    {
+        std::cout << "SHOULD BE HERE" << std::endl;
+        _root.erase(_root.end() - 1);
+    }
     _path = _root + _path;
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END

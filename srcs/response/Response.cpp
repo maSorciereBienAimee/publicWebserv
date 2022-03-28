@@ -108,7 +108,7 @@ void Response::setBody()
 {
 	std::string code;
 	std::stringstream conv;
-	
+
 	if (_autoindex == 0)
 	{
 		conv << status;
@@ -135,7 +135,7 @@ void Response::setBody()
 	// 	{
 	// 		this->body += ((*it) + "\n\n");
 	// 	}
-		
+
 	// 	//this->body += "</h1>\n<img src='https://ih1.redbubble.net/image.3330216512.5449/st,small,507x507-pad,600x600,f8f8f8.jpg'></body>\n</html>";
 	// 	std::stringstream conv2;
 	// 	conv2 << body.length();
@@ -201,11 +201,11 @@ void Response::_get(Request R)
 			this->status = 404;
 			if (_autoindex == 1)
 			{
-				
+
 				std::string root = R.getRoot();
 				root.erase(root.begin(), root.begin() + 1);
 				std::string path = root + "autoindex.html";
-				
+
 				//insert data in html file
 				std::vector<std::string> data = tools::getDirAI();
 				//tools::printVector(data);
