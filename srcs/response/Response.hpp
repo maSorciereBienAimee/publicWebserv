@@ -22,10 +22,12 @@ class Response
 	std::string getReply();
 	void readIn(std::string file);
 	void initErrors();
-	
+	std::string makeDate(void);
+
+
 	private :
 	Response();
-	
+
 	std::string _header;
 	std::string body_message;
 	std::string body;

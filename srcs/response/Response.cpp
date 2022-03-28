@@ -5,6 +5,9 @@
 #include "../manageServer/Server.hpp"
 #include <sys/stat.h>
 #include <vector>
+#include <ctime>
+#include <cstring>
+#include <sstream>
 
 //Response::Response(void)
 //{
@@ -96,7 +99,8 @@ void Response::setHeaders()
 	std::map<std::string, std::string>::iterator it = this->extra_headers.begin();
 	this->_header = "HTTP/1.1 ";
 	_header += (errors[this->status]) + "\n";
-	_header += "server: DreamTeamServer/1.0\n";
+	_header += "Server: DreamTeamServer/1.0\n";
+	_header += "Date: " + makeDate();
 	for (int i = 0; i < this->extra_headers.size(); i++)
 	{
 		_header += (it->first + ": " + it->second + "\n");
@@ -104,6 +108,22 @@ void Response::setHeaders()
 	}
 	if (status != 404 && status != 304 && !(status > 99 && status < 200))
 		_header += "Content-Length: " + body_len;
+}
+
+std::string Response::makeDate(void)
+{
+	std::stringstream conv;
+	time_t now = time(0);
+	time_t current;
+    char rfc_2822[40];
+
+    time(&current);
+    strftime(rfc_2822, sizeof(rfc_2822), "%a, %d %b %Y %T GMT\n", localtime(&current));
+	std::cout << rfc_2822 << std::endl;
+	int i = 0;
+	std::string ret;
+	ret = rfc_2822;
+	return ret;
 }
 
 void Response::setBody()
