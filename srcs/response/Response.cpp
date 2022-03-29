@@ -21,9 +21,8 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 {
 	if (F == 400)
 		this->body_message = "Bad request";
-
+	index_vec = _loc.getIndex();
 	_autoindex = _loc.getAI();
-
 	status = F;
 	initErrors();
 	launch();
@@ -203,7 +202,7 @@ void Response::_get(Request R)
 		{
 			std::string code;
 			std::stringstream conv;
-		
+
 			std::string path = R.getPath();
 			// std::cout << "ROOT IS _______" << R.getRoot() << "\n";
 			// std::cout << "PATH IS _____________ " << path << "\n";
@@ -230,15 +229,67 @@ void Response::_get(Request R)
 		{
 			this->status = 404;
 			this->body_message = "File not found";
-		}	
+		}
 	}
 	else //no file specified so home page??
-	{
-		this->status = 200;
-		readIn("." + R.getPath() + "index.html");
-	}
-
+		_homepage(R);
 }
+
+void Response::_homepage(Request R)
+{
+	int size = index_vec.size();
+	int i;
+	this->status = 200;
+	for (i = 0; i < size; i++)
+	{
+		std::string str = R.getPath() + index_vec[i];
+		str.erase(str.begin(), str.begin() + 1);
+		struct stat check;
+		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+		{
+			readIn(str);
+			this->status = 200;
+			return;
+		}
+	}
+	if (_autoindex == 1)
+	{
+		std::string code;
+		std::stringstream conv;
+		std::string root = R.getRoot();
+
+		root.erase(root.begin(), root.begin() + 1);
+		std::string path = root + "autoindex.html";
+
+		//insert data in html file
+		std::vector<std::string> data = tools::getDirAI();
+		//tools::printVector(data);
+		if (data.empty())
+			std::cout << "Could not open the directory\n";
+		std::vector<std::string> dataAI = tools::getDirAI();
+		if (dataAI.empty())
+			throw OurException("Could not open directory");
+		conv << status;
+		code = conv.str();
+		std::cout << "CODE IS " << code << "\n";
+		this->body = "<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
+		this->body += (code);
+		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
+		{
+			this->body += "<br>" + (*it) + "</br>"; ;
+		}
+		this->body += "</body>\n</html>\n";
+		std::stringstream conv2;
+		conv2 << body.length();
+		this->body_len = conv2.str();
+	}
+	else
+	{
+		this->status = 404;
+		this->body_message = "File not found";
+	}
+}
+
 
 void Response::_post(Request R)
 {

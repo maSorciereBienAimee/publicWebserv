@@ -17,6 +17,7 @@ class Response
 	void setHeaders();
 	void setBody();
 	void _get(Request R);
+	void _homepage(Request R);
 	void _post(Request R);
 	void _other(Request R);
 	std::string getReply();
@@ -29,6 +30,7 @@ class Response
 	Response();
 
 	std::string _header;
+	std::vector<std::string> index_vec;
 	std::string body_message;
 	std::string body;
 	std::string body_len;
