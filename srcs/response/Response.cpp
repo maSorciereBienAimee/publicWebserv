@@ -143,26 +143,6 @@ void Response::setBody()
 		conv2 << body.length();
 		this->body_len = conv2.str();
 	}
-	else if (_autoindex == 1)
-	{
-		std::vector<std::string> dataAI = tools::getDirAI();
-		if (dataAI.empty())
-			throw OurException("Could not open directory");
-		conv << status;
-		code = conv.str();
-		std::cout << "CODE IS " << code << "\n";
-		this->body = "<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
-		this->body += (code);
-		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
-		{
-			this->body += "<br>" + (*it) + "&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp" + makeDate() + "</br>"; ;
-		
-		}
-		this->body += "</body>\n</html>\n";
-		std::stringstream conv2;
-		conv2 << body.length();
-		this->body_len = conv2.str();
-	}
 }
 
 void Response::readIn(std::string file)
@@ -218,46 +198,43 @@ void Response::_get(Request R)
 			readIn(path);
 			this->status = 200;
 		}
+		else if (_autoindex == 1)
+		{
+			std::string code;
+			std::stringstream conv;
+			std::string root = R.getRoot();
+
+			root.erase(root.begin(), root.begin() + 1);
+			std::string path = root + "autoindex.html";
+			
+			//insert data in html file
+			std::vector<std::string> data = tools::getDirAI();
+			//tools::printVector(data);
+			if (data.empty())
+				std::cout << "Could not open the directory\n";
+			std::vector<std::string> dataAI = tools::getDirAI();
+			if (dataAI.empty())
+				throw OurException("Could not open directory");
+			conv << status;
+			code = conv.str();
+			std::cout << "CODE IS " << code << "\n";
+			this->body = "<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
+			this->body += (code);
+			for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
+			{
+				this->body += "<br>" + (*it) + "</br>"; ;
+			}
+			this->body += "</body>\n</html>\n";
+			std::stringstream conv2;
+			conv2 << body.length();
+			this->body_len = conv2.str();
+
+		}
 		else
 		{
 			this->status = 404;
-			if (_autoindex == 1)
-			{
-				
-				std::string root = R.getRoot();
-				root.erase(root.begin(), root.begin() + 1);
-				std::string path = root + "autoindex.html";
-				
-				//insert data in html file
-				std::vector<std::string> data = tools::getDirAI();
-				//tools::printVector(data);
-				if (data.empty())
-					std::cout << "Could not open the directory\n";
-				//std::string content;
-			//	std::ofstream html(path);
-				// if (html.is_open())
-				// {
-				// 	content += "<!DOCTYPE html>\n<html>\n<body>\n<h1>";
-				// 	content += "AUTOINDEX</h1>\n";
-				// 	content += "<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: 0 auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif; }\n</style>";
-
-				// 	//html << "<!DOCTYPE html>\n<html>\n<body>\n<h1>";
-				// 	//html << "AUTOINDEX</h1>\n";
-				// 	//html << "<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: 0 auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif; }\n</style>";
-				// 	for (std::vector<std::string>::iterator it = data.begin(); it != data.end(); it++)
-				// 		content += (*it) + "\n";
-				// 		//html << (*it) << "\n";
-				// 	content += 	"</body>\n</html>\n";
-				// 	html << content;
-				// 	//html << "</body>\n</html>\n";
-				// }
-				// else
-				// 	std::cout << "ISSUE WITH THE FILE\n";
-				readIn(path);
-				this->body_message = "Autoindex on";
-			}
 			this->body_message = "File not found";
-		}
+		}	
 	}
 	else //no file specified so home page??
 	{
