@@ -46,6 +46,10 @@ class Response
 	serverLocation _loc;
 	serverBlock		_server;
 	bool	_autoindex;
+	std::string	_path;
+	std::string	_old_path;
+	std::string _redir_path;
+	bool 		redir;
 
 
 };
