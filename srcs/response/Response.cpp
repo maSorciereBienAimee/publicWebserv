@@ -229,10 +229,7 @@ void Response::_get(Request R)
 			std::string path = R.getPath();
 			// std::cout << "ROOT IS _______" << R.getRoot() << "\n";
 			// std::cout << "PATH IS _____________ " << path << "\n";
-			std::vector<std::string> data = tools::getDirAI();
-			if (data.empty())
-				std::cout << "Could not open the directory\n";
-			std::vector<std::string> dataAI = tools::getDirAI();
+			std::vector<std::string> dataAI = tools::getDirAI();  // change to do a function generate autoindex(host, port, path,)
 			if (dataAI.empty())
 				throw OurException("Could not open directory");
 			conv << status;
@@ -279,32 +276,25 @@ void Response::_homepage(Request R)
 	{
 		std::string code;
 		std::stringstream conv;
-		std::string root = R.getRoot();
 
-		root.erase(root.begin(), root.begin() + 1);
-		std::string path = root + "autoindex.html";
-
-		//insert data in html file
-		std::vector<std::string> data = tools::getDirAI();
-		//tools::printVector(data);
-		if (data.empty())
-			std::cout << "Could not open the directory\n";
+		std::string path = R.getPath();
+		// std::cout << "ROOT IS _______" << R.getRoot() << "\n";
+		// std::cout << "PATH IS _____________ " << path << "\n";
 		std::vector<std::string> dataAI = tools::getDirAI();
 		if (dataAI.empty())
 			throw OurException("Could not open directory");
 		conv << status;
 		code = conv.str();
-		std::cout << "CODE IS " << code << "\n";
 		this->body = "<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
-		this->body += (code);
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
-			this->body += "<br>" + (*it) + "</br>"; ;
+			this->body += "\t\t<p><a href=\"http://" +  _server.getHostStr() + ":" + _server.getPortStr() + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
 		}
 		this->body += "</body>\n</html>\n";
 		std::stringstream conv2;
 		conv2 << body.length();
 		this->body_len = conv2.str();
+	
 	}
 	else
 	{

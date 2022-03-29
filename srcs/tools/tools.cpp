@@ -308,13 +308,13 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		return (finalRes);
 	}
 
-	std::vector<std::string>	getDirAI(void)
+	std::vector<std::string>	getDirAI(void) //add path & server
 	{
 		unsigned char isFile =0x8;
 		std::vector<std::string> data;
 		DIR *Dir;
 		struct dirent *DirEntry;
-		Dir = opendir("./website");
+		Dir = opendir("./website"); //change to path 
 		if (Dir == NULL)
 		{
 			std::cout << "Could not open the directory laaaa\n";
@@ -322,7 +322,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		}
 		while((DirEntry = readdir(Dir)) != NULL)
 		{
-			if ( DirEntry->d_type == isFile)
+			if ( DirEntry->d_type == DT_DIR)
 			{
 				data.push_back(DirEntry->d_name);
    			}
