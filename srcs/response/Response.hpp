@@ -10,7 +10,7 @@
 class Response
 {
 	public:
-	Response(Request R, int F, Cgi myCgi, serverLocation loc);
+	Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock server);
 	~Response();
 	void launch();
 	void	_delete(std::string path);
@@ -42,6 +42,7 @@ class Response
 	int fd;
 	Cgi _cgi;
 	serverLocation _loc;
+	serverBlock		_server;
 	bool	_autoindex;
 
 

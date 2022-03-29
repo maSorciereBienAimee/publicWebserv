@@ -315,7 +315,6 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		DIR *Dir;
 		struct dirent *DirEntry;
 		Dir = opendir("./website");
-		std::cout << "COUCOU\n";
 		if (Dir == NULL)
 		{
 			std::cout << "Could not open the directory laaaa\n";
