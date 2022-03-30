@@ -155,17 +155,17 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		struct stat	stock;
 		std::vector<serverLocation> location = block.getLocation();
 		serverLocation ret;
-		std::string	realPath = "./" + block.getRootServer() + path;
+		std::string	realPath = "." + block.getRootServer() + path;
 	
 		ret.setIndex(block.getIndex());
 		ret.setAI(block.getAI_s());
-//		ret.setAuthBasic(block.getAuthBasic_s()); ?
-//		ret.setMethods(block.getMethods_s());
-//		ret.setBody(block.getBody_s());
+		ret.setAuthBasic(block.getAuthBasic_s());
+		ret.setMethods(block.getMethods_s());
+		ret.setBody(block.getBody_s());
 		ret.setCgiExt(block.getCgiExt());
 		ret.setCgiBin(block.getCgiBin());
-//		ret.setRedir(block.getRedir_s());
-//		ret.setAuthUsrFile(block.getAuthUsrFile_s()); ?
+		ret.setRedir(block.getRedir_s());
+		ret.setAuthUsrFile(block.getAuthUsrFile_s());
 		ret.setRootLoc(block.getRootServer());
 
 		if (stat(realPath.c_str(), &stock) == 0)
@@ -174,36 +174,8 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 			{
 				if (searchInConfig(path, location, &ret) == 1)
 						return (ret);
+				return (ret);
 			}
-			// else
-			// {
-			// 	int i = path.size();
-			// 	std::string str = path;
-			// 	std::string ext = tools::getExtension(path);
-			// 	std::string newPath = path;
-			// 	std::string withoutExt = path;
-			// 	std::string::iterator it = str.begin();
-			// 	while (it != str.end())
-			// 		it++;
-			// 	for (; *it != '/'; it--)
-			// 	{
-			// 		i--;
-			// 		if (it == str.begin())
-			// 			break;
-			// 	}
-			// 	str.erase(it, str.end());
-			// 	withoutExt = str;
-			// 	if (withoutExt == "")
-			// 			withoutExt = "/";
-			// 	if (ext != "")
-			// 	{
-			// 		newPath = str + "/" + "*" + ext;
-			// 		if (searchInConfig(newPath, location, &ret) == 1)
-			// 			return (ret);
-			// 	}
-			// 	if (searchInConfig(withoutExt, location, &ret) == 1)
-			// 		return (ret);
-			// }
 		}
 		int i = path.size();
 		std::string str = path;
@@ -227,50 +199,20 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		{
 			newPath = str + "/" + "*" + ext;
 			if (searchInConfig(newPath, location, &ret) == 1)
-				return (ret);
+			{
+				if (ret.getCgiExt() == ext)
+					return (ret);
+			}
 		}
 		if (searchInConfig(withoutExt, location, &ret) == 1)
 			return (ret);
 		return (ret);
 	}
 
-	int	isItCgi(std::string path, std::vector<serverLocation> location)
+	int	isItCgi(std::string path, serverLocation location)
 	{
-		/*
-		   check if directory
-		*/
-		int i = path.size();
-		std::string str = path;
-		std::string ext = tools::getExtension(path);
-		std::string newPath = "";
-		std::string withoutExt = path;
-		if (ext != "")
-		{
-			std::string::iterator it = str.begin();
-			while (it != str.end())
-				it++;
-			for (; *it != '/'; it--)
-			{
-				i--;
-				if (it == str.begin())
-					break;
-			}
-			str.erase(it, str.end());
-			withoutExt = str;
-			if (withoutExt == "")
-					withoutExt = "/";
-			newPath = str + "/" + "*" + ext;
-		}
-		for (std::vector<serverLocation>::iterator it = location.begin(); it != location.end(); it++)
-		{
-			if ((*it).getLocationPath() == newPath && (*it).getCgiExt() == ext)
-					return (1);
-		}
-		for (std::vector<serverLocation>::iterator it = location.begin(); it != location.end(); it++)
-		{
-			if ((*it).getLocationPath() == withoutExt && (*it).getCgiExt() == ext)
-					return (1);
-		}
+		if (location.getCgiExt() != "" && location.getCgiExt() == getExtension(path))
+				return (1);
 		return (0);
 	}
 
@@ -457,14 +399,57 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 			return (_mimeMap);
 	}
 
-serverLocation	whichLocation(std::string req, serverBlock block)
+std::string searchCorrectPath(std::string query, serverBlock block)
 {
-	std::cout << req << std::endl;
-	serverLocation loc;
+	std::string root = "." + block.getRootServer();
+	std::string path = root + query;
+	struct stat s;
+	std::string ret;
+	//std::string path = "./" + block.getRootServer() + query;
+	std::string::iterator it = path.begin();
+	int i = 0;
+
+	while (1)
+	{
+		while (*it != '/' && *it != '?' && it != path.end())
+		{	
+		std::cout << "*it = " << *it << " et i = " << i << std::endl;
+				it++;
+				i++;
+		}
+		ret = path.substr(0, i);
+		std::cout << "ret = " << ret << std::endl;
+//		std::cout << "path = " << path << std::endl;
+//		std::cout << "query = " << query << std::endl;
+		if (stat(ret.c_str(), &s) == 0)
+		{
+			if (S_ISDIR(s.st_mode))
+			{
+				it++;
+				i++;
+				continue ;
+			}
+			else
+			{
+				ret = path.substr(root.size(), i - root.size());
+				return (ret);
+			}
+		}
+		else
+			return (query);
+	}
+	return (query);
+}
+
+std::string getSimplePath(std::string req, std::string *query, serverBlock block)
+{
 	std::string path;
+	std::string root = "." + block.getRootServer();
+	struct stat s;
 	int deb = 0;
 	int fin;
 	std::string::iterator it = req.begin();
+	
 	while (*it != ' ')
 	{
 		it++;
@@ -479,8 +464,20 @@ serverLocation	whichLocation(std::string req, serverBlock block)
 		it2++;
 		fin++;
 	}
-	path = req.substr(deb, fin - deb);
-	loc = searchLocation(path, block);
+	*query = req.substr(deb, fin - deb);
+	path = root + *query;
+
+	if (stat(path.c_str(), &s) == 0)
+		path = *query;
+	else
+		path = searchCorrectPath(*query, block);
+	return (path);
+}
+
+serverLocation	whichLocation(std::string simple, serverBlock block)
+{
+	serverLocation loc;
+	loc = searchLocation(simple, block);
 	return (loc);
 }
 

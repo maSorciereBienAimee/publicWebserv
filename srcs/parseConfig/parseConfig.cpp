@@ -162,11 +162,11 @@ void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
-	if (value.size() > 1)
-	{
-		std::string::iterator end_pos2 = std::remove(value.begin(), value.end(), '/');
-		value.erase(end_pos2, value.end());
-	}
+//	if (value.size() > 1)
+//	{
+//		std::string::iterator end_pos2 = std::remove(value.begin(), value.end(), '/');
+//		value.erase(end_pos2, value.end());
+//	}
 	server.setRootServer(value);
 	//std::cout << "ROOT SERVER = [" << server.getRootServer() << "]\n";
 }

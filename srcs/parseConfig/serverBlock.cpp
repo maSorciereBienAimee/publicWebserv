@@ -41,7 +41,7 @@ serverBlock 	serverBlock::operator=(const serverBlock& other)
 	_auth_basic_s = other._auth_basic_s;
   	_auth_basic_file_s = other._auth_basic_file_s;
 	_redirection_s = other._redirection_s;
-
+	_server_root = other._server_root;
 	return  (*this);
 }
 

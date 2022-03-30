@@ -170,10 +170,12 @@ void Server::readData(int fd, int epfd)
 
 void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee quand la class reponse sera faite
 {
-	Cgi myCgi;
-	serverLocation synthese = tools::whichLocation(req, this->infoConfig);
+	std::string	queryPath;
+	std::string simplePath = tools::getSimplePath(req, &queryPath, this->infoConfig);
+	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 	Request marco(req, synthese.getRootLoc() );
+	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath);
 	int status = marco.getStatus();
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
 	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
@@ -183,10 +185,14 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
 			status = 400;
 	}
-	myCgi.setIsIt(tools::isItCgi(marco.getPath(), this->infoConfig.getLocation()));
+	myCgi.setIsIt(tools::isItCgi(simplePath, synthese));
 //	myCgi.init(marco, infoConfig);
 
 	std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
+	if (myCgi.getIsIt() == 1)
+			myCgi.cgiRun();
+	else
+	{
 //	tools::printServerBlock(infoConfig);
 //	tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
@@ -195,7 +201,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	std::cout << "CGI EXT SYNTHESE IS  " << synthese.getCgiExt() << "\n";
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
-
+	}
 }
 
 int Server::getListen() const

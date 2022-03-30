@@ -35,12 +35,14 @@ namespace tools
 	std::map<std::string, std::string>	mime();
 	std::string							getMimeType(std::string fileName);
 	std::string							getExtension(std::string filename);
-	int									isItCgi(std::string path, std::vector<serverLocation> info);
+	int									isItCgi(std::string path, serverLocation info);
 	serverLocation						whichLocation(std::string req, serverBlock block);
 	serverLocation						searchLocation(std::string path, serverBlock block);
 	int									searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc);
 	std::vector<std::string>			getDirAI(std::string const& path);
 	std::string							genreateAI(std::string const& host, std::string const& port, std::string const& path);
+	std::string							getSimplePath(std::string r, std::string *p, serverBlock B);
+	std::string							searchCorrectPath(std::string q, serverBlock B);
 
 }
 
