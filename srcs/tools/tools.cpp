@@ -308,13 +308,15 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		return (finalRes);
 	}
 
-	std::vector<std::string>	getDirAI(void) //add path & server
+	std::vector<std::string>	getDirAI(std::string const& path) //add path & server
 	{
 		unsigned char isFile =0x8;
 		std::vector<std::string> data;
 		DIR *Dir;
 		struct dirent *DirEntry;
-		Dir = opendir("./website"); //change to path 
+		//nedd to change the path ??? 
+		std::string newPath = "." + path;
+		Dir = opendir(newPath.c_str()); //change to path 
 		if (Dir == NULL)
 		{
 			std::cout << "Could not open the directory laaaa\n";
@@ -322,14 +324,60 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		}
 		while((DirEntry = readdir(Dir)) != NULL)
 		{
-			if ( DirEntry->d_type == DT_DIR)
-			{
-				data.push_back(DirEntry->d_name);
-   			}
+			data.push_back(DirEntry->d_name);
 		}
 		closedir(Dir);
 		return (data);
-}
+	}
+
+	std::string	genreateAI(std::string const& host, std::string const& port, std::string const& path)
+	{
+		std::string buff;
+
+		std::cout << "Path is  " << path << "\n";
+		std::cout << "Host is  " << host << "\n";
+		std::cout << "Port is  " << port << "\n";
+
+		std::vector<std::string> dataAI = tools::getDirAI(path);  // change to do a function generate autoindex(host, port, path,)
+		if (dataAI.empty())
+			std::cerr << "AUTOINDEX: Could not open directory\n";
+
+		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
+		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
+		{
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
+		}
+		buff += "</body>\n</html>\n";
+		return (buff);
+	}
+
+
+
+// stat() will tell you this.
+
+// struct stat s;
+// if( stat(path,&s) == 0 )
+// {
+//     if( s.st_mode & S_IFDIR )
+//     {
+//         //it's a directory
+//     }
+//     else if( s.st_mode & S_IFREG )
+//     {
+//         //it's a file
+//     }
+//     else
+//     {
+//         //something else
+//     }
+// }
+// else
+// {
+//     //error
+// }
+
+
+
 
 	std::map<std::string, std::string> mime()
 	{

@@ -192,6 +192,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
 	Response polo(marco, status, myCgi, synthese, infoConfig);
 	std::cout << "AUTOINDEX IN SYNTHESE " << synthese.getAI() << "\n";
+	std::cout << "CGI EXT SYNTHESE IS  " << synthese.getCgiExt() << "\n";
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
 
