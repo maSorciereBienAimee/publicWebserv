@@ -1,13 +1,31 @@
 #include "parseConfig.hpp"
 
-parseConfig::parseConfig(void){ return; }
+parseConfig::parseConfig(void) : _lsn(0), _idx(0), _rt(0), _hst(0), _srv(0),_cgx(0),_cgb(0), _err(0),_mtd(0), _cms(0), _ab(0), _abf(0), _rdr(0)
+{ return; }
 
-parseConfig::~parseConfig(void){ return; }
+parseConfig::~parseConfig(void) 
+{ return; }
 
-parseConfig::parseConfig(const parseConfig& cpy)
+parseConfig::parseConfig(const parseConfig& cpy) : _lsn(cpy._lsn), _idx(cpy._idx),
+_rt(cpy._rt), _hst(cpy._hst), _srv(cpy._srv),_cgx(cpy._cgx),_cgb(cpy._cgb), _err(cpy._err),_mtd(cpy._mtd), _cms(cpy._cms), _ab(cpy._ab), _abf(cpy._abf), _rdr(cpy._rdr)
 {}
 
-parseConfig &parseConfig::operator=(const parseConfig& other){ return *this; }
+parseConfig &parseConfig::operator=(const parseConfig& other)
+{	
+	_lsn = other._lsn;
+	_idx = other._idx;
+	_rt  = other._rt;
+	_hst = other._hst;
+	_srv = other._srv;
+	_cgx = other._cgx;
+	_cgb = other._cgb;
+	_err = other._err;
+	_mtd = other._mtd;
+	_cms = other._cms;
+	_ab  = other._ab;
+	_abf = other._abf;
+	_rdr = other._rdr;
+	return *this; }
 
 /******_____PARSEING COMMON FUNCTION______******/
 
@@ -421,6 +439,36 @@ void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std
 		parseAndSetRedirServer(value, server);
 }
 
+void		parseConfig::countEachAtt(std::string const& attribut)
+{
+	if (attribut.compare("listen ") == 0)
+		_lsn++;
+	else if (attribut.compare("index ") == 0)
+		_idx++;
+	else if (attribut.compare("host ") == 0)
+		_hst++;
+	else if (attribut.compare("server_name ") == 0)
+		_srv++;
+	else if (attribut.compare("cgi_extension ") == 0)
+		_cgx++;
+	else if (attribut.compare("cgi_bin ") == 0)
+		_cgb++;
+	else if (attribut.compare("error ") == 0)
+		_err++;
+	else if (attribut.compare("root ") == 0)
+		_rt++;
+	else if (attribut.compare("methods ") == 0)
+		_mtd++;
+	else if (attribut.compare("client_max_body_size ") == 0)
+	 	_cms++;
+	else if (attribut.compare("auth_basic ") == 0)
+	 	_ab++;
+	else if (attribut.compare("auth_basic_user_file ") == 0)
+		_abf++;
+	else if (attribut.compare("redirection ") == 0)
+		_rdr++;
+}
+
 int		parseConfig::getAttributName(std::string const &line, std::string &attribut, std::string& value, serverBlock &server)
 {
 	int 						i = 0, j = 0;
@@ -443,16 +491,17 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 		if (pos != std::string::npos)
 		{
 			attribut = (*it).substr(0, (*it).length());
-		//	std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
+			countEachAtt(attribut);
+			if (_lsn > 1 || _idx > 1 || _rt > 1 || _hst > 1 || _srv > 1 || _cgx > 1 || _cgb > 1 
+			|| _err > 1 || _mtd > 1 || _cms > 1 || _ab > 1 || _abf > 1 || _rdr > 1)
+					throw OurException("Directive in server block not allowed here");
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
 		//	std::cout << " Value = " << "'"<<  value << "'" << "\n";
 			getValueServerBlock(((*it).length() + 1), attribut, value, server);
 			return ((*it).length());
 		}	
 	}
-	// std::cout << "LINE = " << line << "\n";
-	// if (it == atts.end())
-	// 	throw OurException("Directive in server block not allowed here");
 	return (0);
 }
 
