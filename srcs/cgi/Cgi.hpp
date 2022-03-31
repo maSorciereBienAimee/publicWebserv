@@ -15,8 +15,9 @@ class Cgi
 	~Cgi();
 	std::string	getMimeType(std::string fileName);
 	void init(void);
-	std::string getBody();
-	int getStatus();
+	std::string getBody() const;
+	std::map<std::string, std::string> getHeaders() const;
+	int getStatus() const;
 	void setIsIt(int n);
 	int getIsIt() const;
 	void getEnv();
@@ -26,8 +27,10 @@ class Cgi
 	std::string getPathInfo(std::string str, std::string ext);
 	void cgiRun();
 	std::string getHex(std::string path);
+	void	setResponse(std::string str, int r);
 
 	private:
+	std::map<std::string, std::string> _headers;
 	std::string		_body;
 	std::string		_query;
 	std::string		_simple;

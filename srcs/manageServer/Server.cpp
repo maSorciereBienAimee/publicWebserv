@@ -186,13 +186,6 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 			status = 400;
 	}
 	myCgi.setIsIt(tools::isItCgi(simplePath, synthese));
-//	myCgi.init(marco, infoConfig);
-
-	// std::cout << "isCGI = " << myCgi.getIsIt() << std::endl;
-	// if (myCgi.getIsIt() == 1)
-	// 		myCgi.cgiRun();
-	// else
-	// {
 //	tools::printServerBlock(infoConfig);
 	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
@@ -202,7 +195,6 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	// std::cout << "LOCATION PATH ******* " << synthese.getLocationPath() << "\n";
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
-	// }
 }
 
 int Server::getListen() const

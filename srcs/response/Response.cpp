@@ -204,15 +204,14 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
-	
-/*	if (_cgi.getIsIt() == 1)
+	if (_cgi.getIsIt() == 1)
 	{
-		myCgi.init(R);
-		myCgi.run();
-		this->status = myCgi.getStatus();
-		this->body = myCgi.getBody();
+		_cgi.cgiRun();
+		this->status = _cgi.getStatus();
+		this->body = _cgi.getBody();
+		this->extra_headers = _cgi.getHeaders();
+		return ;
 	}
-*/
 	if (R.getPath() != (R.getRoot() + '/') )
 	{
 		struct stat check;

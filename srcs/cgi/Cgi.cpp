@@ -2,10 +2,12 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <stdio.h>
+#include <istream>
 
 Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::string S) : _request(R), _loc(loc), _serv(serv), _query(Q), _simple(S)
 {
 	_env = NULL;
+	_headers.clear();
 }
 
 Cgi::~Cgi(void)
@@ -174,25 +176,30 @@ std::string Cgi::getHex(std::string path)
 
 void Cgi::getEnv()
 {
+	std::string pathFile = "." + _serv.getRootServer() + _simple; 
 	std::map<std::string, std::string>	requestHeader = _request.getHeaders();
 	std::map<std::string, std::string>	mapEnv;
 	std::string pathWQ = getPathWithoutQuery(_request.getPath(), _loc.getCgiExt());
 	std::string pathWPI = getPathWithoutPathInfo(pathWQ, _loc.getCgiExt());
+	std::string body = "";
+	std::fstream file;
+	char c;
+
 	mapEnv["REDIRECT_STATUS"] = "200";
-	mapEnv["SERVER_SOFTWARE"] = _serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
+	mapEnv["SERVER_SOFTWARE"] = "DreamTeamServer/1.0";//_serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
 	mapEnv["SERVER_NAME"] = _serv.getHostStr();
 	mapEnv["GATEWAY_INTERFACE"] = "CGI/1.1";
 	mapEnv["SERVER_PROTOCOL"] = "HTTP/1.1";
 	mapEnv["SERVER_PORT"] = _serv.getPortStr();
 	mapEnv["REQUEST_METHOD"] = _request.getMethod();
-	mapEnv["PATH_INFO"] = getPathInfo(_request.getPath(), _loc.getCgiExt());
+	mapEnv["PATH_INFO"] = getPathInfo(_query, _loc.getCgiExt());
 	if (mapEnv["PATH_INFO"] == "")
 		mapEnv["PATH_TRANSLATED"] = "";
 	else
 		mapEnv["PATH_TRANSLATED"] = pathWPI + getHex(mapEnv["PATH_INFO"]);
-	mapEnv["SCRIPT_FILENAME"] = "./website/index.php";//_loc.getCgiBin(); //plutot nom du fichier envoye ? 
+	mapEnv["SCRIPT_FILENAME"] = pathFile; 
 	mapEnv["SCRIPT_NAME"] = _loc.getCgiBin();
-	mapEnv["QUERY_STRING"] = getQuery(_request.getPath());
+	mapEnv["QUERY_STRING"] = getQuery(_query);
 	mapEnv["REMOTE_HOST"] = _serv.getHostStr();
 	mapEnv["REMOTE_ADDR"] = _serv.getHostStr();
 	if (requestHeader.find("Authorization") != requestHeader.end()
@@ -201,16 +208,13 @@ void Cgi::getEnv()
 	mapEnv["REMOTE_USER"] = requestHeader["Authorization"];
 	mapEnv["REMOTE_IDENT"] = requestHeader["Authorization"];
 	mapEnv["CONTENT_TYPE"] = requestHeader["Content-Type"];
-	std::string body = "";
-	std::fstream file;
-	char c;
-	file.open("./website/index.php", std::ios::in);
+	file.open(pathFile, std::ios::in);
 	while (1)
 	{
 		file >> std::noskipws >> c;
 		if (file.eof())
 			break;
-	body.push_back(c);
+		body.push_back(c);
 	}
 	file.close();
 	int len = body.size();
@@ -258,37 +262,22 @@ void	Cgi::cgiRun()
 	int fd[2];
 	int i = 0;
 	int stockOut = dup(1);
-	int stockIn = dup(0);
 	int status;
 	char buf[1024];
 	int res; 
 	std::string str = "";
 	std::string temp;
 	char **arg = NULL;
-	std::string body = "";
-	std::fstream file;
-	char c;
-	
-//	file.open("./website/index.php", std::ios::in);
-//	while (1)
-//	{
-//		file >> std::noskipws >> c;
-//		if (file.eof())
-//			break;
-//		body.push_back(c);
-//	}
-//	file.close();
-
-	
-	
 	std::FILE *tmp = std::tmpfile();
-	getEnv();
 	int fdTmp = fileno(tmp);
+	
+	getEnv();
 	pipe(fd);	
 	pid = fork();
 	if (pid < 0)
 	{
-		std::cerr << "Can't fork(), error" << std::endl;
+		std::cerr << "error fork()" << std::endl;
+		_status = 500;
 		return;
 	}
 	else if (pid == 0)
@@ -298,11 +287,13 @@ void	Cgi::cgiRun()
 		if (dup2(fd[0], 0) < 0)
 		{
 			std::cerr << "Error dup2 in cgiRun()" << std::endl;
+			_status = 500;
 			return;
 		}
-		dup2(1, fdTmp);
+		dup2(fdTmp, 1);
 		execve(_loc.getCgiBin().c_str(), arg, _env);
-		std::cout << "execve est retourne" << std::endl;
+		std::cout << "error execve()" << std::endl;
+		exit (1);
 	}
 	else
 	{
@@ -311,32 +302,100 @@ void	Cgi::cgiRun()
 		if (dup2(fd[1], 1) < 0)
 		{
 			std::cerr << "Error dup2 in cgiRun()" << std::endl;
+			_status = 500;
 			return;
 		}
-		write(1, body.c_str(), body.size());
-	close(1);
-	close(fd[1]);
-//	close(0);
-	waitpid(pid, &status, 0);	
-	dup2(stockOut, 1);
-	i = 0;
-	if (_env != NULL)
-	{
-		while (_env[i])
+		close(1);
+		close(fd[1]);
+		waitpid(pid, &status, 0);
+		dup2(stockOut, 1);
+		i = 0;
+		if (_env != NULL)
 		{
-			delete [] _env[i];
+			while (_env[i])
+			{
+				delete [] _env[i];
+				i++;
+			}
+			delete [] _env;
+		}
+		rewind(tmp);
+		while(!feof(tmp))
+		{
+			if (fgets(buf, 1024, tmp) == NULL)
+				break;
+			temp = buf;
+			str += temp;
+		}
+		close(fdTmp);
+		setResponse(str, WEXITSTATUS(status));		
+	}
+}
+
+void	Cgi::setResponse(std::string str, int retStat)
+{
+	int	sep;
+	int i = 0;
+	int len;
+	std::string head;
+	std::string headS;
+	std::string key;
+	std::string val;
+	std::string temp;
+
+	if (retStat == 1)
+	{
+		_headers.clear();
+		_body = "";
+		_status = 502; // ?
+		return ;
+	}
+	else
+	{
+		_status = 200;
+		sep = str.find("\r\n\r\n", 0);
+		if (sep < str.size())
+				sep += 4;
+		_body = str.substr(sep, str.size() - sep);
+		head = str.substr(0, sep - 4);
+		headS = head;
+		for (std::string::iterator it = head.begin(); it != head.end(); it++)
+		{
+			if (*it == ':')
+			{
+				key = headS.substr(0, i);
+				len = headS.size() - (i + 2);
+				temp = headS.substr(i + 2, len);
+				headS = temp;
+				i = 0;
+			}
+			if (*it == '\n' || *it == '\r')
+			{
+				val = headS.substr(0, i);
+				_headers.insert(std::make_pair(key, val));
+				len = headS.size() - (i + 1);
+				temp = headS.substr(i + 1, len);
+				headS = temp;
+				i = 0;
+			}
 			i++;
 		}
-		delete [] _env;
+		val = headS.substr(0, i);
+		_headers.insert(std::make_pair(key, val));
 	}
-	//	res = 1;
-	//	while (res > 0)
-	//	{
-	//		res = read(fd2[0], &buf, 1023);
-	//		temp = buf;
-	//		str += temp;
-	//	}
-//		std::cout << "YO THIS ID THE RETURN OF CGIRUN :  " << str  << "|" << std::endl;
-	close(fdTmp);
-	}
+}
+
+int Cgi::getStatus() const
+{
+	return (this->_status);
+}
+
+std::string Cgi::getBody() const
+{
+	return (this->_body);
+}
+
+std::map<std::string, std::string> Cgi::getHeaders() const
+{
+	return (this->_headers);
 }
