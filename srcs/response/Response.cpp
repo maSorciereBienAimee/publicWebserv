@@ -206,10 +206,16 @@ void Response::_get(Request R)
 	status = 200;
 	if (_cgi.getIsIt() == 1)
 	{
+		int len;
+		std::string length;
+		std::stringstream ss;
 		_cgi.cgiRun();
 		this->status = _cgi.getStatus();
 		this->body = _cgi.getBody();
 		this->extra_headers = _cgi.getHeaders();
+		len = this->body.size();
+		ss << len;
+		ss >> this->body_len;
 		return ;
 	}
 	if (R.getPath() != (R.getRoot() + '/') )
