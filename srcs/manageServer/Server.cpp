@@ -9,7 +9,6 @@ Server::Server()
 }
 Server::Server(serverBlock block)
 {
-	//tools::printServerBlock(block);
 	this->listenfd = -1;
 	this->infoConfig = block;
 }
@@ -173,6 +172,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	std::string	queryPath;
 	std::string simplePath = tools::getSimplePath(req, &queryPath, this->infoConfig);
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
+	
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 	Request marco(req, synthese.getRootLoc() );
 	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath);
@@ -194,11 +194,12 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	else
 	{
 //	tools::printServerBlock(infoConfig);
-//	tools::printLocationBlock(infoConfig.getLocation());
+	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
 	Response polo(marco, status, myCgi, synthese, infoConfig);
-	std::cout << "AUTOINDEX IN SYNTHESE " << synthese.getAI() << "\n";
-	std::cout << "CGI EXT SYNTHESE IS  " << synthese.getCgiExt() << "\n";
+	// std::cout << "AUTOINDEX IN SYNTHESE " << synthese.getAI() << "\n";
+	// std::cout << "CGI EXT SYNTHESE IS  " << synthese.getCgiExt() << "\n";
+	// std::cout << "LOCATION PATH ******* " << synthese.getLocationPath() << "\n";
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);
 	}

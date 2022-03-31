@@ -144,6 +144,7 @@ int searchInConfig(std::string str, std::vector<serverLocation> location, server
 			(*loc).setRedir((*it).getRedir());
 			(*loc).setAuthUsrFile((*it).getAuthUsrFile());
 			(*loc).setRootLoc((*it).getRootLoc());
+			(*loc).setLocationPath((*it).getLocationPath());
 			return (1);
 		}
 	}
@@ -167,6 +168,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		ret.setRedir(block.getRedir_s());
 		ret.setAuthUsrFile(block.getAuthUsrFile_s());
 		ret.setRootLoc(block.getRootServer());
+
 
 		if (stat(realPath.c_str(), &stock) == 0)
 		{
@@ -272,13 +274,15 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		return (data);
 	}
 
-	std::string	genreateAI(std::string const& host, std::string const& port, std::string const& path)
+	std::string	genreateAI(std::string const& locationPath, std::string const& host, std::string const& port, std::string const& path)
 	{
 		std::string buff;
 
-		std::cout << "Path is  " << path << "\n";
-		std::cout << "Host is  " << host << "\n";
-		std::cout << "Port is  " << port << "\n";
+		// std::cout << "Path is  " << path << "\n";
+		// std::cout << "Host is  " << host << "\n";
+		// std::cout << "Port is  " << port << "\n";
+		// std::cout << "LOCATION PATH is  " << locationPath << "\n";
+
 
 		std::vector<std::string> dataAI = tools::getDirAI(path);  // change to do a function generate autoindex(host, port, path,)
 		if (dataAI.empty())
@@ -287,7 +291,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
-				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
 		}
 		buff += "</body>\n</html>\n";
 		return (buff);
@@ -413,12 +417,12 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 	{
 		while (*it != '/' && *it != '?' && it != path.end())
 		{	
-		std::cout << "*it = " << *it << " et i = " << i << std::endl;
+	//	std::cout << "*it = " << *it << " et i = " << i << std::endl;
 				it++;
 				i++;
 		}
 		ret = path.substr(0, i);
-		std::cout << "ret = " << ret << std::endl;
+		//std::cout << "ret = " << ret << std::endl;
 //		std::cout << "path = " << path << std::endl;
 //		std::cout << "query = " << query << std::endl;
 		if (stat(ret.c_str(), &s) == 0)

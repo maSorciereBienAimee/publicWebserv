@@ -36,6 +36,9 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 
 	}
 	index_vec = _loc.getIndex();
+	// std::cout << "ROOT LOCATION IS ["<< _loc.getRootLoc() << "\n";
+	// std::cout << "LOCATION PATH IS [" << _loc.getLocationPath() << "\n";
+
 	_autoindex = _loc.getAI();
 	status = F;
 	initErrors();
@@ -234,9 +237,13 @@ void Response::_get(Request R)
 			{
 				if (stat(path.c_str(), &check) == 0 && S_ISDIR(check.st_mode))
 				{
-					std::cout << "IN AI _GET || PATH IS " << path << "\n";
+					std::cout << "IN AI _GET || PATH IS " << _path << "\n";
+					std::cout << "IN AI _GET || OLD_PATH IS " << _old_path << "\n";
+				//	std::cout << "IN AI _GET || REDIR IS " << _redir_path << "\n";
+
 					std::string path = R.getPath();
-					this->body = tools::genreateAI(_server.getHostStr(), _server.getPortStr(), path);
+					//std::string pathLoc = R.getPath();
+					this->body = tools::genreateAI(_loc.getLocationPath() , _server.getHostStr(), _server.getPortStr(), path);
 					this->status = 200;
 				}
 				else

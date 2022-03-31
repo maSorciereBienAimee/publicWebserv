@@ -40,7 +40,7 @@ namespace tools
 	serverLocation						searchLocation(std::string path, serverBlock block);
 	int									searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc);
 	std::vector<std::string>			getDirAI(std::string const& path);
-	std::string							genreateAI(std::string const& host, std::string const& port, std::string const& path);
+	std::string							genreateAI(std::string const& locationPath, std::string const& host, std::string const& port, std::string const& path);
 	std::string							getSimplePath(std::string r, std::string *p, serverBlock B);
 	std::string							searchCorrectPath(std::string q, serverBlock B);
 
