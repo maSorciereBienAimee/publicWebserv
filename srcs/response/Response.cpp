@@ -215,17 +215,14 @@ void Response::_get(Request R)
 */
 	if (R.getPath() != (R.getRoot() + '/') )
 	{
-		std::cout << "PATH IS" << R.getPath() << std::endl;
 		struct stat check;
-
 		std::string path = R.getPath();
+
 		path.erase(path.begin(), path.begin() + 1);
 		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     	{
-			if (check.st_mode && S_IFREG && _autoindex == 0)
+			if (S_ISREG(check.st_mode))
 			{
-				std::cout << "IN FILE || PATH IS " << path << "\n";
-
 				std::string root = R.getRoot();
 				root.erase(root.begin(), root.begin() + 1);
 				if (path == root + "/favicon.ico")
@@ -233,41 +230,38 @@ void Response::_get(Request R)
 				readIn(path);
 				this->status = 200;
 			}
-			if (_autoindex == 1)
+			else if (_autoindex == 0 && S_ISDIR(check.st_mode))
 			{
-				if (stat(path.c_str(), &check) == 0 && S_ISDIR(check.st_mode))
+				DIR *dir;
+				struct dirent *de;
+				std::vector<std::string> findIndex;
+				if ((dir = opendir(path.c_str())) != NULL)
 				{
-					std::cout << "IN AI _GET || PATH IS " << _path << "\n";
-					std::cout << "IN AI _GET || OLD_PATH IS " << _old_path << "\n";
-				//	std::cout << "IN AI _GET || REDIR IS " << _redir_path << "\n";
-
-					std::string path = R.getPath();
-					//std::string pathLoc = R.getPath();
-					this->body = tools::genreateAI(_loc.getLocationPath() , _server.getHostStr(), _server.getPortStr(), path);
-					this->status = 200;
-				}
-				else
-				{
-					std::cout << "ICI in else AI == 1 in _get\n";
-					std::string root = R.getRoot();
-					root.erase(root.begin(), root.begin() + 1);
-					if (path == root + "/favicon.ico")
-						path = root + "/favicon.html";
-					readIn(path);
-					this->status = 200;
+					while ((de = readdir(dir)) != NULL)
+						findIndex.push_back(de->d_name);
+					std::string path = tools::getIndex(findIndex);	
+					if (path.empty())
+					{
+						this->status = 404;
+						this->body_message = "File not found";
+					}
+					else 
+					{
+						std::string root = R.getRoot();
+						root.erase(root.begin(), root.begin() + 1);
+						std::string newPath =   root + _loc.getLocationPath() + "/" + path;
+						readIn(newPath);
+						this->status = 200;
+					}
 				}
 			}
-			// else
-			// {
-			// 	std::cout << "IN ELSE || PATH IS " << path << "\n";
-
-			// 	std::string root = R.getRoot();
-			// 	root.erase(root.begin(), root.begin() + 1);
-			// 	if (path == root + "/favicon.ico")
-			// 		path = root + "/favicon.html";
-			// 	readIn(path);
-			// 	this->status = 200;
-			// }
+			else if (_autoindex == 1 && S_ISDIR(check.st_mode))
+			{
+				std::string path = R.getPath();
+				this->body = tools::genreateAI(_loc.getLocationPath() , _server.getHostStr(), _server.getPortStr(), path);
+				this->status = 200;
+				return ;
+			}
 		}
 		else 
 		{
@@ -275,9 +269,7 @@ void Response::_get(Request R)
 			this->body_message = "File not found";
 		}
 	}
-	
 	else //no file specified so home page??
-
 		_homepage(R);
 }
 

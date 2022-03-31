@@ -297,34 +297,19 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		return (buff);
 	}
 
-
-
-// stat() will tell you this.
-
-// struct stat s;
-// if( stat(path,&s) == 0 )
-// {
-//     if( s.st_mode & S_IFDIR )
-//     {
-//         //it's a directory
-//     }
-//     else if( s.st_mode & S_IFREG )
-//     {
-//         //it's a file
-//     }
-//     else
-//     {
-//         //something else
-//     }
-// }
-// else
-// {
-//     //error
-// }
-
-
-
-
+	std::string getIndex(std::vector<std::string> files)
+	{
+		std::vector<std::string>::iterator it;
+		
+		for (it = files.begin(); it != files.end(); it++)
+		{
+			size_t pos = (*it).find("index");
+			if  (pos != std::string::npos)
+				return(*it);
+		}
+		return ("");
+	}
+	
 	std::map<std::string, std::string> mime()
 	{
 		std::map<std::string, std::string> _mimeMap;

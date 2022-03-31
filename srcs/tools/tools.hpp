@@ -43,6 +43,7 @@ namespace tools
 	std::string							genreateAI(std::string const& locationPath, std::string const& host, std::string const& port, std::string const& path);
 	std::string							getSimplePath(std::string r, std::string *p, serverBlock B);
 	std::string							searchCorrectPath(std::string q, serverBlock B);
+	std::string 						getIndex(std::vector<std::string> files);
 
 }
 
