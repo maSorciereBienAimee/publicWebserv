@@ -204,11 +204,12 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
+	int len;
+	std::string length;
+	std::stringstream ss;
+	
 	if (_cgi.getIsIt() == 1)
 	{
-		int len;
-		std::string length;
-		std::stringstream ss;
 		_cgi.cgiRun();
 		this->status = _cgi.getStatus();
 		this->body = _cgi.getBody();
@@ -255,6 +256,22 @@ void Response::_get(Request R)
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath =   root + _loc.getLocationPath() + "/" + path;
+						_cgi.setIsIt(tools::isItCgi(newPath, _loc));
+						if (_cgi.getIsIt() == 1)
+						{
+							_cgi.setQuery(_loc.getLocationPath() + "/" + path);
+							_cgi.setSimple(_loc.getLocationPath() + "/" + path);
+							std::cout << _cgi.getQ() << std::endl;
+							std::cout << _cgi.getS() << std::endl;
+							_cgi.cgiRun();
+							this->status = _cgi.getStatus();
+							this->body = _cgi.getBody();
+							this->extra_headers = _cgi.getHeaders();
+							len = this->body.size();
+							ss << len;
+							ss >> this->body_len;
+							return ;
+						}
 						readIn(newPath);
 						this->status = 200;
 					}

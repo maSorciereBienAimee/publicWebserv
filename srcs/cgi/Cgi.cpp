@@ -20,6 +20,16 @@ std::string Cgi::getMimeType(std::string fileName)
 	return (res);
 }
 
+void Cgi::setSimple(std::string newSimple)
+{
+	this->_simple = newSimple;
+}
+
+void Cgi::setQuery(std::string newQuery)
+{
+	this->_query = newQuery;
+}
+
 void Cgi::setIsIt(int N)
 {
 	this->_isItCgi = N;
@@ -393,6 +403,15 @@ int Cgi::getStatus() const
 std::string Cgi::getBody() const
 {
 	return (this->_body);
+}
+std::string Cgi::getQ() const
+{
+	return (this->_query);		
+}
+
+std::string Cgi::getS() const
+{
+	return (this->_simple);
 }
 
 std::map<std::string, std::string> Cgi::getHeaders() const
