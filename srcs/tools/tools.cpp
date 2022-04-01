@@ -174,6 +174,14 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		{
 			if (S_ISDIR(stock.st_mode))
 			{
+				std::string::iterator it = path.end();
+				if (path.size() > 0)
+						it--;
+				if (path != "/" && *it == '/')
+				{
+					std::string tmp = path.substr(0, path.size() - 1);
+					path = tmp;
+				}
 				if (searchInConfig(path, location, &ret) == 1)
 						return (ret);
 				return (ret);
