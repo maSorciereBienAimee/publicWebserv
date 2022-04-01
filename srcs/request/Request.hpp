@@ -24,6 +24,7 @@ class Request
 			void	pathDecoder(std::string path);
 			std::string	getRoot(void);
 			std::string getHost() const;
+			const std::string&									getBody() const;
 			/*const std::map<std::string, std::string>&			getEnv() const;
 			const std::string&									getVersion() const;
 			int													getRet() const;

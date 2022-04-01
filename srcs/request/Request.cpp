@@ -218,3 +218,8 @@ std::string	Request::getRoot(void)
 {
     return _root;
 }
+
+const std::string& Request::getBody() const
+{
+	return (this->_body);
+}

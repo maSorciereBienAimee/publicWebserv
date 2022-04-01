@@ -354,7 +354,24 @@ void Response::_post(Request R)
 {
 	(void)R;
 	status = 200;
-	readIn("." + R.getPath() + "index.html");
+	int len;
+	std::stringstream ss;
+	if (_cgi.getIsIt() == 1)
+	{
+		_cgi.cgiRun();
+		this->status = _cgi.getStatus();
+		this->body = _cgi.getBody();
+		this->extra_headers = _cgi.getHeaders();
+		len = this->body.size();
+		ss << len;
+		ss >> this->body_len;
+		return ;
+	}
+	else
+	{
+		this->status = 204;
+		this->body = "";
+	}
 }
 
 

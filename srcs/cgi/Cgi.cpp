@@ -207,7 +207,8 @@ void Cgi::getEnv()
 		mapEnv["PATH_TRANSLATED"] = "";
 	else
 		mapEnv["PATH_TRANSLATED"] = pathWPI + getHex(mapEnv["PATH_INFO"]);
-	mapEnv["SCRIPT_FILENAME"] = pathFile; 
+	if (_simple != "")
+		mapEnv["SCRIPT_FILENAME"] = pathFile; 
 	mapEnv["SCRIPT_NAME"] = _loc.getCgiBin();
 	mapEnv["QUERY_STRING"] = getQuery(_query);
 	mapEnv["REMOTE_HOST"] = _serv.getHostStr();
@@ -315,6 +316,7 @@ void	Cgi::cgiRun()
 			_status = 500;
 			return;
 		}
+		write(1, _request.getBody().c_str(), _request.getBody().size());
 		close(1);
 		close(fd[1]);
 		waitpid(pid, &status, 0);
