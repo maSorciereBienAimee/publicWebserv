@@ -213,6 +213,9 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 
 	int	isItCgi(std::string path, serverLocation location)
 	{
+		struct stat	stock;
+		if (stat(path.c_str(), &stock) != 0)
+				return (0);
 		if (location.getCgiExt() != "" && location.getCgiExt() == getExtension(path))
 				return (1);
 		return (0);

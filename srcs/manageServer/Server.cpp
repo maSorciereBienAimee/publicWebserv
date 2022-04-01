@@ -185,7 +185,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
 			status = 400;
 	}
-	myCgi.setIsIt(tools::isItCgi(simplePath, synthese));
+	myCgi.setIsIt(tools::isItCgi("." + infoConfig.getRootServer() + simplePath, synthese));
 //	tools::printServerBlock(infoConfig);
 	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
