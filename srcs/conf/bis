@@ -2,8 +2,7 @@ server {
 	        listen  8000;
             host           localhost;
 			root                	/website;
-			
-			server_name localhost:8001;
+			server_name serverA;
 			index	                		index.html,      indexxxx.html;
 		
 
@@ -70,7 +69,31 @@ server {
             host           127.0.0.1;
 		root                	/var/www;
 		
-		server_name localhost:8001;
+		server_name serverB;
 	index	                		index.html,      indexxxx.html;
 }
 
+server {
+	        listen  8001;
+            host           localhost;
+		server_name serverC;
+			root                	/website;
+}			
+server {
+	        listen  8080;
+            host           localhost;
+			root                	/website;
+		server_name serverD;
+}			
+server {
+	        listen  8001;
+            host           127.0.0.1;
+			root                	/website;
+		server_name serverE;
+}			
+server {
+	        listen  8000;
+            host           127.0.0.1;
+			root                	/website;
+		server_name serverF;
+}			

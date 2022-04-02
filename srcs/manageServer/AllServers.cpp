@@ -27,6 +27,20 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
         {
                 std::cerr << e.what() << '\n';
         }
+	std::vector<serverBlock>::iterator it = serverBlocks.begin();
+	for (; it != serverBlocks.end(); it++)
+	{
+		for (std::vector<serverBlock>::iterator it2 = serverBlocks.begin(); it2 != it; it2++)
+		{
+			if (it2->getPortStr() == it->getPortStr() && it2->getHostStr() == it->getHostStr())
+			{
+				std::cout << "erase " << it->getName() << std::endl;
+					this->serverBlocks.erase(it);
+			}
+		}
+	}
+	for (std::vector<serverBlock>::iterator it2 = serverBlocks.begin(); it2 != serverBlocks.end(); it2++)
+		std::cout << it2->getName() << std::endl;
 	for (std::vector<serverBlock>::iterator it = serverBlocks.begin(); it != serverBlocks.end(); it++)
         	this->servers.push_back(Server(*it));						//for each data receive earliest in the vector serverBlock, create a server, it initiate in Server class a private member called infoServer and take data parsed before, then, after create, push it in a vector<Server>
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)

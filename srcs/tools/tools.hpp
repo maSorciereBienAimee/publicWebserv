@@ -44,7 +44,7 @@ namespace tools
 	std::string							getSimplePath(std::string r, std::string *p, serverBlock B);
 	std::string							searchCorrectPath(std::string q, serverBlock B);
 	std::string 						getIndex(std::vector<std::string> files);
-
+	std::string getRelativeRoot(serverLocation loc, std::string simple);
 }
 
 

@@ -127,6 +127,22 @@ namespace tools
         return (false);
     }
 
+std::string getRelativeRoot(serverLocation loc, std::string simple)
+{
+	std::string ret;
+	std::string temp;
+	std::string root = loc.getRootLoc();
+	int x = root.size() - 1;
+	int len = loc.getLocationPath().size();
+
+	temp = simple.substr(len, simple.size() - len);
+	if (temp[0] != '/')
+			temp = "/" + temp;
+	if (x > -1 && temp[0] == '/' && root[x] == '/')
+		root.erase(root.end() - 1);
+	ret = root + temp;
+	return (ret);
+}
 
 int searchInConfig(std::string str, std::vector<serverLocation> location, serverLocation *loc)
 {
