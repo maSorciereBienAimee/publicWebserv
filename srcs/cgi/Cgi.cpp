@@ -196,7 +196,7 @@ void Cgi::getEnv()
 	char c;
 
 	mapEnv["REDIRECT_STATUS"] = "200";
-	mapEnv["SERVER_SOFTWARE"] = "DreamTeamServer/1.0";//_serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
+	mapEnv["SERVER_SOFTWARE"] = _serv.getName()+ "/1.0";//_serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
 	mapEnv["SERVER_NAME"] = _serv.getHostStr();
 	mapEnv["GATEWAY_INTERFACE"] = "CGI/1.1";
 	mapEnv["SERVER_PROTOCOL"] = "HTTP/1.1";

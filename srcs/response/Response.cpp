@@ -70,6 +70,11 @@ void Response::launch()
 			_delete(request.getPath());
 		else if (this->request.getMethod() == "POST" && find(methods.begin(), methods.end(), "POST") != methods.end())
 			_post(request);
+		else if ((this->request.getMethod() == "GET"
+			|| this->request.getMethod() == "POST"
+			|| this->request.getMethod() == "DELETE")
+			&& find(methods.begin(), methods.end(), this->request.getMethod()) == methods.end())
+				_notAllowed();
 		else
 			_other(request);
 	}
@@ -117,12 +122,28 @@ void	Response::_other(Request req)
 	return;
 }
 
+void Response::_notAllowed()
+{
+	std::string str = "";
+	std::vector<std::string> m = _loc.getMethods();
+	for (std::vector<std::string>::iterator it = m.begin(); it != m.end(); it++)
+	{
+		str += *it;
+		if (it + 1 != m.end())
+			str += ", ";
+	}
+	status = 405;
+	this->body_message = "Ressource location does not accept this method";
+	this->extra_headers.insert(std::make_pair("Allow", str));
+	return;
+}
+
 void Response::setHeaders()
 {
 	std::map<std::string, std::string>::iterator it = this->extra_headers.begin();
 	this->_header = "HTTP/1.1 ";
 	_header += (errors[this->status]) + "\n";
-	_header += "Server: DreamTeamServer/1.0\n";
+	_header += "Server: " + _server.getName() + "/1.0\n";
 	_header += "Date: " + makeDate();
 	for (int i = 0; i < this->extra_headers.size(); i++)
 	{
@@ -259,8 +280,8 @@ void Response::_get(Request R)
 						_cgi.setIsIt(tools::isItCgi(newPath, _loc));
 						if (_cgi.getIsIt() == 1)
 						{
-							_cgi.setQuery(_loc.getLocationPath() + "/" + path);
-							_cgi.setSimple(_loc.getLocationPath() + "/" + path);
+							_cgi.setQuery(_loc.getLocationPath() +  path);
+							_cgi.setSimple(_loc.getLocationPath() + path);
 							std::cout << _cgi.getQ() << std::endl;
 							std::cout << _cgi.getS() << std::endl;
 							_cgi.cgiRun();

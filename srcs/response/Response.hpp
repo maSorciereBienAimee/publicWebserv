@@ -24,7 +24,7 @@ class Response
 	void readIn(std::string file);
 	void initErrors();
 	std::string makeDate(void);
-
+	void _notAllowed();
 
 	private :
 	Response();
