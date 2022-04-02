@@ -277,6 +277,7 @@ void Response::_get(Request R)
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath =   root + _loc.getLocationPath() + "/" + path;
+						std::cout << "NEWW PATTTTHH " << newPath << std::endl;
 						_cgi.setIsIt(tools::isItCgi(newPath, _loc));
 						if (_cgi.getIsIt() == 1)
 						{
@@ -329,8 +330,26 @@ void Response::_homepage(Request R)
 		std::string str = R.getPath() + index_vec[i];
 		str.erase(str.begin(), str.begin() + 1);
 		struct stat check;
+		std::stringstream ss;
+		int len;
 		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
 		{
+			_cgi.setIsIt(tools::isItCgi(str, _loc));
+			if (_cgi.getIsIt() == 1)
+			{
+				_cgi.setQuery(_loc.getLocationPath() +  index_vec[i]);
+				_cgi.setSimple(_loc.getLocationPath() + index_vec[i]);
+				std::cout << _cgi.getQ() << std::endl;
+				std::cout << _cgi.getS() << std::endl;
+				_cgi.cgiRun();
+				this->status = _cgi.getStatus();
+				this->body = _cgi.getBody();
+				this->extra_headers = _cgi.getHeaders();
+				len = this->body.size();
+				ss << len;
+				ss >> this->body_len;
+				return ;
+			}
 
 			readIn(str);
 			this->status = 200;
