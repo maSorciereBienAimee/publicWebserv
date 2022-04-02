@@ -11,7 +11,7 @@
 class Cgi
 {
 	public:
-	Cgi(Request R, serverLocation loc, serverBlock serv, std::string query, std::string simple);
+	Cgi(Request R, serverLocation loc, serverBlock serv, std::string query, std::string simple, std::string rp);
 	~Cgi();
 	std::string	getMimeType(std::string fileName);
 	void init(void);
@@ -38,6 +38,7 @@ class Cgi
 	std::string		_body;
 	std::string		_query;
 	std::string		_simple;
+	std::string		_realPath;
 	int				_status;
 	int				_isItCgi;
 	Request			_request;

@@ -172,10 +172,10 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	std::string	queryPath;
 	std::string simplePath = tools::getSimplePath(req, &queryPath, this->infoConfig);
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
-	std::string	root = tools::getRelativeRoot(synthese, simplePath);	
+	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);	
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 	Request marco(req, synthese.getRootLoc() );
-	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath);
+	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath, realPath);
 	int status = marco.getStatus();
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
 	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)

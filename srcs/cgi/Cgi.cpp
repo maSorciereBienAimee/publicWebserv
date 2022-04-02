@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <istream>
 
-Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::string S) : _request(R), _loc(loc), _serv(serv), _query(Q), _simple(S)
+Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::string S, std::string rp) : _request(R), _loc(loc), _serv(serv), _query(Q), _simple(S), _realPath(rp)
 {
 	_env = NULL;
 	_headers.clear();
