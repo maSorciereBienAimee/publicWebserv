@@ -97,7 +97,7 @@ std::string Response::getReply()
 void    Response::_delete(std::string path)
 {
     struct stat check;
-	path.erase(path.begin(), path.begin() + 1);
+//	path.erase(path.begin(), path.begin() + 1);
 	status = 200;
 	if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     {
@@ -217,7 +217,13 @@ void Response::readIn(std::string file)
 	is.read (b,length);
 	std::string bufStr(b);
 	this->body = bufStr;
-	std::cout << "_READIN BODY IS: " << this->body << std::endl;
+	std::string fav = "";
+	std::string path;
+	path = request.getPath();
+	if (path.size() >= 12)
+		fav = path.substr(path.size() - 12, 12);
+	if (fav != "favicon.html")
+		std::cout << "_READIN BODY IS: " << this->body << std::endl;
 
 
 }
@@ -240,18 +246,19 @@ void Response::_get(Request R)
 		ss >> this->body_len;
 		return ;
 	}
-	if (R.getPath() != (R.getRoot() + '/') )
+//	if (R.getPath() != (R.getRoot() + '/') )
+	if (R.getPath() != _loc.getRootLoc() + '/' )
 	{
 		struct stat check;
 		std::string path = R.getPath();
 
-		path.erase(path.begin(), path.begin() + 1);
+//		path.erase(path.begin(), path.begin() + 1);
 		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     	{
 			if (S_ISREG(check.st_mode))
 			{
-				std::string root = R.getRoot();
-				root.erase(root.begin(), root.begin() + 1);
+				std::string root = _loc.getRootLoc();
+//				root.erase(root.begin(), root.begin() + 1);
 				if (path == root + "/favicon.ico")
 					path = root + "/favicon.html";
 				readIn(path);
@@ -276,13 +283,13 @@ void Response::_get(Request R)
 					{
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
-						std::string newPath =   root + _loc.getLocationPath() + "/" + path;
+						std::string newPath = R.getPath() + "/" + path;
 						std::cout << "NEWW PATTTTHH " << newPath << std::endl;
 						_cgi.setIsIt(tools::isItCgi(newPath, _loc));
 						if (_cgi.getIsIt() == 1)
 						{
-							_cgi.setQuery(_loc.getLocationPath() +  path);
-							_cgi.setSimple(_loc.getLocationPath() + path);
+							_cgi.setQuery(newPath);
+							_cgi.setSimple(newPath);
 							std::cout << _cgi.getQ() << std::endl;
 							std::cout << _cgi.getS() << std::endl;
 							_cgi.cgiRun();
@@ -328,7 +335,8 @@ void Response::_homepage(Request R)
 	for (i = 0; i < size; i++)
 	{
 		std::string str = R.getPath() + index_vec[i];
-		str.erase(str.begin(), str.begin() + 1);
+	//	str.erase(str.begin(), str.begin() + 1);
+		std::cout << str << std::endl;
 		struct stat check;
 		std::stringstream ss;
 		int len;
@@ -337,8 +345,8 @@ void Response::_homepage(Request R)
 			_cgi.setIsIt(tools::isItCgi(str, _loc));
 			if (_cgi.getIsIt() == 1)
 			{
-				_cgi.setQuery(_loc.getLocationPath() +  index_vec[i]);
-				_cgi.setSimple(_loc.getLocationPath() + index_vec[i]);
+				_cgi.setQuery(str);
+				_cgi.setSimple(str);
 				std::cout << _cgi.getQ() << std::endl;
 				std::cout << _cgi.getS() << std::endl;
 				_cgi.cgiRun();
@@ -350,6 +358,7 @@ void Response::_homepage(Request R)
 				ss >> this->body_len;
 				return ;
 			}
+		std::cout << str << std::endl;
 
 			readIn(str);
 			this->status = 200;

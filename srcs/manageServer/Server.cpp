@@ -174,7 +174,8 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
 	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);	
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
-	Request marco(req, synthese.getRootLoc() );
+//	Request marco(req, synthese.getRootLoc() );
+	Request marco(req, realPath);
 	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath, realPath);
 	int status = marco.getStatus();
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
@@ -185,7 +186,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
 			status = 400;
 	}
-	myCgi.setIsIt(tools::isItCgi("." + infoConfig.getRootServer() + simplePath, synthese));
+	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
 //	tools::printServerBlock(infoConfig);
 	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();

@@ -83,12 +83,13 @@ int Request::parseRequestLine(const std::string &str)
     int break_2 = line.find_first_of(' ');
     //PATH IS FROM 0 UNTIL FIRST SPACE
     _path = line.substr(0, break_2);
+	_path = _root;
     pathDecoder(_path);
-    int x = _root.length() - 1;
+//    int x = _root.length() - 1;
     // GET RID OF DOUBLE //
-    if (x > -1 && _path[0] == '/' && _root[x] == '/')
-        _root.erase(_root.end() - 1);
-    _path = _root + _path;
+//    if (x > -1 && _path[0] == '/' && _root[x] == '/')
+//        _root.erase(_root.end() - 1);
+//    _path = _root + _path;
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);

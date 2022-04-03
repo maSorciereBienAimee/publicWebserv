@@ -141,6 +141,8 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	if (x > -1 && temp[0] == '/' && root[x] == '/')
 		root.erase(root.end() - 1);
 	ret = root + temp;
+	if (ret[ret.size()] == '/')
+		ret.erase(ret.end() - 1);
 	return (ret);
 }
 
@@ -286,7 +288,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		DIR *Dir;
 		struct dirent *DirEntry;
 		//nedd to change the path ??? 
-		std::string newPath = "." + path;
+		std::string newPath = path;
 		Dir = opendir(newPath.c_str()); //change to path 
 		if (Dir == NULL)
 		{
@@ -318,7 +320,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
-				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + (*it) + "\">" + (*it) + "</a></p>\n";
 		}
 		buff += "</body>\n</html>\n";
 		return (buff);
@@ -417,7 +419,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 
 std::string searchCorrectPath(std::string query, serverBlock block)
 {
-	std::string root = "." + block.getRootServer();
+	std::string root = block.getRootServer();
 	std::string path = root + query;
 	struct stat s;
 	std::string ret;
@@ -460,7 +462,7 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 std::string getSimplePath(std::string req, std::string *query, serverBlock block)
 {
 	std::string path;
-	std::string root = "." + block.getRootServer();
+	std::string root = block.getRootServer();
 	struct stat s;
 	int deb = 0;
 	int fin;

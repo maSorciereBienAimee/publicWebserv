@@ -186,7 +186,7 @@ std::string Cgi::getHex(std::string path)
 
 void Cgi::getEnv()
 {
-	std::string pathFile = "." + _serv.getRootServer() + _simple; 
+	std::string pathFile = _realPath;//"." + _serv.getRootServer() + _simple; 
 	std::map<std::string, std::string>	requestHeader = _request.getHeaders();
 	std::map<std::string, std::string>	mapEnv;
 	std::string pathWQ = getPathWithoutQuery(_request.getPath(), _loc.getCgiExt());
