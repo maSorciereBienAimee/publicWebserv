@@ -246,21 +246,8 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
-//	int len;
 	std::string length;
-//	std::stringstream ss;
-	
-//	if (_cgi.getIsIt() == 1)
-//	{
-//		_cgi.cgiRun();
-//		this->status = _cgi.getStatus();
-//		this->body = _cgi.getBody();
-//		this->extra_headers = _cgi.getHeaders();
-//		len = this->body.size();
-//		ss << len;
-//		ss >> this->body_len;
-//		return ;
-//	}
+
 //	if (R.getPath() != (R.getRoot() + '/') )
 	if (R.getPath() != _loc.getRootLoc() + '/' )
 	{
@@ -300,21 +287,6 @@ void Response::_get(Request R)
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath = R.getPath() + "/" + path;
-						std::cout << "NEWW PATTTTHH " << newPath << std::endl;
-				//		_cgi.setIsIt(tools::isItCgi(newPath, _loc));
-				//		if (_cgi.getIsIt() == 1)
-				//		{
-				//			_cgi.setReal(newPath);
-				//			std::cout << _cgi.getR() << std::endl;
-				//			_cgi.cgiRun();
-				//			this->status = _cgi.getStatus();
-				//			this->body = _cgi.getBody();
-				//			this->extra_headers = _cgi.getHeaders();
-				//			len = this->body.size();
-				//			ss << len;
-				///			ss >> this->body_len;
-				//			return ;
-				//		}
 						readIn(newPath);
 						this->status = 200;
 					}
@@ -356,24 +328,6 @@ void Response::_homepage(Request R)
 		int len;
 		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
 		{
-//				std::cout << "rentre" << std::endl;
-//			_cgi.setIsIt(tools::isItCgi(str, _loc));
-//			if (_cgi.getIsIt() == 1)
-//			{
-//				_cgi.setReal(str);
-//				std::cout << _cgi.getR() << std::endl;
-//				_cgi.cgiRun();
-//				std::cout << "rentre" << std::endl;
-//				this->status = _cgi.getStatus();
-//				this->body = _cgi.getBody();
-//				this->extra_headers = _cgi.getHeaders();
-//				len = this->body.size();
-//				ss << len;
-//				ss >> this->body_len;
-//				return ;
-//			}
-//		std::cout << str << std::endl;
-
 			readIn(str);
 			this->status = 200;
 			return;
