@@ -328,7 +328,10 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
+			if (locationPath == "/")
 				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + (*it) + "\">" + (*it) + "</a></p>\n";
+			else
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
 		}
 		buff += "</body>\n</html>\n";
 		return (buff);
