@@ -212,11 +212,12 @@ void Cgi::getEnv()
 	mapEnv["SERVER_PROTOCOL"] = "HTTP/1.1";
 	mapEnv["SERVER_PORT"] = _serv.getPortStr();
 	mapEnv["REQUEST_METHOD"] = _request.getMethod();
-	mapEnv["PATH_INFO"] = getPathInfo(_query, _loc.getCgiExt());
+//	mapEnv["PATH_INFO"] = pathFile;
+	mapEnv["PATH_INFO"] = pathFile + getQuery(_query);
 	if (mapEnv["PATH_INFO"] == "")
 		mapEnv["PATH_TRANSLATED"] = "";
 	else
-		mapEnv["PATH_TRANSLATED"] = pathWPI + getHex(mapEnv["PATH_INFO"]);
+		mapEnv["PATH_TRANSLATED"] = getHex(mapEnv["PATH_INFO"]);
 	if (_simple != "")
 		mapEnv["SCRIPT_FILENAME"] = pathFile; 
 	mapEnv["SCRIPT_NAME"] = _loc.getCgiBin();
@@ -226,9 +227,14 @@ void Cgi::getEnv()
 	if (requestHeader.find("Authorization") != requestHeader.end()
 			&& requestHeader["Authorisation"] != "")
 		mapEnv["AUTH_TYPE"] = requestHeader["Authorization"];
+	mapEnv["REQUEST_URI"] = pathFile + getQuery(_query);
 	mapEnv["REMOTE_USER"] = requestHeader["Authorization"];
 	mapEnv["REMOTE_IDENT"] = requestHeader["Authorization"];
-	mapEnv["CONTENT_TYPE"] = requestHeader["Content-Type"];
+	if (requestHeader.find("Content-Type") != requestHeader.end()
+			&& requestHeader["Content-Type"] != "")
+		mapEnv["CONTENT_TYPE"] = requestHeader["Content-Type"];
+	else
+		mapEnv["CONTENT_TYPE"] = tools::getMimeType(pathFile);
 	file.open(pathFile, std::ios::in);
 	while (1)
 	{
@@ -279,6 +285,7 @@ void Cgi::getEnv()
 
 void	Cgi::cgiRun()
 {
+	std::cout << "entre cgiRun" << std::endl;
 	pid_t pid;
 	int fd[2];
 	int i = 0;
@@ -353,6 +360,7 @@ void	Cgi::cgiRun()
 		close(fdTmp);
 		setResponse(str, WEXITSTATUS(status));		
 	}
+	
 }
 
 void	Cgi::setResponse(std::string str, int retStat)
@@ -387,24 +395,34 @@ void	Cgi::setResponse(std::string str, int retStat)
 			if (*it == ':')
 			{
 				key = headS.substr(0, i);
+				std::cout << "key = " << key << std::endl;
 				len = headS.size() - (i + 2);
 				temp = headS.substr(i + 2, len);
 				headS = temp;
 				i = 0;
 			}
-			if (*it == '\n' || *it == '\r')
+			else if (*it == '\n' || *it == '\r')
 			{
 				val = headS.substr(0, i);
+				std::cout << "val = " << val << std::endl;
 				_headers.insert(std::make_pair(key, val));
 				len = headS.size() - (i + 1);
 				temp = headS.substr(i + 1, len);
 				headS = temp;
+				it++;
 				i = 0;
 			}
-			i++;
+			else
+				i++;
 		}
 		val = headS.substr(0, i);
+				std::cout << "val = " << val << std::endl;
 		_headers.insert(std::make_pair(key, val));
+	}
+	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
+	{
+		if (it->first == "Status")
+			_headers.erase(it);
 	}
 }
 
