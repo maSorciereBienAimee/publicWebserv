@@ -21,9 +21,11 @@ class Cgi
 	void setIsIt(int n);
 	int getIsIt() const;
 	void getEnv();
+	void setReal(std::string str);
 	void setQuery(std::string str);
 	void setSimple(std::string str);
 	std::string getQuery(std::string str);
+	std::string getR() const;
 	std::string getQ() const;
 	std::string getS() const;
 	std::string getPathWithoutPathInfo(std::string str, std::string ext);

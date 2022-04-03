@@ -206,12 +206,27 @@ void Response::readIn(std::string file)
 		setBody();
 		return;
 	}
+	int len;
+	std::stringstream ss;
+	_cgi.setIsIt(tools::isItCgi(file, _loc));
+	if (_cgi.getIsIt() == 1)
+	{
+		_cgi.setReal(file);
+		std::cout << _cgi.getR() << std::endl;
+		_cgi.cgiRun();
+		this->status = _cgi.getStatus();
+		this->body = _cgi.getBody();
+		this->extra_headers = _cgi.getHeaders();
+		len = this->body.size();
+		ss << len;
+		ss >> this->body_len;
+		return ;
+	}
 	is.seekg (0, is.end);
 	int length = is.tellg();
 	is.seekg (0, is.beg);
 	char * b = (char *)malloc(sizeof(char) * (length + 1));
 	b[length] = '\0';
-	std::stringstream ss;
 	ss << length;
 	this->body_len = ss.str();
 	is.read (b,length);
@@ -231,27 +246,28 @@ void Response::readIn(std::string file)
 void Response::_get(Request R)
 {
 	status = 200;
-	int len;
+//	int len;
 	std::string length;
-	std::stringstream ss;
+//	std::stringstream ss;
 	
-	if (_cgi.getIsIt() == 1)
-	{
-		_cgi.cgiRun();
-		this->status = _cgi.getStatus();
-		this->body = _cgi.getBody();
-		this->extra_headers = _cgi.getHeaders();
-		len = this->body.size();
-		ss << len;
-		ss >> this->body_len;
-		return ;
-	}
+//	if (_cgi.getIsIt() == 1)
+//	{
+//		_cgi.cgiRun();
+//		this->status = _cgi.getStatus();
+//		this->body = _cgi.getBody();
+//		this->extra_headers = _cgi.getHeaders();
+//		len = this->body.size();
+//		ss << len;
+//		ss >> this->body_len;
+//		return ;
+//	}
 //	if (R.getPath() != (R.getRoot() + '/') )
 	if (R.getPath() != _loc.getRootLoc() + '/' )
 	{
 		struct stat check;
 		std::string path = R.getPath();
-
+		std::cout << _autoindex << std::endl;
+		std::cout << "location path = " << _loc.getLocationPath() << std::endl;
 //		path.erase(path.begin(), path.begin() + 1);
 		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
     	{
@@ -285,22 +301,20 @@ void Response::_get(Request R)
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath = R.getPath() + "/" + path;
 						std::cout << "NEWW PATTTTHH " << newPath << std::endl;
-						_cgi.setIsIt(tools::isItCgi(newPath, _loc));
-						if (_cgi.getIsIt() == 1)
-						{
-							_cgi.setQuery(newPath);
-							_cgi.setSimple(newPath);
-							std::cout << _cgi.getQ() << std::endl;
-							std::cout << _cgi.getS() << std::endl;
-							_cgi.cgiRun();
-							this->status = _cgi.getStatus();
-							this->body = _cgi.getBody();
-							this->extra_headers = _cgi.getHeaders();
-							len = this->body.size();
-							ss << len;
-							ss >> this->body_len;
-							return ;
-						}
+				//		_cgi.setIsIt(tools::isItCgi(newPath, _loc));
+				//		if (_cgi.getIsIt() == 1)
+				//		{
+				//			_cgi.setReal(newPath);
+				//			std::cout << _cgi.getR() << std::endl;
+				//			_cgi.cgiRun();
+				//			this->status = _cgi.getStatus();
+				//			this->body = _cgi.getBody();
+				//			this->extra_headers = _cgi.getHeaders();
+				//			len = this->body.size();
+				//			ss << len;
+				///			ss >> this->body_len;
+				//			return ;
+				//		}
 						readIn(newPath);
 						this->status = 200;
 					}
@@ -342,23 +356,23 @@ void Response::_homepage(Request R)
 		int len;
 		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
 		{
-			_cgi.setIsIt(tools::isItCgi(str, _loc));
-			if (_cgi.getIsIt() == 1)
-			{
-				_cgi.setQuery(str);
-				_cgi.setSimple(str);
-				std::cout << _cgi.getQ() << std::endl;
-				std::cout << _cgi.getS() << std::endl;
-				_cgi.cgiRun();
-				this->status = _cgi.getStatus();
-				this->body = _cgi.getBody();
-				this->extra_headers = _cgi.getHeaders();
-				len = this->body.size();
-				ss << len;
-				ss >> this->body_len;
-				return ;
-			}
-		std::cout << str << std::endl;
+//				std::cout << "rentre" << std::endl;
+//			_cgi.setIsIt(tools::isItCgi(str, _loc));
+//			if (_cgi.getIsIt() == 1)
+//			{
+//				_cgi.setReal(str);
+//				std::cout << _cgi.getR() << std::endl;
+//				_cgi.cgiRun();
+//				std::cout << "rentre" << std::endl;
+//				this->status = _cgi.getStatus();
+//				this->body = _cgi.getBody();
+//				this->extra_headers = _cgi.getHeaders();
+//				len = this->body.size();
+//				ss << len;
+//				ss >> this->body_len;
+//				return ;
+//			}
+//		std::cout << str << std::endl;
 
 			readIn(str);
 			this->status = 200;

@@ -184,6 +184,16 @@ std::string Cgi::getHex(std::string path)
 	return (ret);
 }
 
+std::string Cgi::getR() const
+{
+	return (this->_realPath);
+}
+
+void Cgi::setReal(std::string newPath)
+{
+	this->_realPath = newPath;
+}
+
 void Cgi::getEnv()
 {
 	std::string pathFile = _realPath;//"." + _serv.getRootServer() + _simple; 
@@ -331,6 +341,7 @@ void	Cgi::cgiRun()
 			}
 			delete [] _env;
 		}
+		_env = NULL;
 		rewind(tmp);
 		while(!feof(tmp))
 		{

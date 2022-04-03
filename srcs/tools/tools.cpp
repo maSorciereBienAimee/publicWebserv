@@ -141,8 +141,9 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	if (x > -1 && temp[0] == '/' && root[x] == '/')
 		root.erase(root.end() - 1);
 	ret = root + temp;
-	if (ret[ret.size()] == '/')
+	if (ret[ret.size() - 1] == '/')
 		ret.erase(ret.end() - 1);
+	std::cout << "REALPATH IS = " << ret << std::endl;
 	return (ret);
 }
 
@@ -174,7 +175,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		struct stat	stock;
 		std::vector<serverLocation> location = block.getLocation();
 		serverLocation ret;
-		std::string	realPath = "." + block.getRootServer() + path;
+		std::string	realPath = block.getRootServer() + path;
 	
 		ret.setIndex(block.getIndex());
 		ret.setAI(block.getAI_s());
@@ -213,13 +214,21 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::string::iterator it = str.begin();
 		while (it != str.end())
 			it++;
-		for (; *it != '/'; it--)
+		while (1)
 		{
-			i--;
-			if (it == str.begin())
+			for (; *it != '/'; it--)
+			{
+				i--;
+				if (it == str.begin())
+					break;
+			}
+			str.erase(it, str.end());
+			realPath = block.getRootServer() + str;
+			if (stat(realPath.c_str(), &stock) == 0)
 				break;
+			if (str == "/")
+				break ;
 		}
-		str.erase(it, str.end());
 		withoutExt = str;
 		if (withoutExt == "")
 				withoutExt = "/";
@@ -277,7 +286,6 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 			finalRes = it2->second;
 		else
 			finalRes = _mimeMap["unknown"];
-		std::cout << "final = "<< finalRes << std::endl;
 		return (finalRes);
 	}
 
