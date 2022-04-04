@@ -298,7 +298,21 @@ void	Cgi::cgiRun()
 	char **arg = NULL;
 	std::FILE *tmp = std::tmpfile();
 	int fdTmp = fileno(tmp);
-	
+
+//	std::string body = "";
+//	std::fstream file;
+//	char c;
+//	file.open(_realPath, std::ios::in);
+//	while (1)
+//	{
+//		file >> std::noskipws >> c;
+//		if (file.eof())
+//			break;
+//		body.push_back(c);
+//	}
+//	file.close();
+
+
 	getEnv();
 	pipe(fd);	
 	pid = fork();
