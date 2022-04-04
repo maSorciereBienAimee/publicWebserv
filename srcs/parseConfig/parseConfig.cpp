@@ -894,7 +894,8 @@ std::vector<std::string> parseConfig::parseLine(std::string line, std::vector<st
 void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &servers)
 {
 	serverBlock server;
-
+	_lsn = 0, _idx = 0, _rt = 0, _hst = 0, _srv = 0, _cgx = 0, _cgb = 0 , _err  = 0;
+	_mtd = 0, _cms = 0, _ab = 0, _abf = 0, _rdr = 0;
 	 
 	for(int bracket = 0; start != end;)
 	{
@@ -968,13 +969,15 @@ void	parseConfig::setServers(std::vector<std::string> &content, std::vector<serv
 			if (bracket == 0)
 			{
 				setOneServer(start, --it, servers);
-				// std::cout << "IT -- = " << (*it) << "\n";
+			
 			}
 			else
 				throw OurException("ERROR: server block : missing a bracket");
 		}
+		//std::cout << "IT -- = " << (*it) << "\n";
+
 		else
-			throw OurException("ERROR: server block" + *it + ": unexpected line");
+			throw OurException("ERROR: server block [" + *it + "] : unexpected line");
 		// if (it != content.end())
 		// {
 		// 	//std::cout << "is it nessecary ??\n";
