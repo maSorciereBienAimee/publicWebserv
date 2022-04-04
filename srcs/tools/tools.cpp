@@ -10,13 +10,13 @@ namespace tools
 		for (it = content.begin(); it != content.end(); it++)
 			std::cout << (*it) << "\n";
 		std::cout << "___________\n";
-		
+
 	}
 
 	void    printServerBlock(serverBlock content)
 	{
 		std::cout << "_____ServerBlock IS______\n";
-		
+
 			std::cout<< "HOST : " << content.getHost() << "\n";
 			std::cout<< "NAME : " << content.getName() << "\n";
 			std::cout<< "HOST STR : " << content.getHostStr() << "\n";
@@ -35,7 +35,7 @@ namespace tools
 			printVector(content.getIndex());
 			std::cout<< "METHODS content : \n";
 			printVector(content.getMethods_s());
-		std::cout << "___________\n";		
+		std::cout << "___________\n";
 	}
 
 	void    printLocationBlock(std::vector<serverLocation> content)
@@ -59,12 +59,12 @@ namespace tools
 			printVector((*it).getMethods());
 
 		}
-		std::cout << "___________\n";		
+		std::cout << "___________\n";
 }
 
 	bool    isSpaces(std::string str)
 	{
-	
+
 		for (int i = 0; str[i]; i++)
 		{
 			if (!isspace(str[i]))
@@ -73,12 +73,12 @@ namespace tools
 		return (true);
 	}
 
-	std::string removeDuplicateSpaces(std::string const &str) 
+	std::string removeDuplicateSpaces(std::string const &str)
 	{
 		std::string s;
 		std::string word;
 		std::istringstream ss(str);
-	
+
 		while (ss >> word) {
 			if (!s.empty()) {
 				s += ' ';
@@ -112,8 +112,8 @@ namespace tools
     {
         if (dir == "index" || dir == "root" || dir == "server_name"
         || dir == "listen" || dir == "host" || dir == "error"
-        || dir == "cgi_extension" || dir == "cgi_bin" 
-		|| dir == "methods" || dir == "client_max_body_size" || dir == "auth_basic" 
+        || dir == "cgi_extension" || dir == "cgi_bin"
+		|| dir == "methods" || dir == "client_max_body_size" || dir == "auth_basic"
 		|| dir == "auth_basic_user_file" || dir == "redirection" )
             return (true);
         return (false);
@@ -176,7 +176,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::vector<serverLocation> location = block.getLocation();
 		serverLocation ret;
 		std::string	realPath = block.getRootServer() + path;
-	
+
 		ret.setIndex(block.getIndex());
 		ret.setAI(block.getAI_s());
 		ret.setAuthBasic(block.getAuthBasic_s());
@@ -295,9 +295,9 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::vector<std::string> data;
 		DIR *Dir;
 		struct dirent *DirEntry;
-		//nedd to change the path ??? 
+		//nedd to change the path ???
 		std::string newPath = path;
-		Dir = opendir(newPath.c_str()); //change to path 
+		Dir = opendir(newPath.c_str()); //change to path
 		if (Dir == NULL)
 		{
 			std::cout << "Could not open the directory laaaa\n";
@@ -310,6 +310,36 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		closedir(Dir);
 		return (data);
 	}
+
+	std::string pathEncoder(std::string path)
+	{
+		std::string new_path = "";
+		char c;
+		int ic;
+		char hex_c[3];
+		int len = path.length();
+
+		for(int i=0; i < len; i++)
+		{
+			c = path[i];
+			ic = c;
+
+			if ( c == ' ')
+				new_path += '+';
+			else if (isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~')
+				new_path += c;
+			else
+			{
+				sprintf(hex_c, "%X", c);
+				if(ic < 16)
+					new_path += "%0";
+				else
+					new_path += "%";
+				new_path += hex_c;
+			}
+		}
+		return new_path;
+ }
 
 	std::string	genreateAI(std::string const& locationPath, std::string const& host, std::string const& port, std::string const& path)
 	{
@@ -328,10 +358,12 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
+
+			std::cout << "\n\n\n\n\n\n\nHEX PATH IS: " << pathEncoder(*it) << "\n\n\n\n\n\n\n\n\n";
 			if (locationPath == "/")
-				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + (*it) + "\">" + (*it) + "</a></p>\n";
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + pathEncoder(*it) + "\">" + (*it) + "</a></p>\n";
 			else
-				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
+				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + "/" + pathEncoder(*it) + "\">" + (*it) + "</a></p>\n";
 		}
 		buff += "</body>\n</html>\n";
 		return (buff);
@@ -340,7 +372,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 	std::string getIndex(std::vector<std::string> files)
 	{
 		std::vector<std::string>::iterator it;
-		
+
 		for (it = files.begin(); it != files.end(); it++)
 		{
 			size_t pos = (*it).find("index");
@@ -349,7 +381,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		}
 		return ("");
 	}
-	
+
 	std::map<std::string, std::string> mime()
 	{
 		std::map<std::string, std::string> _mimeMap;
@@ -441,7 +473,7 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 	while (1)
 	{
 		while (*it != '/' && *it != '?' && it != path.end())
-		{	
+		{
 	//	std::cout << "*it = " << *it << " et i = " << i << std::endl;
 				it++;
 				i++;
@@ -478,7 +510,7 @@ std::string getSimplePath(std::string req, std::string *query, serverBlock block
 	int deb = 0;
 	int fin;
 	std::string::iterator it = req.begin();
-	
+
 	while (*it != ' ')
 	{
 		it++;
