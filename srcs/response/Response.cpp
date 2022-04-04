@@ -285,6 +285,7 @@ void Response::_get(Request R)
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath = R.getPath() + "/" + path;
+					//	std::cout << "NEW PATH IS [" << newPath << "\n";
 						readIn(newPath);
 						this->status = 200;
 					}

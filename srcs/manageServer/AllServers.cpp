@@ -19,23 +19,24 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 	
 	this->events = (struct epoll_event *)calloc(MAX_CLIENT, sizeof(struct epoll_event));	//alloc event where will be stock event that epoll_wait will receive (alloc 5000, maybe add a realloc if event > 5000 latter in code)
 	this->epfd = -1;									//epfd is the file descriptor of the creation of an epoll, init here at -1 to say that is not create yet
-        try
-        {
-                config.parsing(path, this->serverBlocks);                                      //launch parsing of the config file and stock data of each server in a vector<serverBlock>
-        }
-        catch(const OurException& e)
-        {
-                std::cerr << e.what() << '\n';
-        }
+	try
+	{
+			config.parsing(path, this->serverBlocks);                                      //launch parsing of the config file and stock data of each server in a vector<serverBlock>
+	}
+	catch(const OurException& e)
+	{
+			std::cerr << e.what() << '\n';
+	}
 	std::vector<serverBlock>::iterator it = serverBlocks.begin();
 	for (; it != serverBlocks.end(); it++)
 	{
 		for (std::vector<serverBlock>::iterator it2 = serverBlocks.begin(); it2 != it; it2++)
 		{
+			//SEGFAULT WHEN ENTER IN THE CONDITION 
 			if (it2->getPortStr() == it->getPortStr() && it2->getHostStr() == it->getHostStr())
 			{
 				std::cout << "erase " << it->getName() << std::endl;
-					this->serverBlocks.erase(it);
+				this->serverBlocks.erase(it2);
 			}
 		}
 	}
