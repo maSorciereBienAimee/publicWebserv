@@ -239,8 +239,6 @@ void Response::readIn(std::string file)
 		fav = path.substr(path.size() - 12, 12);
 	if (fav != "favicon.html")
 		std::cout << "_READIN BODY IS: " << this->body << std::endl;
-
-
 }
 
 void Response::_get(Request R)
@@ -262,8 +260,8 @@ void Response::_get(Request R)
 			{
 				std::string root = _loc.getRootLoc();
 //				root.erase(root.begin(), root.begin() + 1);
-				if (path == root + "/favicon.ico")
-					path = root + "/favicon.html";
+				if (path == root + "favicon.ico")
+					path = root + "favicon.html";
 				readIn(path);
 				this->status = 200;
 			}
