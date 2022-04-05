@@ -20,7 +20,10 @@
 Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock server) : request(R), _cgi(myCgi), _loc(loc), _server(server)
 {
 	if (F == 400)
+	{
+		std::cout << "C'EST LAAAAAAA\n";
 		this->body_message = "Bad request";
+	}
 	if (_loc.getRedir() == "")
 	{
 		redir = 0;

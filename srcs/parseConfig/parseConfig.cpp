@@ -797,7 +797,6 @@ void 	parseConfig::getValuesLocationBlock(int pos, std::string const& attribut, 
 		parseAndSetBodyLoc(value, location);
 	else if (attribut.compare("upload ") == 0)
 		parseAndSetUploadLoc(value, location);
-
 }
 
 /******_________________________________________******/
@@ -933,7 +932,7 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 {
 	serverBlock server;
 	_lsn = 0, _idx = 0, _rt = 0, _hst = 0, _srv = 0, _cgx = 0, _cgb = 0 , _err  = 0;
-	_mtd = 0, _cms = 0, _ab = 0, _abf = 0, _rdr = 0;
+	_mtd = 0, _cms = 0, _ab = 0, _abf = 0, _rdr = 0, _up = 0;
 	 
 	for(int bracket = 0; start != end;)
 	{
