@@ -148,11 +148,21 @@ std::string Server::chunkDecoder(std::string str)
 
 bool	Server::check_size_body(std::string request)
 {
+	if (request.find("\n\r\n") == std::string::npos)
+		return true;
+	std::string	queryPath;
+	std::string simplePath = tools::getSimplePath(request, &queryPath, this->infoConfig);
+	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
+	
+
+//	tools::printLocationBlock(synthese);
+	std::cout << "BODU LOC IS " << synthese.getBody() << "\n";
+	std::cout << "REQUEST " << request << "\n";
+	std::cout << "PATH IS " << synthese.getLocationPath() << "\n";
 	if (this->infoConfig.getBody_s() == -1)
 		return true;
 	//IF WE HAVENOT REACHED END OF HEADERS
-	if (request.find("\n\r\n") == std::string::npos)
-		return true;
+	
 	//ELSE CREATE STRING WITHOUT HEADERS
 	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
 	int max_size = this->infoConfig.getBody_s();
@@ -208,6 +218,7 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 	std::string	queryPath;
 	std::string tmp = "";
 	std::string simplePath = tools::getSimplePath(req, &queryPath, this->infoConfig);
+
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
 	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
@@ -232,7 +243,7 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 		}
 	}
 	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
-//	tools::printServerBlock(infoConfig);
+	//tools::printServerBlock(infoConfig);
 	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
 	if (max_size_check == false)
