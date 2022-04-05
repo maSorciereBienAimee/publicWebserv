@@ -244,7 +244,7 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 	}
 	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
 	//tools::printServerBlock(infoConfig);
-	//tools::printLocationBlock(infoConfig.getLocation());
+	tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
 	if (max_size_check == false)
 	{

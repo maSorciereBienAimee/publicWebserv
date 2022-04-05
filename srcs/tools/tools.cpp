@@ -32,6 +32,7 @@ namespace tools
 			std::cout<< "AUTH USR FILE : " << content.getAuthUsrFile_s() << "\n";
 			std::cout<< "REDIRECTION : " << content.getRedir_s() << "\n";
 			std::cout<< "UPLOAD : " << content.getUpload_s() << "\n";
+			std::cout<< "IS BODY SET = : " << content.getBodySet_s() << "\n";
 			std::cout<< "INDEX content : \n";
 			printVector(content.getIndex());
 			std::cout<< "METHODS content : \n";
@@ -54,6 +55,7 @@ namespace tools
 			std::cout<< "CGIBIN LOC : " << (*it).getCgiBin() << "\n";
 			std::cout<< "REDIRECTION LOC : " << (*it).getRedir() << "\n";
 			std::cout<< "ROOT LOC : " << (*it).getRootLoc() << "\n";
+			std::cout<< "IS BODY SET : " << (*it).getBodySetLoc() << "\n";
 			std::cout<< "INDEX content : \n";
 			printVector((*it).getIndex());
 			std::cout<< "METHODS content : \n";
@@ -166,6 +168,7 @@ int searchInConfig(std::string str, std::vector<serverLocation> location, server
 			(*loc).setRootLoc((*it).getRootLoc());
 			(*loc).setLocationPath((*it).getLocationPath());
 			(*loc).setUploadLoc((*it).getUploadLoc());
+			(*loc).setBodySetLoc((*it).getBodySetLoc());
 			return (1);
 		}
 	}
@@ -190,6 +193,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		ret.setAuthUsrFile(block.getAuthUsrFile_s());
 		ret.setRootLoc(block.getRootServer());
 		ret.setUploadLoc(block.getUpload_s());
+		ret.setBodySetLoc(block.getBodySet_s());
 
 
 		if (stat(realPath.c_str(), &stock) == 0)

@@ -37,6 +37,7 @@ class serverBlock {
 		std::string				    _auth_basic_file_s; //ok
 		std::string                 _redirection_s; //ok
 		std::string					_upload_s;
+		bool						_bodyIsSet;
 
 	public: 
 
@@ -65,6 +66,7 @@ class serverBlock {
 		void										setAuthUsrFile_s(std::string path);
 		void										setRedir_s(std::string path);
 		void										setUpload_s(std::string path);
+		void										setBodySet_s(bool val);
 		
 
 
@@ -88,6 +90,7 @@ class serverBlock {
 		std::string									getAuthUsrFile_s(void) const;
 		std::string									getRedir_s(void) const;
 		std::string									getUpload_s(void) const;
+		bool										getBodySet_s(void) const;
 
 		bool operator==(const serverBlock& other);
 };

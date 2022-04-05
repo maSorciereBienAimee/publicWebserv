@@ -1,14 +1,14 @@
 #include "serverBlock.hpp"
 
 serverBlock::serverBlock() :  _host(0), _hostStr(), _portStr(), _name("DreamTeamServer"), _port(80), _index(), _cgi_ext_s(), _cgi_bin_s(), _error(), _server_root(), _locations() ,
-_methods_s(), _auto_index_s(), _body_size_s(-1), _auth_basic_s(), _auth_basic_file_s(), _redirection_s(), _upload_s() {}
+_methods_s(), _auto_index_s(), _body_size_s(-1), _auth_basic_s(), _auth_basic_file_s(), _redirection_s(), _upload_s(),_bodyIsSet(false) {}
 
 serverBlock::~serverBlock() {}
 
 serverBlock::serverBlock(const serverBlock& cpy) :
  _host(cpy._host), _hostStr(cpy._hostStr), _portStr(cpy._portStr), _name(cpy._name), _port(cpy._port), _index(cpy._index), _cgi_ext_s(cpy._cgi_ext_s), _cgi_bin_s(cpy._cgi_bin_s), _error(cpy._error), _server_root(cpy._server_root), _locations(cpy._locations),
   _methods_s(cpy._methods_s), _auto_index_s(cpy._auto_index_s), _body_size_s(cpy._body_size_s), _auth_basic_s(cpy._auth_basic_s),
-  _auth_basic_file_s(cpy._auth_basic_file_s), _redirection_s(cpy._redirection_s), _upload_s(cpy._upload_s)  {}
+  _auth_basic_file_s(cpy._auth_basic_file_s), _redirection_s(cpy._redirection_s), _upload_s(cpy._upload_s), _bodyIsSet(cpy._bodyIsSet)  {}
 
 serverBlock		const & serverBlock::getServerBlock()
 {
@@ -43,6 +43,7 @@ serverBlock 	serverBlock::operator=(const serverBlock& other)
 	_redirection_s = other._redirection_s;
 	_server_root = other._server_root;
 	_upload_s = other._upload_s;
+	_bodyIsSet  = other._bodyIsSet;
 	return  (*this);
 }
 
@@ -64,7 +65,7 @@ void							serverBlock::setAuthBasic_s(bool auth) { this->_auth_basic_s = auth; 
 void							serverBlock::setAuthUsrFile_s(std::string path) { this->_auth_basic_file_s = path; }
 void							serverBlock::setRedir_s(std::string path) { this->_redirection_s = path; }
 void							serverBlock::setUpload_s(std::string path) { this->_upload_s = path; }
-
+void							serverBlock::setBodySet_s(bool val) { this->_bodyIsSet = val; }
 
 uint32_t						serverBlock::getHost(void) const { return (this->_host); }
 std::string	const&				serverBlock::getName(void) const { return (this->_name); }
@@ -83,6 +84,7 @@ int								serverBlock::getBody_s(void) const { return (this->_body_size_s); }
 std::string						serverBlock::getAuthUsrFile_s(void) const { return (this->_auth_basic_file_s); }
 std::string						serverBlock::getRedir_s(void) const { return (this->_redirection_s); }
 std::string						serverBlock::getUpload_s(void) const { return (this->_upload_s); }
+bool							serverBlock::getBodySet_s(void) const { return (this->_bodyIsSet); }
 
 
 

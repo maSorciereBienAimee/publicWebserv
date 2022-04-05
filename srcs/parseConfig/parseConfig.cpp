@@ -305,6 +305,7 @@ void	parseConfig::parseAndSetBodyServer(std::string &value, serverBlock &server)
 {
 	int i = 0;
 
+	server.setBodySet_s(true);
 	commonParsingValues(value);
 	while (value[i])
 	{
@@ -443,7 +444,7 @@ void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std
 		parseAndSetMethodsServer(value, server);
 	else if (attribut.compare("methods ") == 0)
 		parseAndSetMethodsServer(value, server);
-	 else if (attribut.compare("client_max_body_size ") == 0)
+	else if (attribut.compare("client_max_body_size ") == 0)
 	 	parseAndSetBodyServer(value, server);
 	else if (attribut.compare("auth_basic ") == 0)
 	 	parseAndSetAuthServer(value, server);
@@ -758,6 +759,7 @@ void	parseConfig::parseAndSetBodyLoc(std::string &value, serverLocation &locatio
 {
 	int i = 0;
 
+	location.setBodySetLoc(true);
 	commonParsingValues(value);
 	while (value[i])
 	{
