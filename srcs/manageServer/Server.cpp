@@ -183,11 +183,11 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 	{
 		if (this->infoConfig.getHostStr() == "127.0.0.1")
 			hp = "localhost:" + this->infoConfig.getPortStr();
-		// if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
-		// {
-		// 	std::cout << "CEST ICICICICI que f = 400\n"; 
-		// 	status = 400;
-		// }
+		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+		{
+			// std::cout << "CEST ICICICICI que f = 400\n"; 
+			status = 400;
+		}
 	}
 	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
 //	tools::printServerBlock(infoConfig);
