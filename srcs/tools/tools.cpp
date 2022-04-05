@@ -31,6 +31,7 @@ namespace tools
 			std::cout<< "AUTH BASIC : " << content.getAuthBasic_s() << "\n";
 			std::cout<< "AUTH USR FILE : " << content.getAuthUsrFile_s() << "\n";
 			std::cout<< "REDIRECTION : " << content.getRedir_s() << "\n";
+			std::cout<< "UPLOAD : " << content.getUpload_s() << "\n";
 			std::cout<< "INDEX content : \n";
 			printVector(content.getIndex());
 			std::cout<< "METHODS content : \n";
@@ -114,7 +115,7 @@ namespace tools
         || dir == "listen" || dir == "host" || dir == "error"
         || dir == "cgi_extension" || dir == "cgi_bin"
 		|| dir == "methods" || dir == "client_max_body_size" || dir == "auth_basic"
-		|| dir == "auth_basic_user_file" || dir == "redirection" )
+		|| dir == "auth_basic_user_file" || dir == "redirection" || dir == "upload" )
             return (true);
         return (false);
     }
@@ -122,7 +123,7 @@ namespace tools
     {
         if (dir == "index" || dir == "methods" || dir == "cgi_extension"
         || dir == "cgi_bin" || dir == "language" || dir == "autoindex" || dir == "root"
-        || dir == "client_max_body_size" || dir == "auth_basic" || dir == "auth_basic_user_file" || dir == "redirection")
+        || dir == "client_max_body_size" || dir == "auth_basic" || dir == "auth_basic_user_file" || dir == "redirection") //|| dir == "Upload"
             return (true);
         return (false);
     }
@@ -164,6 +165,7 @@ int searchInConfig(std::string str, std::vector<serverLocation> location, server
 			(*loc).setAuthUsrFile((*it).getAuthUsrFile());
 			(*loc).setRootLoc((*it).getRootLoc());
 			(*loc).setLocationPath((*it).getLocationPath());
+			//(*loc).setUploadLoc((*it).getUploadLoc());
 			return (1);
 		}
 	}
@@ -187,6 +189,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		ret.setRedir(block.getRedir_s());
 		ret.setAuthUsrFile(block.getAuthUsrFile_s());
 		ret.setRootLoc(block.getRootServer());
+		//ret.setUploadLoc(block.getUploadLoc());
 
 
 		if (stat(realPath.c_str(), &stock) == 0)

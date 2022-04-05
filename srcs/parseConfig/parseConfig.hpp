@@ -35,6 +35,7 @@ class parseConfig  {
 		int _ab;
 		int _abf;
 		int _rdr;
+		int _up;
 	
 	public:
 
@@ -84,6 +85,7 @@ class parseConfig  {
 	void						parseAndSetAuthServer(std::string &value, serverBlock &server);
 	void						parseAndSetAuthUsrServer(std::string &value, serverBlock &server);
 	void						parseAndSetRedirServer(std::string &value, serverBlock &server);
+	void						parseAndSetUploadServer(std::string &value, serverBlock &server);
 
 
 	/******_____ FUNCTION PARSE && SET && GET && VALUE FROM LOCATION BLOCK______******/

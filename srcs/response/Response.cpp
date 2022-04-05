@@ -424,7 +424,7 @@ void Response::_post(Request R)
 			if (f != std::string::npos)
 			{
 				f += 9;
-				if (content[f] == '"');
+				if (content[f] == '"')
 					f++;
 				f2 = f;
 				while (content[f] != '"' && content[f] != '\n'

@@ -1,13 +1,14 @@
 #include "parseConfig.hpp"
 
-parseConfig::parseConfig(void) : _lsn(0), _idx(0), _rt(0), _hst(0), _srv(0),_cgx(0),_cgb(0), _err(0),_mtd(0), _cms(0), _ab(0), _abf(0), _rdr(0)
+parseConfig::parseConfig(void) : _lsn(0), _idx(0), _rt(0), _hst(0), _srv(0),_cgx(0),_cgb(0), _err(0),_mtd(0), _cms(0), _ab(0), _abf(0), _rdr(0), _up(0)
 { return; }
 
 parseConfig::~parseConfig(void) 
 { return; }
 
 parseConfig::parseConfig(const parseConfig& cpy) : _lsn(cpy._lsn), _idx(cpy._idx),
-_rt(cpy._rt), _hst(cpy._hst), _srv(cpy._srv),_cgx(cpy._cgx),_cgb(cpy._cgb), _err(cpy._err),_mtd(cpy._mtd), _cms(cpy._cms), _ab(cpy._ab), _abf(cpy._abf), _rdr(cpy._rdr)
+_rt(cpy._rt), _hst(cpy._hst), _srv(cpy._srv),_cgx(cpy._cgx),_cgb(cpy._cgb), _err(cpy._err),_mtd(cpy._mtd), _cms(cpy._cms), _ab(cpy._ab),
+_abf(cpy._abf), _rdr(cpy._rdr), _up(cpy._up)
 {}
 
 parseConfig &parseConfig::operator=(const parseConfig& other)
@@ -25,6 +26,7 @@ parseConfig &parseConfig::operator=(const parseConfig& other)
 	_ab  = other._ab;
 	_abf = other._abf;
 	_rdr = other._rdr;
+	_up = other._up;
 	return *this; }
 
 /******_____PARSEING COMMON FUNCTION______******/
@@ -39,6 +41,24 @@ void	parseConfig::commonParsingValues(std::string &value)
 
 /******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******
 / * 			DON'T FORGET TO PUT VALUE IN CONST						*/
+
+void	parseConfig::parseAndSetUploadServer(std::string &value, serverBlock &server)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurException("ERROR: server block :upload server one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	server.setUpload_s(value);
+	std::cout << "UPLOAD SERVER = [" << server.getUpload_s() << "]\n";
+
+}
 
 void	parseConfig::parseAndSetPort(std::string &value, serverBlock &server)
 {
@@ -437,6 +457,8 @@ void 	parseConfig::getValueServerBlock(int pos, std::string const& attribut, std
 		parseAndSetAuthUsrServer(value, server);
 	else if (attribut.compare("redirection ") == 0)
 		parseAndSetRedirServer(value, server);
+	else if (attribut.compare("upload ") == 0)
+		parseAndSetUploadServer(value, server);
 }
 
 void		parseConfig::countEachAtt(std::string const& attribut)
@@ -467,6 +489,8 @@ void		parseConfig::countEachAtt(std::string const& attribut)
 		_abf++;
 	else if (attribut.compare("redirection ") == 0)
 		_rdr++;
+	else if (attribut.compare("upload ") == 0)
+		_up++;
 }
 
 int		parseConfig::getAttributName(std::string const &line, std::string &attribut, std::string& value, serverBlock &server)
@@ -475,7 +499,8 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 	size_t 						pos;
 	IT 							it;
 	std::string					dir;
- 	std::vector<std::string> 	atts = {"listen ", "index ", "root ", "host ", "server_name ", "cgi_extension ", "cgi_bin ", "error ", "methods ", "client_max_body_size ", "auth_basic ", "auth_basic_user_file ", "redirection "};
+ 	std::vector<std::string> 	atts = {"listen ", "index ", "root ", "host ", "server_name ", "cgi_extension ", "cgi_bin ", "error ", "methods ",
+	 "client_max_body_size ", "auth_basic ", "auth_basic_user_file ", "redirection ", "upload "};
 	
 	while(line[j] && line[j] != ' ')
 	{
@@ -494,7 +519,7 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 			//std::cout << " Attribut = " << "'"<<  attribut << "'" << "\n";
 			countEachAtt(attribut);
 			if (_lsn > 1 || _idx > 1 || _rt > 1 || _hst > 1 || _srv > 1 || _cgx > 1 || _cgb > 1 
-			|| _err > 1 || _mtd > 1 || _cms > 1 || _ab > 1 || _abf > 1 || _rdr > 1)
+			|| _err > 1 || _mtd > 1 || _cms > 1 || _ab > 1 || _abf > 1 || _rdr > 1 || _up > 1)
 					throw OurException("Directive in server block not allowed here");
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
 		//	std::cout << " Value = " << "'"<<  value << "'" << "\n";
