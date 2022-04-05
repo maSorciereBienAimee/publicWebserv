@@ -1,12 +1,14 @@
 #include "serverLocation.hpp"
 
 serverLocation::serverLocation() : 
-_root(""), _cgi_ext(""), _cgi_bin(""), _language(""), _auth_basic_file(""), _location_path(""), _auto_index(0), _auth_basic(0), _body_size(-1), _redirection(""){}
+_root(""), _cgi_ext(""), _cgi_bin(""), _language(""), _auth_basic_file(""), _location_path(""), _auto_index(0),
+_auth_basic(0), _body_size(-1), _redirection(""), _uploadLoc(""){}
 
 serverLocation::serverLocation(const serverLocation &cpy) :
 _index(cpy._index) , _methods(cpy._methods), _root(cpy._root), _cgi_ext(cpy._cgi_ext),
 _cgi_bin(cpy._cgi_bin), _language(cpy._language), _auth_basic_file(cpy._auth_basic_file),
-_location_path(cpy._location_path), _auto_index(cpy._auto_index), _auth_basic(cpy._auth_basic), _body_size(cpy._body_size), _redirection(cpy._redirection){}
+_location_path(cpy._location_path), _auto_index(cpy._auto_index), _auth_basic(cpy._auth_basic), _body_size(cpy._body_size),
+_redirection(cpy._redirection), _uploadLoc(cpy._uploadLoc){}
 
 serverLocation &serverLocation::operator=(const serverLocation &other) {
 
@@ -22,6 +24,7 @@ serverLocation &serverLocation::operator=(const serverLocation &other) {
 	_auto_index = other._auto_index;
 	_body_size = other._body_size;
 	_redirection = other._redirection;
+	_uploadLoc = other._uploadLoc;
 	return (*this);
 }
 
@@ -38,6 +41,7 @@ void						serverLocation::setCgiBin(std::string path) { this->_cgi_bin = path; }
 void						serverLocation::setRedir(std::string path) { this->_redirection = path; }
 void						serverLocation::setAuthUsrFile(std::string path) { this->_auth_basic_file = path; }
 void						serverLocation::setRootLoc(std::string path) { this->_root = path; }
+void						serverLocation::setUploadLoc(std::string path) { this->_uploadLoc = path; }
 
 
 bool						serverLocation::getAI(void) const { return (this->_auto_index); }
@@ -51,4 +55,6 @@ std::string					serverLocation::getCgiBin(void) const { return (this->_cgi_bin);
 std::string					serverLocation::getRedir(void) const { return (this->_redirection); }
 std::string					serverLocation::getAuthUsrFile(void) const { return (this->_auth_basic_file); }
 std::string					serverLocation::getRootLoc(void) const { return (this->_root); }
+std::string					serverLocation::getUploadLoc(void) const { return (this->_uploadLoc); }
+
 

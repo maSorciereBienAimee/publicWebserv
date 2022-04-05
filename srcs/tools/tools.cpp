@@ -123,7 +123,7 @@ namespace tools
     {
         if (dir == "index" || dir == "methods" || dir == "cgi_extension"
         || dir == "cgi_bin" || dir == "language" || dir == "autoindex" || dir == "root"
-        || dir == "client_max_body_size" || dir == "auth_basic" || dir == "auth_basic_user_file" || dir == "redirection") //|| dir == "Upload"
+        || dir == "client_max_body_size" || dir == "auth_basic" || dir == "auth_basic_user_file" || dir == "redirection" || dir == "upload")
             return (true);
         return (false);
     }
@@ -165,7 +165,7 @@ int searchInConfig(std::string str, std::vector<serverLocation> location, server
 			(*loc).setAuthUsrFile((*it).getAuthUsrFile());
 			(*loc).setRootLoc((*it).getRootLoc());
 			(*loc).setLocationPath((*it).getLocationPath());
-			//(*loc).setUploadLoc((*it).getUploadLoc());
+			(*loc).setUploadLoc((*it).getUploadLoc());
 			return (1);
 		}
 	}
@@ -189,7 +189,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		ret.setRedir(block.getRedir_s());
 		ret.setAuthUsrFile(block.getAuthUsrFile_s());
 		ret.setRootLoc(block.getRootServer());
-		//ret.setUploadLoc(block.getUploadLoc());
+		ret.setUploadLoc(block.getUpload_s());
 
 
 		if (stat(realPath.c_str(), &stock) == 0)

@@ -27,6 +27,8 @@ class serverLocation
 		bool    			    	_auth_basic;
 		int							_body_size;
 		std::string                 _redirection;
+		std::string                 _uploadLoc;
+
 
 	public:
 
@@ -47,6 +49,7 @@ class serverLocation
 		void	setRedir(std::string path);
 		void	setAuthUsrFile(std::string path);
 		void	setRootLoc(std::string path);
+		void	setUploadLoc(std::string path);
 
 
 		bool						getAI(void) const;
@@ -60,8 +63,7 @@ class serverLocation
 		std::string					getRedir(void) const;
 		std::string					getAuthUsrFile(void) const;
 		std::string					getRootLoc(void) const;
-		
-		
+		std::string					getUploadLoc(void) const;
 };
 
 

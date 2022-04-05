@@ -100,6 +100,7 @@ class parseConfig  {
 	void						parseAndSetAuthLoc(std::string &value, serverLocation &location);
 	void						parseAndSetAuthUsrLoc(std::string &value, serverLocation &location);
 	void						parseAndSetBodyLoc(std::string &value, serverLocation &location);
+	void						parseAndSetUploadLoc(std::string &value, serverLocation &location);
 };
 
 

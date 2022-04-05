@@ -39,8 +39,7 @@ void	parseConfig::commonParsingValues(std::string &value)
 //	std::cout << "VALUE IN COMMON FT IS [" << value << "]\n";
 }
 
-/******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******
-/ * 			DON'T FORGET TO PUT VALUE IN CONST						*/
+/******_____PARSE && SET && GET && VALUE FROM SERVER BLOCK______******/
 
 void	parseConfig::parseAndSetUploadServer(std::string &value, serverBlock &server)
 {
@@ -200,11 +199,6 @@ void	parseConfig::parseAndServerRoot(std::string &value, serverBlock &server)
 	}
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
-//	if (value.size() > 1)
-//	{
-//		std::string::iterator end_pos2 = std::remove(value.begin(), value.end(), '/');
-//		value.erase(end_pos2, value.end());
-//	}
 	server.setRootServer(value);
 	//std::cout << "ROOT SERVER = [" << server.getRootServer() << "]\n";
 }
@@ -672,6 +666,23 @@ void	parseConfig::parseAndSetCgiBinLoc(std::string &value, serverLocation &locat
 //	std::cout << "LOCATION CGI_BIN = [" << location.getCgiBin() << "]\n";
 }
 
+void	parseConfig::parseAndSetUploadLoc(std::string &value, serverLocation &location)
+{
+	int i = 0;
+
+	commonParsingValues(value);
+	while (value[i])
+	{
+		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+			throw OurException("ERROR: location block : redirection one path expected");
+		i++;
+	}
+    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
+	value.erase(end_pos, value.end());
+	location.setUploadLoc(value);
+	//std::cout << "LOCATION UPLOAD = [" << location.getUploadLoc() << "]\n";
+}
+
 void	parseConfig::parseAndSetRedirLoc(std::string &value, serverLocation &location)
 {
 	int i = 0;
@@ -784,6 +795,8 @@ void 	parseConfig::getValuesLocationBlock(int pos, std::string const& attribut, 
 		parseAndSetAuthUsrLoc(value, location);
 	else if (attribut.compare("client_max_body_size ") == 0)
 		parseAndSetBodyLoc(value, location);
+	else if (attribut.compare("upload ") == 0)
+		parseAndSetUploadLoc(value, location);
 
 }
 
@@ -797,7 +810,7 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 	IT 							it;
 	std::string 				dir;
 	std::vector<std::string> 	atts = { "autoindex ","methods ", "root ", "cgi_extension ", "cgi_bin ",
-	 "redirection ","index ", "auth_basic ", "auth_basic_user_file ", "client_max_body_size "}; 
+	 "redirection ","index ", "auth_basic ", "auth_basic_user_file ", "client_max_body_size ", "upload "}; 
 	
 	while(line[j] && line[j] != ' ')
 	{
