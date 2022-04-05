@@ -1,11 +1,11 @@
 #include "serverBlock.hpp"
- 
+
 serverBlock::serverBlock() :  _host(0), _hostStr(), _portStr(), _name("DreamTeamServer"), _port(80), _index(), _cgi_ext_s(), _cgi_bin_s(), _error(), _server_root(), _locations() ,
-_methods_s(), _auto_index_s(), _body_size_s(), _auth_basic_s(), _auth_basic_file_s(), _redirection_s(), _upload_s() {}
+_methods_s(), _auto_index_s(), _body_size_s(-1), _auth_basic_s(), _auth_basic_file_s(), _redirection_s(), _upload_s() {}
 
 serverBlock::~serverBlock() {}
 
-serverBlock::serverBlock(const serverBlock& cpy) : 
+serverBlock::serverBlock(const serverBlock& cpy) :
  _host(cpy._host), _hostStr(cpy._hostStr), _portStr(cpy._portStr), _name(cpy._name), _port(cpy._port), _index(cpy._index), _cgi_ext_s(cpy._cgi_ext_s), _cgi_bin_s(cpy._cgi_bin_s), _error(cpy._error), _server_root(cpy._server_root), _locations(cpy._locations),
   _methods_s(cpy._methods_s), _auto_index_s(cpy._auto_index_s), _body_size_s(cpy._body_size_s), _auth_basic_s(cpy._auth_basic_s),
   _auth_basic_file_s(cpy._auth_basic_file_s), _redirection_s(cpy._redirection_s), _upload_s(cpy._upload_s)  {}
@@ -47,7 +47,7 @@ serverBlock 	serverBlock::operator=(const serverBlock& other)
 }
 
 void							serverBlock::setHost(const uint32_t host) { this->_host = host; }
-void							serverBlock::setName(std::string const& name) { this->_name = name; }		
+void							serverBlock::setName(std::string const& name) { this->_name = name; }
 void							serverBlock::setPort(const uint16_t port) { this->_port = port; }
 void							serverBlock::setIndex(std::vector<std::string> const &index) { this->_index = index; }
 void							serverBlock::setHostStr(std::string const& str) { this->_hostStr = str; }
@@ -77,7 +77,7 @@ std::string	const&				serverBlock::getError(void) const { return (this->_error);
 std::string	const&				serverBlock::getCgiBin(void) const { return (this->_cgi_bin_s); }
 std::string	const&				serverBlock::getCgiExt(void) const { return (this->_cgi_ext_s); }
 bool							serverBlock::getAuthBasic_s(void) const { return (this->_auth_basic_s); }
-std::vector<std::string> 		serverBlock::getMethods_s(void) const { return (this->_methods_s); } 
+std::vector<std::string> 		serverBlock::getMethods_s(void) const { return (this->_methods_s); }
 bool							serverBlock::getAI_s(void) const { return (this->_auto_index_s); }
 int								serverBlock::getBody_s(void) const { return (this->_body_size_s); }
 std::string						serverBlock::getAuthUsrFile_s(void) const { return (this->_auth_basic_file_s); }

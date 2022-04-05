@@ -65,7 +65,7 @@ std::string Server::processContentLength(std::string request)
 }
 
 
-std::string Server::processContent(std::string request, int fd, int epfd)
+std::string Server::processContent(std::string request, int fd, int epfd, bool *max_size)
 {
 	int size = 24;
 	std::string bufStr;
@@ -74,11 +74,21 @@ std::string Server::processContent(std::string request, int fd, int epfd)
 	check = recv(fd, buf, size - 1, 0);
 	while (check > 0)
 	{
+		if (check_size_body(request) == false)
+		{
+			*max_size = false;
+			return request;
+		}
 		request += buf;
 		memset(buf, '\0', size);
 		check = recv(fd, buf, size - 1, 0);
 	}
 	request += buf;
+	if (check_size_body(request) == false)
+	{
+		*max_size = false;
+		return request;
+	}
 	if (check == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
@@ -136,8 +146,29 @@ std::string Server::chunkDecoder(std::string str)
     return (decoded);
 }
 
+bool	Server::check_size_body(std::string request)
+{
+	if (this->infoConfig.getBody_s() == -1)
+		return true;
+	//IF WE HAVENOT REACHED END OF HEADERS
+	if (request.find("\n\r\n") == std::string::npos)
+		return true;
+	//ELSE CREATE STRING WITHOUT HEADERS
+	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
+	int max_size = this->infoConfig.getBody_s();
+	std::cout << body << "----" << body.length() << "----" << std::endl;
+	if (body.length() > max_size)
+	{
+		std::cout << "HEREHEREHREHRHERHEH. MAX SIZE: " << max_size << std::endl;
+		return false;
+	}
+	std::cout << "TRUE" << std::endl;
+	return true;
+}
+
 void Server::readData(int fd, int epfd)
 {
+	bool max_size_check = true;
 	int n;
 	int size = 24;
 	char buf[size];
@@ -159,22 +190,33 @@ void Server::readData(int fd, int epfd)
 	else
 	{
 		request += buf;
-		request = this->processContent(request, fd, epfd);
-		this->pseudoReponse(request, fd);
+		if (check_size_body(request) == false)
+		{
+			max_size_check = false;
+			this->pseudoReponse(request, fd, max_size_check);
+		}
+		request = this->processContent(request, fd, epfd, &max_size_check);
+		this->pseudoReponse(request, fd, max_size_check);
 		close(fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 }
 
 
-void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee quand la class reponse sera faite
+void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //destinee a etre suprimee quand la class reponse sera faite
 {
 	std::string	queryPath;
+	std::string tmp = "";
 	std::string simplePath = tools::getSimplePath(req, &queryPath, this->infoConfig);
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
-	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);	
+	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);
 	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
 //	Request marco(req, synthese.getRootLoc() );
+	if (max_size_check == false)
+	{
+		tmp = req.substr(0, req.length() - 1 - request.find("\r\n\r\n") + 4);
+		req = tmp;
+	}
 	Request marco(req, realPath);
 	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath, realPath);
 	int status = marco.getStatus();
@@ -185,7 +227,7 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 			hp = "localhost:" + this->infoConfig.getPortStr();
 		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
 		{
-			// std::cout << "CEST ICICICICI que f = 400\n"; 
+			// std::cout << "CEST ICICICICI que f = 400\n";
 			status = 400;
 		}
 	}
@@ -193,6 +235,11 @@ void Server::pseudoReponse(std::string req, int fd) //destinee a etre suprimee q
 //	tools::printServerBlock(infoConfig);
 	//tools::printLocationBlock(infoConfig.getLocation());
 	//std::cout << "LOCATION PATH IS  " << synthese.getLocationPath();
+	if (max_size_check == false)
+	{
+		std::cout << "HERE" << std::endl;
+		status = 413;
+	}
 	Response polo(marco, status, myCgi, synthese, infoConfig);
 	// std::cout << "AUTOINDEX IN SYNTHESE " << synthese.getAI() << "\n";
 	// std::cout << "CGI EXT SYNTHESE IS  " << synthese.getCgiExt() << "\n";
