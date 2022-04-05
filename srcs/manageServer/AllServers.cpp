@@ -111,7 +111,10 @@ void AllServers::loop() //it's the principal running function here that will mak
 
 					if (it->getListen() == allFd[this->events[i].data.fd])    //searching here for corresponding server of the actual fd. We set it when we add the Fd to the list at creation
 					{
+						std::map<int,int>::iterator it2 = allFd.find(this->events[i].data.fd);
+
 						it->readData(this->events[i].data.fd, epfd); 	  //send to read in Server class
+						allFd.erase(it2);
 						break;	
 					}
 				}
