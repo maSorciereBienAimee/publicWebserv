@@ -311,7 +311,23 @@ void	Cgi::cgiRun()
 //		body.push_back(c);
 //	}
 //	file.close();
-
+	std::string body = "";
+	if (_request.getMethod() == "POST")
+		body = _request.getBody();
+	else if (_request.getMethod() == "GET")
+	{
+		std::fstream file;
+		char c;
+		file.open(_realPath, std::ios::in);
+		while (1)
+		{
+			file >> std::noskipws >> c;
+			if (file.eof())
+				break;
+			body.push_back(c);
+		}
+		file.close();
+	}
 
 	getEnv();
 	pipe(fd);	
@@ -347,7 +363,10 @@ void	Cgi::cgiRun()
 			_status = 500;
 			return;
 		}
-		write(1, _request.getBody().c_str(), _request.getBody().size());
+		std::cout << "CGIRUN BEFORE WRITING" << std::endl;
+		write(1, body.c_str(), body.size());
+
+//		write(1, _request.getBody().c_str(), _request.getBody().size());
 		close(1);
 		close(fd[1]);
 		waitpid(pid, &status, 0);

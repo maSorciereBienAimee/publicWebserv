@@ -79,7 +79,7 @@ void Response::launch()
 			_other(request);
 	}
 	//200 has index page and others have no body
-	if (status != 200 && status != 204 && status != 304 && !(status > 99 && status < 200)) //peut etre a changer si on utilise d'autres code 2xx
+	if (status != 200 && status != 201 && status != 204 && status != 304 && !(status > 99 && status < 200)) //peut etre a changer si on utilise d'autres code 2xx
 		setBody();
 	setHeaders();
 }
@@ -88,7 +88,7 @@ std::string Response::getReply()
 {
 	std::string reply = _header;
 	//THESE CODES SHOULD NOT INCLUDE BODY... SHOULD THEY INCLUDE THE /r/n/r/n though?
-	if (status != 204 && status != 304 && !(status > 99 && status < 200))
+	if (status != 204 && status != 201 && status != 304 && !(status > 99 && status < 200))
 		reply += "\r\n\r\n" + this->body;
 	std::cout << "REPLY IS:\n" << reply << std::endl;
 	return (reply);
@@ -150,7 +150,7 @@ void Response::setHeaders()
 		_header += (it->first + ": " + it->second + "\n");
 		it++;
 	}
-	if (status != 404 && status != 304 && !(status > 99 && status < 200))
+	if (status != 404 && status != 201 && status != 304 && !(status > 99 && status < 200))
 		_header += "Content-Length: " + body_len;
 }
 
@@ -198,6 +198,15 @@ void Response::readIn(std::string file)
 	// si non retourner une erreur
 	std::cout << "_READIN FILE IS: " << file << std::endl;
 	std::ifstream is (file, std::ifstream::binary);
+	/*????????????????????????????????????????????????
+	if(!is.good())
+	{
+		this->status = 403;
+		this->body_message = "Forbidden";
+		setBody();
+		return;
+	}
+	??????????????????????????????????????????????*/
 	if (!is)
 	{
 		std::cout << "_READIN FILE DOESN'T exist: " << file << std::endl;
@@ -368,26 +377,81 @@ void Response::_homepage(Request R)
 
 void Response::_post(Request R)
 {
-	(void)R;
+			(void)R;
 	status = 200;
 	int len;
 	std::stringstream ss;
-	if (_cgi.getIsIt() == 1)
+	std::map<std::string, std::string> headers = R.getHeaders();
+	std::map<std::string, std::string>::iterator it = headers.find("Content-Type");
+	if (it != headers.end() && it->second.find("application/x-www-form-urlencoded") != std::string::npos)
 	{
-		_cgi.cgiRun();
-		this->status = _cgi.getStatus();
-		this->body = _cgi.getBody();
-		this->extra_headers = _cgi.getHeaders();
-		len = this->body.size();
-		ss << len;
-		ss >> this->body_len;
-		return ;
+		if (_cgi.getIsIt() == 1)
+		{
+			_cgi.cgiRun();
+			this->status = _cgi.getStatus();
+			this->body = _cgi.getBody();
+			this->extra_headers = _cgi.getHeaders();
+			len = this->body.size();
+			ss << len;
+			ss >> this->body_len;
+			return ;
+		}
+	}
+	else if (it != headers.end() && it->second.find("multipart/form-data") != std::string::npos)
+	{
+		std::cout << "ENTRE DANS UPLOAD" << std::endl;
+		std::string pathFile = "./website/Download";
+		int b = it->second.find("boundary=");
+		int f;
+		int f2;
+		std::string boundary;
+		std::string content = "";
+		std::string file = "";
+		if (b != std::string::npos)
+				boundary = "--" + it->second.substr(b + 9, it->second.size() - (b+9));
+		std::vector<std::string> body = tools::getBodyBoundary(R.getBody(), boundary);
+		for (std::vector<std::string>::iterator it = body.begin(); it != body.end(); it++)
+		{
+			f = (*it).find("Content-Disposition");
+			f2 = f;
+			if (f != std::string::npos)
+			{
+				while ((*it)[f] != '\n' && f < (*it).size())
+						f++;
+			}
+			content = (*it).substr(f2, f - f2);
+			f = content.find("filename=");
+			if (f != std::string::npos)
+			{
+				f += 9;
+				if (content[f] == '"');
+					f++;
+				f2 = f;
+				while (content[f] != '"' && content[f] != '\n'
+						&& content[f] != ' ' && f < content.size())
+						f++;
+				file = content.substr(f2, f - f2);
+				if (pathFile[pathFile.size() - 1] != '/' && file[0] != '/')
+						pathFile += "/";
+				f = (*it).find("\n\r\n");
+				if (f != std::string::npos && f + 3 < (*it).size())
+						f += 3;
+				content = (*it).substr(f, (*it).size() - f);
+				std::string completePath = pathFile + file;
+				std::ofstream myFile(completePath);
+				myFile << content;
+				myFile.close();
+			}
+		}
+		this->status = 201;
+		this->body = "";
 	}
 	else
 	{
 		this->status = 204;
 		this->body = "";
 	}
+
 }
 
 

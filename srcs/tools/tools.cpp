@@ -542,4 +542,38 @@ serverLocation	whichLocation(std::string simple, serverBlock block)
 	return (loc);
 }
 
+std::vector<std::string> getBodyBoundary(std::string body, std::string boundary)
+{
+	std::vector<std::string> ret;
+	std::string stock = body;
+	std::string::iterator it = stock.begin();
+	std::string temp;
+	int find;
+	int lenBody;
+	while (1)
+	{
+		find = body.find(boundary);
+		temp = body.substr(0, find);
+		if (body.size() <= boundary.size())
+			break;
+		if (temp != "")
+		{
+			ret.push_back(temp);
+			lenBody = body.size();
+			body = body.substr(find, lenBody - find);
+		}
+		else
+		{
+			lenBody = body.size();
+			if (lenBody - boundary.size() <= boundary.size())
+					break;
+			body = body.substr(boundary.size(), lenBody - boundary.size());
+		}
+		if (body.size() <= boundary.size())
+			break;
+
+	}
+	return (ret);
+}
+
 }
