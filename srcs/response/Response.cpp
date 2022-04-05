@@ -231,16 +231,33 @@ void Response::readIn(std::string file)
 		ss >> this->body_len;
 		return ;
 	}
-	is.seekg (0, is.end);
-	int length = is.tellg();
-	is.seekg (0, is.beg);
-	char * b = (char *)malloc(sizeof(char) * (length + 1));
-	b[length] = '\0';
+	is.close();
+
+	int length;
+	std::fstream myFile;
+	char c;
+	myFile.open(file, std::ios::in);
+	while (1)
+	{
+		myFile >> std::noskipws >> c;
+		if (myFile.eof())
+			break;
+		this->body.push_back(c);
+	}
+	myFile.close();
+	length = this->body.size();
+
+
+//	is.seekg (0, is.end);
+//	int length = is.tellg();
+//	is.seekg (0, is.beg);
+//	char * b = (char *)malloc(sizeof(char) * (length + 1));
+//	b[length] = '\0';
 	ss << length;
 	this->body_len = ss.str();
-	is.read (b,length);
-	std::string bufStr(b);
-	this->body = bufStr;
+//	is.read (b,length);
+//	std::string bufStr(b);
+//	this->body = bufStr;
 	std::string fav = "";
 	std::string path;
 	path = request.getPath();
@@ -400,7 +417,7 @@ void Response::_post(Request R)
 	else if (it != headers.end() && it->second.find("multipart/form-data") != std::string::npos)
 	{
 		std::cout << "ENTRE DANS UPLOAD" << std::endl;
-		std::string pathFile = "./website/Download";
+		std::string pathFile = _loc.getUploadLoc();
 		int b = it->second.find("boundary=");
 		int f;
 		int f2;

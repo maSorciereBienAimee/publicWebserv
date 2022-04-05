@@ -363,9 +363,9 @@ void	Cgi::cgiRun()
 			_status = 500;
 			return;
 		}
-		std::cout << "CGIRUN BEFORE WRITING" << std::endl;
-		write(1, body.c_str(), body.size());
-
+//		std::cout << "CGIRUN BEFORE WRITING" << std::endl;
+//		write(1, body.c_str(), body.size());
+		std::cout << body << std::endl;
 //		write(1, _request.getBody().c_str(), _request.getBody().size());
 		close(1);
 		close(fd[1]);
