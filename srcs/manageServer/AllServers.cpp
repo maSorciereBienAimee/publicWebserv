@@ -24,8 +24,10 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 	}
 	catch(const OurException& e)
 	{
-			std::cerr << e.what() << '\n';
-			exit(1);
+		clear_fd();
+		free(events);
+		std::cerr << e.what() << '\n';
+		exit(1);
 	}
 	std::vector<serverBlock> blocks = serverBlocks;
 	std::vector<serverBlock>::iterator it = serverBlocks.begin();
