@@ -21,7 +21,6 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 {
 	if (F == 400)
 	{
-		std::cout << "C'EST LAAAAAAA\n";
 		this->body_message = "Bad request";
 	}
 	if (_loc.getRedir() == "")

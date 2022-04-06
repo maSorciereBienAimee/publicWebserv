@@ -143,11 +143,25 @@ void Request::parse(const std::string &str)
 void Request::error_checker(void)
 {
     const std::string con_key = "Content-Length";
+    const std::string cont_key = "Expect";
     //CHECK LENGTH
     if (_headers.find(con_key) != _headers.end())
     {
         if (_body.length() != (atoi(_headers[con_key].c_str())))
+        {
             this->status = 400;
+            if (_headers.find(cont_key) != _headers.end())
+            {
+                if (_headers[cont_key] == "100-continue") 
+                    this->status = 417;
+            }
+        }
+        else
+        if (_headers.find(cont_key) != _headers.end())
+        {
+            if (_headers[cont_key] == "100-continue")
+                _headers[cont_key] == "";
+        }
     }
 }
 
