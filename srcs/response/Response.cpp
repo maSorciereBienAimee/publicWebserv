@@ -196,8 +196,7 @@ void Response::setBody()
 void Response::readIn(std::string file)
 {
 	std::cout << "_READIN FILE IS: " << file << std::endl;
-	std::ifstream is (file.c_str(), std::ifstream::binary);
-	if(!is.good())
+	if (access(file.c_str(), R_OK) == -1)
 	{
 		this->status = 403;
 		this->body_message = "Forbidden";
@@ -205,6 +204,7 @@ void Response::readIn(std::string file)
 		setBody();
 		return;
 	}
+	std::ifstream is (file.c_str(), std::ifstream::binary);
 	if (!is)
 	{
 		std::cout << "_READIN FILE DOESN'T exist: " << file << std::endl;
@@ -392,6 +392,14 @@ void Response::_post(Request R)
 			this->body = "";
 			return;
 		}
+		if (access(pathFile.c_str(), R_OK) == -1)
+		{
+			this->status = 403;
+			this->body_message = "Forbidden";
+			this->body = "";
+			setBody();
+			return;
+		}
 		size_t b = it->second.find("boundary=");
 		size_t f;
 		size_t f2;
@@ -430,13 +438,6 @@ void Response::_post(Request R)
 				content = (*it).substr(f, (*it).size() - f);
 				std::string completePath = pathFile + file;
 				std::ofstream myFile(completePath.c_str());
-				if (myFile.good() == 0)
-				{
-					this->status = 403;
-					this->body_message = "Forbidden";
-					this->body = "";
-					return;
-				}
 				myFile << content;
 				myFile.close();
 			}

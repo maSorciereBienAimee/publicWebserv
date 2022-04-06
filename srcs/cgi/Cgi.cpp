@@ -194,7 +194,7 @@ void Cgi::setReal(std::string newPath)
 	this->_realPath = newPath;
 }
 
-void Cgi::getEnv()
+void Cgi::getEnv(int len)
 {
 	std::string pathFile = _realPath;//"." + _serv.getRootServer() + _simple; 
 	std::map<std::string, std::string>	requestHeader = _request.getHeaders();
@@ -203,8 +203,6 @@ void Cgi::getEnv()
 	std::string pathWPI = getPathWithoutPathInfo(pathWQ, _loc.getCgiExt());
 	std::string body = "";
 	std::fstream file;
-	char c;
-
 	mapEnv["REDIRECT_STATUS"] = "200";
 	mapEnv["SERVER_SOFTWARE"] = _serv.getName()+ "/1.0";//_serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
 	mapEnv["SERVER_NAME"] = _serv.getHostStr();
@@ -235,16 +233,6 @@ void Cgi::getEnv()
 		mapEnv["CONTENT_TYPE"] = requestHeader["Content-Type"];
 	else
 		mapEnv["CONTENT_TYPE"] = tools::getMimeType(pathFile);
-	file.open(pathFile.c_str(), std::ios::in);
-	while (1)
-	{
-		file >> std::noskipws >> c;
-		if (file.eof())
-			break;
-		body.push_back(c);
-	}
-	file.close();
-	int len = body.size();
 	std::string length;
 	std::stringstream ss;
 	ss << len;
@@ -298,18 +286,6 @@ void	Cgi::cgiRun()
 	std::FILE *tmp = std::tmpfile();
 	int fdTmp = fileno(tmp);
 
-//	std::string body = "";
-//	std::fstream file;
-//	char c;
-//	file.open(_realPath, std::ios::in);
-//	while (1)
-//	{
-//		file >> std::noskipws >> c;
-//		if (file.eof())
-//			break;
-//		body.push_back(c);
-//	}
-//	file.close();
 	std::string body = "";
 	if (_request.getMethod() == "POST")
 		body = _request.getBody();
@@ -328,7 +304,7 @@ void	Cgi::cgiRun()
 		file.close();
 	}
 
-	getEnv();
+	getEnv(body.size());
 	pipe(fd);	
 	pid = fork();
 	if (pid < 0)
@@ -347,6 +323,7 @@ void	Cgi::cgiRun()
 			_status = 500;
 			return;
 		}
+		close(fd[0]);
 		dup2(fdTmp, 1);
 		execve(_loc.getCgiBin().c_str(), arg, _env);
 		std::cout << "error execve()" << std::endl;
@@ -366,7 +343,8 @@ void	Cgi::cgiRun()
 //		write(1, body.c_str(), body.size());
 		std::cout << body << std::endl;
 //		write(1, _request.getBody().c_str(), _request.getBody().size());
-		close(1);
+		dup2(stockOut, 1);
+		close(stockOut);
 		close(fd[1]);
 		waitpid(pid, &status, 0);
 		dup2(stockOut, 1);
