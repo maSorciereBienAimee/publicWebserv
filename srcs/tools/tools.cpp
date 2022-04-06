@@ -137,6 +137,10 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	std::string root = loc.getRootLoc();
 	int x = root.size() - 1;
 	int len = loc.getLocationPath().size();
+	int l;
+	if (( l = loc.getLocationPath().find("/*.")) != std::string::npos)
+			len = len - (len - l);
+	std::cout << "simple IS = " << simple << std::endl;
 
 	temp = simple.substr(len, simple.size() - len);
 	if (temp[0] != '/')
