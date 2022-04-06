@@ -27,16 +27,22 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 	{
 			std::cerr << e.what() << '\n';
 	}
+	std::vector<serverBlock> blocks = serverBlocks;
 	std::vector<serverBlock>::iterator it = serverBlocks.begin();
-	for (; it != serverBlocks.end(); it++)
+	int i = 0;
+	int j;
+	for (; it != serverBlocks.end(); it++, i++)
 	{
-		for (std::vector<serverBlock>::iterator it2 = serverBlocks.begin(); it2 != it; it2++)
+		j = 0;
+		for (std::vector<serverBlock>::iterator it2 = blocks.begin(); j < i; it2++, j++)
 		{
 			//SEGFAULT WHEN ENTER IN THE CONDITION 
 			if (it2->getPortStr() == it->getPortStr() && it2->getHostStr() == it->getHostStr())
 			{
 				std::cout << "erase " << it->getName() << std::endl;
-				this->serverBlocks.erase(it2);
+				this->serverBlocks.erase(it);
+				i--;
+				break ;
 			}
 		}
 	}
