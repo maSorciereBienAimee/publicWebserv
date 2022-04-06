@@ -43,7 +43,7 @@ void Request::pathDecoder(std::string path)
 {
     std::string ret;
     char c;
-    int i;
+    size_t i;
     int x;
     for (i=0; i < path.length(); i++)
     {
@@ -107,7 +107,6 @@ std::string Request::parseHeaders(const std::string &str, int end)
     tmp = tmp.erase(0, (size_t)end + 2);
     int ptr = 0;
     int ptr_end = tmp.find_first_of('\n');
-    int count = 0;
     //UNTIL WE GET TO AN EMPTY LINE
     while (ptr_end != ptr + 1)
     {
@@ -147,7 +146,7 @@ void Request::error_checker(void)
     //CHECK LENGTH
     if (_headers.find(con_key) != _headers.end())
     {
-        if (_body.length() != (atoi(_headers[con_key].c_str())))
+        if (static_cast<int>(_body.length()) != (atoi(_headers[con_key].c_str())))
         {
             this->status = 400;
             if (_headers.find(cont_key) != _headers.end())

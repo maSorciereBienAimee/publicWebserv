@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <istream>
 
-Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::string S, std::string rp) : _request(R), _loc(loc), _serv(serv), _query(Q), _simple(S), _realPath(rp)
+Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::string S, std::string rp) :  _query(Q), _simple(S), _realPath(rp), _request(R), _loc(loc), _serv(serv)
 {
 	_env = NULL;
 	_headers.clear();
@@ -45,8 +45,8 @@ std::string Cgi::getPathInfo(std::string str, std::string ext)
 	std::string temp = "";
 	std::string::iterator it = str.begin();
 	std::string::iterator it2;
-	int i = 0;
-	int j = 0;
+	size_t i = 0;
+	size_t j = 0;
 	for (; it != str.end(); it++)
 	{
 		temp = str.substr(i, ext.size());
@@ -85,8 +85,8 @@ std::string Cgi::getPathWithoutQuery(std::string str, std::string ext)
 	std::string temp = "";
 	std::string::iterator it = str.begin();
 	std::string::iterator it2;
-	int i = 0;
-	int j = 0;
+	unsigned long i = 0;
+	unsigned long j = 0;
 	for (; it != str.end(); it++)
 	{
 		temp = str.substr(i, ext.size());
@@ -124,8 +124,8 @@ std::string Cgi::getPathWithoutPathInfo(std::string str, std::string ext)
 {
 	std::string temp = "";
 	std::string::iterator it = str.begin();
-	int i = 0;
-	int j = 0;
+	unsigned long i = 0;
+	unsigned long j = 0;
 	for (; it != str.end(); it++)
 	{
 		temp = str.substr(i, ext.size());
@@ -150,7 +150,7 @@ std::string Cgi::getPathWithoutPathInfo(std::string str, std::string ext)
 
 std::string Cgi::getQuery(std::string str)
 {
-	int res;
+	size_t res;
 	std::string result = "";
 	res = str.find('?');
 	if (res != std::string::npos)
@@ -164,7 +164,7 @@ std::string Cgi::getHex(std::string path)
 {
 	std::string ret;
 	char c;
-	int i;
+	size_t i;
 	int x;
 	for (i=0; i < path.length(); i++)
 	{
@@ -235,7 +235,7 @@ void Cgi::getEnv()
 		mapEnv["CONTENT_TYPE"] = requestHeader["Content-Type"];
 	else
 		mapEnv["CONTENT_TYPE"] = tools::getMimeType(pathFile);
-	file.open(pathFile, std::ios::in);
+	file.open(pathFile.c_str(), std::ios::in);
 	while (1)
 	{
 		file >> std::noskipws >> c;
@@ -292,7 +292,6 @@ void	Cgi::cgiRun()
 	int stockOut = dup(1);
 	int status;
 	char buf[1024];
-	int res; 
 	std::string str = "";
 	std::string temp;
 	char **arg = NULL;
@@ -318,7 +317,7 @@ void	Cgi::cgiRun()
 	{
 		std::fstream file;
 		char c;
-		file.open(_realPath, std::ios::in);
+		file.open(_realPath.c_str(), std::ios::in);
 		while (1)
 		{
 			file >> std::noskipws >> c;
@@ -398,9 +397,9 @@ void	Cgi::cgiRun()
 
 void	Cgi::setResponse(std::string str, int retStat)
 {
-	int	sep;
+	size_t	sep;
 	int i = 0;
-	int len;
+	size_t len;
 	std::string head;
 	std::string headS;
 	std::string key;

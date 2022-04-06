@@ -59,7 +59,7 @@ std::string Server::processContentLength(std::string request)
 	std::string tmp1 = tmp.substr(0, index - 1);
 	std::string body = request.substr(index + 4, request.length() - (index + 4));
 
-	if (body.length() != atoi(tmp1.c_str()))
+	if (static_cast<int>(body.length()) != atoi(tmp1.c_str()))
 		std::cout << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << std::endl;
 	return(request + "\r\n\r\n");
 }
@@ -103,7 +103,7 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 	}
 	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
 	{
-		int i = 0;
+		size_t i = 0;
 		while (i < request.length() - 1)
 		{
 			std::cout << i << "is: " << request[i] << std::endl;
@@ -166,7 +166,7 @@ bool	Server::check_size_body(std::string request)
 	//ELSE CREATE STRING WITHOUT HEADERS
 	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
 	std::cout << body << "----" << body.length() << "----" << std::endl;
-	if (body.length() > max_size)
+	if (static_cast<int>(body.length()) > max_size)
 	{
 		std::cout << "HEREHEREHREHRHERHEH. MAX SIZE: " << max_size << std::endl;
 		return false;
@@ -178,9 +178,6 @@ bool	Server::check_size_body(std::string request)
 void Server::readData(int fd, int epfd)
 {
 	bool max_size_check = true;
-	int n;
-	int size = 24;
-	char buf[size];
 	std::string request;
 	request = this->processContent(fd, epfd, &max_size_check);
 	if (request != "")

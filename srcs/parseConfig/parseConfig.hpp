@@ -55,7 +55,7 @@ class parseConfig  {
 	/******_____SERVER BLOCK PARSING______******/
 	void						setServerConfig(std::string const &line, serverBlock &server);
 	int							getAttributName(std::string const &line, std::string  &attribut, std::string& value, serverBlock &server);
-	void 						getValueServerBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server);
+	void 						getValueServerBlock(std::string const& attribut, std::string& value, serverBlock &server);
 	bool						isServerBlock(std::string line);
 	void						countEachAtt(std::string const& attribut);
 	
@@ -63,9 +63,9 @@ class parseConfig  {
 	bool 						isLocationBlock(std::string const &line);
 	std::string					parseLocationPath(std::string const& path);
 	void						setLocationBlock(IT &start, IT &end, serverBlock &server, std::string path);
-	void						setLocationConfig(std::string &line, serverLocation &location, serverBlock &server);
-	int							getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverBlock &server, serverLocation &location);
-	void 						getValuesLocationBlock(int pos, std::string const& attribut, std::string& value, serverBlock &server, serverLocation &location);
+	void						setLocationConfig(std::string &line, serverLocation &location);
+	int							getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverLocation &location);
+	void 						getValuesLocationBlock(std::string const& attribut, std::string& value, serverLocation &location);
 
 	private:
 

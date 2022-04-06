@@ -119,6 +119,7 @@ void    Response::_delete(std::string path)
 
 void	Response::_other(Request req)
 {
+	(void)req;
 	status = 501;
 	this->body_message = "Server does not accept this method";
 	return;
@@ -147,7 +148,7 @@ void Response::setHeaders()
 	_header += (errors[this->status]) + "\n";
 	_header += "Server: " + _server.getName() + "/1.0\n";
 	_header += "Date: " + makeDate();
-	for (int i = 0; i < this->extra_headers.size(); i++)
+	for (size_t i = 0; i < this->extra_headers.size(); i++)
 	{
 		_header += (it->first + ": " + it->second + "\n");
 		it++;
@@ -160,13 +161,13 @@ std::string Response::makeDate(void)
 {
 	std::stringstream conv;
 	time_t now = time(0);
+	(void)now;
 	time_t current;
     char rfc_2822[40];
 
     time(&current);
     strftime(rfc_2822, sizeof(rfc_2822), "%a, %d %b %Y %T GMT\n", localtime(&current));
 	std::cout << rfc_2822 << std::endl;
-	int i = 0;
 	std::string ret;
 	ret = rfc_2822;
 	return ret;
@@ -194,12 +195,8 @@ void Response::setBody()
 
 void Response::readIn(std::string file)
 {
-	//segfault avec DIRECTORY
-	//checker si le path est un dossier si oui checker si il y a un index dans le dossier
-	// si oui lire l;index
-	// si non retourner une erreur
 	std::cout << "_READIN FILE IS: " << file << std::endl;
-	std::ifstream is (file, std::ifstream::binary);
+	std::ifstream is (file.c_str(), std::ifstream::binary);
 	if(!is.good())
 	{
 		this->status = 403;
@@ -237,7 +234,7 @@ void Response::readIn(std::string file)
 	int length;
 	std::fstream myFile;
 	char c;
-	myFile.open(file, std::ios::in);
+	myFile.open(file.c_str(), std::ios::in);
 	while (1)
 	{
 		myFile >> std::noskipws >> c;
@@ -347,11 +344,9 @@ void Response::_homepage(Request R)
 	for (i = 0; i < size; i++)
 	{
 		std::string str = R.getPath() + index_vec[i];
-	//	str.erase(str.begin(), str.begin() + 1);
 		std::cout << str << std::endl;
 		struct stat check;
 		std::stringstream ss;
-		int len;
 		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
 		{
 			readIn(str);
@@ -359,43 +354,14 @@ void Response::_homepage(Request R)
 			return;
 		}
 	}
-	// if (_autoindex == 1)
-	// {
-	// 	//std::string code;
-	// 		std::stringstream conv;
-
-	// 		std::string path = R.getPath();
-	// 		// std::cout << "ROOT IS _______" << R.getRoot() << "\n";
-	// 		// std::cout << "PATH IS _____________ " << path << "\n";
-	// 		// std::vector<std::string> dataAI = tools::getDirAI();  // change to do a function generate autoindex(host, port, path,)
-	// 		// if (dataAI.empty())
-	// 		// 	throw OurException("Could not open directory");
-	// 		conv << status;
-	// 		//code = conv.str();
-	// 		//std::cout << "CODE IS " << code << "\n";
-	// 		//this->body = "<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
-	// 		// for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
-	// 		// {
-	// 		// 	this->body += "\t\t<p><a href=\"http://" +  _server.getHostStr() + ":" + _server.getPortStr() + "/" + (*it) + "\">" + (*it) + "</a></p>\n";
-	// 		// }
-	// 	//	this->body += "</body>\n</html>\n";
-	// 		this->body = tools::genreateAI(_server.getHostStr(), _server.getPortStr(), path);
-	// 		std::stringstream conv2;
-	// 		conv2 << body.length();
-	// 		this->body_len = conv2.str();
-	
-	// }
-	// else
-	// {
 		this->status = 404;
 		this->body_message = "File not found";
-	//}
 }
 
 
 void Response::_post(Request R)
 {
-			(void)R;
+	(void)R;
 	status = 200;
 	int len;
 	std::stringstream ss;
@@ -417,7 +383,6 @@ void Response::_post(Request R)
 	}
 	else if (it != headers.end() && it->second.find("multipart/form-data") != std::string::npos)
 	{
-		std::cout << "ENTRE DANS UPLOAD" << std::endl;
 		std::string pathFile = _loc.getUploadLoc();
 		struct stat	stock;
 		if (stat(pathFile.c_str(), &stock) != 0)
@@ -427,9 +392,9 @@ void Response::_post(Request R)
 			this->body = "";
 			return;
 		}
-		int b = it->second.find("boundary=");
-		int f;
-		int f2;
+		size_t b = it->second.find("boundary=");
+		size_t f;
+		size_t f2;
 		std::string boundary;
 		std::string content = "";
 		std::string file = "";
@@ -464,7 +429,7 @@ void Response::_post(Request R)
 						f += 3;
 				content = (*it).substr(f, (*it).size() - f);
 				std::string completePath = pathFile + file;
-				std::ofstream myFile(completePath);
+				std::ofstream myFile(completePath.c_str());
 				if (myFile.good() == 0)
 				{
 					this->status = 403;

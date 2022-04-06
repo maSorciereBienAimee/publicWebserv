@@ -49,12 +49,13 @@ namespace tools
 }
 
 
-struct OurException : public std::exception
+class OurException : public std::exception
 {
-	std::string _str;
-
+	
+	public :
+	std::string _str;	
 	OurException(std::string str): _str(str){}
-	~OurException() {}
+	~OurException() throw () {}
 	const char * what() const throw() { return _str.c_str(); }
 };
 

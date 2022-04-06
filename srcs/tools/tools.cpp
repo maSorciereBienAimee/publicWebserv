@@ -137,7 +137,7 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	std::string root = loc.getRootLoc();
 	int x = root.size() - 1;
 	int len = loc.getLocationPath().size();
-	int l;
+	size_t l;
 	if (( l = loc.getLocationPath().find("/*.")) != std::string::npos)
 			len = len - (len - l);
 	std::cout << "simple IS = " << simple << std::endl;
@@ -302,7 +302,6 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 
 	std::vector<std::string>	getDirAI(std::string const& path) //add path & server
 	{
-		unsigned char isFile =0x8;
 		std::vector<std::string> data;
 		DIR *Dir;
 		struct dirent *DirEntry;
@@ -477,7 +476,6 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 	std::string path = root + query;
 	struct stat s;
 	std::string ret;
-	//std::string path = "./" + block.getRootServer() + query;
 	std::string::iterator it = path.begin();
 	int i = 0;
 
@@ -485,14 +483,11 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 	{
 		while (*it != '/' && *it != '?' && it != path.end())
 		{
-	//	std::cout << "*it = " << *it << " et i = " << i << std::endl;
 				it++;
 				i++;
 		}
 		ret = path.substr(0, i);
-		//std::cout << "ret = " << ret << std::endl;
-//		std::cout << "path = " << path << std::endl;
-//		std::cout << "query = " << query << std::endl;
+	
 		if (stat(ret.c_str(), &s) == 0)
 		{
 			if (S_ISDIR(s.st_mode))
@@ -557,7 +552,6 @@ std::vector<std::string> getBodyBoundary(std::string body, std::string boundary)
 {
 	std::vector<std::string> ret;
 	std::string stock = body;
-	std::string::iterator it = stock.begin();
 	std::string temp;
 	int find;
 	int lenBody;

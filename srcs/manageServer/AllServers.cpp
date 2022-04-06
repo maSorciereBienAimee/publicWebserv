@@ -15,7 +15,6 @@ AllServers::~AllServers(void) //destructor to complete
 AllServers::AllServers(std::string path) //constructor wich accept the argv[1] of main, that is the path of the config file
 {
 	parseConfig config;
-	int reuse_addr = 1;
 	
 	this->events = (struct epoll_event *)calloc(MAX_CLIENT, sizeof(struct epoll_event));	//alloc event where will be stock event that epoll_wait will receive (alloc 5000, maybe add a realloc if event > 5000 latter in code)
 	this->epfd = -1;									//epfd is the file descriptor of the creation of an epoll, init here at -1 to say that is not create yet
