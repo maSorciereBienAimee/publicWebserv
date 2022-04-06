@@ -429,8 +429,8 @@ void	Cgi::setResponse(std::string str, int retStat)
 			{
 				key = headS.substr(0, i);
 				std::cout << "key = " << key << std::endl;
-				len = headS.size() - (i + 2);
-				temp = headS.substr(i + 2, len);
+				len = headS.size() - (i + 1);
+				temp = headS.substr(i + 1, len);
 				headS = temp;
 				i = 0;
 			}
@@ -445,8 +445,6 @@ void	Cgi::setResponse(std::string str, int retStat)
 				it++;
 				i = 0;
 			}
-			else
-				i++;
 		}
 		val = headS.substr(0, i);
 				std::cout << "val = " << val << std::endl;
