@@ -1,6 +1,6 @@
 THE_SOURCE = 	main.cpp \
 				manageServer/Server.cpp \
-				manageServer/AllServers.cpp \
+				manageServer/AllServers_leaks.cpp \
 				response/Response.cpp \
 				request/Request.cpp \
 				tools/tools.cpp \
@@ -12,7 +12,7 @@ THE_SOURCE = 	main.cpp \
 SRCS = $(THE_SOURCE)
 OBJS = $(addprefix ${OBJDIR}/,${SRCS:.cpp=.o})
 
-NAME = webserv
+NAME = leaks
 DEPF = -MMD -MP
 DEP = ${OBJS:.o=.d}
 OBJDIR = helper_files
