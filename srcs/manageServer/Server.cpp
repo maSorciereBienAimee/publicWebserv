@@ -65,21 +65,27 @@ std::string Server::processContentLength(std::string request)
 }
 
 
-std::string Server::processContent(std::string request, int fd, int epfd, bool *max_size)
+std::string Server::processContent(int fd, int epfd, bool *max_size)
 {
+	bool first_time = true;
 	int size = 24;
+	std::string request;
 	std::string bufStr;
 	char buf[size];
-	int check = 0;
-	check = recv(fd, buf, size - 1, 0);
+	int check = 1;
+	memset(buf, '\0', size);
 	while (check > 0)
 	{
-		if (check_size_body(request) == false)
+		if (first_time == false)
 		{
-			*max_size = false;
-			return request;
+			if (check_size_body(request) == false)
+			{
+				*max_size = false;
+				return request;
+			}
+			request += buf;
 		}
-		request += buf;
+		first_time = false;
 		memset(buf, '\0', size);
 		check = recv(fd, buf, size - 1, 0);
 	}
@@ -148,24 +154,17 @@ std::string Server::chunkDecoder(std::string str)
 
 bool	Server::check_size_body(std::string request)
 {
+	if (request == "")
+		return true;
 	if (request.find("\n\r\n") == std::string::npos)
 		return true;
-	std::string	queryPath;
-	std::string simplePath = tools::getSimplePath(request, &queryPath, this->infoConfig);
-	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
-	
-
-//	tools::printLocationBlock(synthese);
-	std::cout << "BODU LOC IS " << synthese.getBody() << "\n";
-	std::cout << "REQUEST " << request << "\n";
-	std::cout << "PATH IS " << synthese.getLocationPath() << "\n";
-	if (this->infoConfig.getBody_s() == -1)
+	if (this->infoConfig.getBodySet_s() == false)
 		return true;
+	int max_size = this->infoConfig.getBody_s();
 	//IF WE HAVENOT REACHED END OF HEADERS
 	
 	//ELSE CREATE STRING WITHOUT HEADERS
 	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
-	int max_size = this->infoConfig.getBody_s();
 	std::cout << body << "----" << body.length() << "----" << std::endl;
 	if (body.length() > max_size)
 	{
@@ -183,33 +182,11 @@ void Server::readData(int fd, int epfd)
 	int size = 24;
 	char buf[size];
 	std::string request;
-	int inutile;
-	n = recv(fd, buf, size - 1, 0);
-	if (n == 0)
-	{
-		std::cout << "connexion close by client" << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-	}
-	else if (n < 0) //IF WE HAVE LARGER BUFFER DO WE NEED TO ADD: && request.find_last_of("\r\n\r\n") != request.length() - 4
-	{
-		std::cout << "error with recv" << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-	}
-	else
-	{
-		request += buf;
-		if (check_size_body(request) == false)
-		{
-			max_size_check = false;
-			this->pseudoReponse(request, fd, max_size_check);
-		}
-		request = this->processContent(request, fd, epfd, &max_size_check);
-		this->pseudoReponse(request, fd, max_size_check);
-		close(fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-	}
+	request = this->processContent(fd, epfd, &max_size_check);
+	this->pseudoReponse(request, fd, max_size_check);
+	close(fd);
+	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+
 }
 
 
