@@ -198,28 +198,16 @@ void Response::readIn(std::string file)
 	//checker si le path est un dossier si oui checker si il y a un index dans le dossier
 	// si oui lire l;index
 	// si non retourner une erreur
-		struct stat	stock;
-		if (stat(file.c_str(), &stock) != 0)
-		{
-			if (errno == EACCES)
-			{
-				this->status = 403;
-				this->body_message = "Forbidden";
-				this->body = "";
-				return;
-			}
-		}
 	std::cout << "_READIN FILE IS: " << file << std::endl;
 	std::ifstream is (file, std::ifstream::binary);
-	/*????????????????????????????????????????????????
 	if(!is.good())
 	{
 		this->status = 403;
 		this->body_message = "Forbidden";
+		this->body = "";
 		setBody();
 		return;
 	}
-	??????????????????????????????????????????????*/
 	if (!is)
 	{
 		std::cout << "_READIN FILE DOESN'T exist: " << file << std::endl;
@@ -434,13 +422,10 @@ void Response::_post(Request R)
 		struct stat	stock;
 		if (stat(pathFile.c_str(), &stock) != 0)
 		{
-			if (errno == EACCES)
-			{
-				this->status = 403;
-				this->body_message = "Forbidden";
-				this->body = "";
-				return;
-			}
+			this->status = 404;
+			this->body_message = "Not found";
+			this->body = "";
+			return;
 		}
 		int b = it->second.find("boundary=");
 		int f;
@@ -480,6 +465,13 @@ void Response::_post(Request R)
 				content = (*it).substr(f, (*it).size() - f);
 				std::string completePath = pathFile + file;
 				std::ofstream myFile(completePath);
+				if (myFile.good() == 0)
+				{
+					this->status = 403;
+					this->body_message = "Forbidden";
+					this->body = "";
+					return;
+				}
 				myFile << content;
 				myFile.close();
 			}

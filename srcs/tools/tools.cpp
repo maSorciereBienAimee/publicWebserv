@@ -515,50 +515,34 @@ std::string searchCorrectPath(std::string query, serverBlock block)
 
 std::string getSimplePath(std::string req, std::string *query, serverBlock block)
 {
-	std::cout << "A" << std::endl;
 	std::string path;
-	std::cout << "B" << std::endl;
 	std::string root = block.getRootServer();
-	std::cout << "C" << std::endl;
 	struct stat s;
-	std::cout << "D" << std::endl;
 	int deb = 0;
-	std::cout << "E" << std::endl;
 	int fin;
-	std::cout << "F" << std::endl;
 	std::string::iterator it = req.begin();
-	std::cout << "G" << "req = " << req << std::endl;
 
 	while (*it != ' ')
 	{
 		it++;
 		deb++;
 	}
-	std::cout << "H" << std::endl;
 	it++;
-	std::cout << "I" << std::endl;
 	deb++;
-	std::cout << "J" << std::endl;
 	std::string::iterator it2 = it;
-	std::cout << "K" << std::endl;
 	fin = deb;
-	std::cout << "L" << std::endl;
 	while (*it2 != ' ')
 	{
 		it2++;
 		fin++;
 	}
-	std::cout << "M" << std::endl;
 	*query = req.substr(deb, fin - deb);
-	std::cout << "N" << std::endl;
 	path = root + *query;
-	std::cout << "O" << std::endl;
 
 	if (stat(path.c_str(), &s) == 0)
 		path = *query;
 	else
 		path = searchCorrectPath(*query, block);
-	std::cout << "P" << std::endl;
 	return (path);
 }
 
