@@ -990,6 +990,8 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 	}
 	// once we get all the config from one server we push back the server 
 	// with updated info in the vector<serverBLock> servers
+	if (_lsn == 0 || _hst == 0)
+		throw OurException("Directive in server block missing: port and host");
 	servers.push_back(server);
 }
 
