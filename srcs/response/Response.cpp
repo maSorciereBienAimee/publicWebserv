@@ -198,6 +198,17 @@ void Response::readIn(std::string file)
 	//checker si le path est un dossier si oui checker si il y a un index dans le dossier
 	// si oui lire l;index
 	// si non retourner une erreur
+		struct stat	stock;
+		if (stat(file.c_str(), &stock) != 0)
+		{
+			if (errno == EACCES)
+			{
+				this->status = 403;
+				this->body_message = "Forbidden";
+				this->body = "";
+				return;
+			}
+		}
 	std::cout << "_READIN FILE IS: " << file << std::endl;
 	std::ifstream is (file, std::ifstream::binary);
 	/*????????????????????????????????????????????????
@@ -420,6 +431,17 @@ void Response::_post(Request R)
 	{
 		std::cout << "ENTRE DANS UPLOAD" << std::endl;
 		std::string pathFile = _loc.getUploadLoc();
+		struct stat	stock;
+		if (stat(pathFile.c_str(), &stock) != 0)
+		{
+			if (errno == EACCES)
+			{
+				this->status = 403;
+				this->body_message = "Forbidden";
+				this->body = "";
+				return;
+			}
+		}
 		int b = it->second.find("boundary=");
 		int f;
 		int f2;

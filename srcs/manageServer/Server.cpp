@@ -183,7 +183,8 @@ void Server::readData(int fd, int epfd)
 	char buf[size];
 	std::string request;
 	request = this->processContent(fd, epfd, &max_size_check);
-	this->pseudoReponse(request, fd, max_size_check);
+	if (request != "")
+		this->pseudoReponse(request, fd, max_size_check);
 	close(fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 

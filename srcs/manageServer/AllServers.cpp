@@ -69,7 +69,7 @@ void AllServers::init()			//init epoll
 	}
 	for (std::vector<int>::iterator it = allListen.begin(); it != allListen.end(); it++) //for each listendFd (that come from server class), we create add an epoll_event with flag EPOLLIN (read flag) EPOLLERR(error flag) and EPOLLHUP( hang up flag) 
 	{										     // instanciated this first epoll_event allow to know if an event happened in these particular socket, if yes, that means data are ready to be read
-		ev.events = EPOLLIN | EPOLLERR | EPOLLHUP; 					
+		ev.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP; 					
 		ev.data.fd = *it;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, *it, &ev) < 0)			//epfd = fd of epoll, EPOLL_CTL_ADD = add event flag, *it, the actual listenfd that we want to observ, &ev, event to add
 		{
@@ -138,7 +138,7 @@ void AllServers::addFd(int fd_origin)
 	if (clifd > 0)
 	{
 		nonblock(clifd);	          //get this new fd non blocking
-		ev.events = EPOLLIN | EPOLLET;	  // init an event with these flag, EPOLLIN for read, EPOLLET to hang despite available data is presente
+		ev.events = EPOLLIN | EPOLLOUT | EPOLLET;	  // init an event with these flag, EPOLLIN for read, EPOLLET to hang despite available data is presente
 		ev.data.fd = clifd;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, clifd, &ev) < 0) //add this new event in epoll_event list
 		{

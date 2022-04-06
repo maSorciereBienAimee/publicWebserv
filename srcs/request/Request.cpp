@@ -160,7 +160,7 @@ void Request::error_checker(void)
         if (_headers.find(cont_key) != _headers.end())
         {
             if (_headers[cont_key] == "100-continue")
-                _headers[cont_key] == "";
+                _headers[cont_key] = "";
         }
     }
 }
