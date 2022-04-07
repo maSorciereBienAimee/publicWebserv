@@ -12,11 +12,12 @@ class Response
 	public:
 	Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock server);
 	~Response();
-	void launch();
-	void	_delete(std::string path);
+	void launch(serverBlock Server);
+	void _delete(std::string path);
 	void setHeaders();
 	void setBody();
 	void _get(Request R);
+	bool isPath(std::string path);
 	void _homepage(Request R);
 	void _post(Request R);
 	void _other(Request R);

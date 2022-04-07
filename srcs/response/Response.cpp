@@ -29,22 +29,17 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 		_path = R.getPath();
 		_old_path = "";
 		_redir_path = "";
-
 	}
 	else
 	{
 		redir = 1;
 		_redir_path = _loc.getRedir();
-
 	}
 	index_vec = _loc.getIndex();
-	// std::cout << "ROOT LOCATION IS ["<< _loc.getRootLoc() << "\n";
-	// std::cout << "LOCATION PATH IS [" << _loc.getLocationPath() << "\n";
-
 	_autoindex = _loc.getAI();
 	status = F;
 	initErrors();
-	launch();
+	launch(server);
 	return;
 }
 
@@ -53,7 +48,7 @@ Response::~Response()
 	return;
 }
 
-void Response::launch()
+void Response::launch(serverBlock server)
 {
 	std::vector<std::string> methods = _loc.getMethods();
 	std::string reponse;
@@ -80,10 +75,26 @@ void Response::launch()
 		else
 			_other(request);
 	}
-	//200 has index page and others have no body
-	if (status != 200 && status != 201 && status != 204 && status != 304 && !(status > 99 && status < 200)) //peut etre a changer si on utilise d'autres code 2xx
+	if (server.getErrorSet() == true && status == server.getErrorCode() && isPath(server.getErrorPath()) == true)
+		readIn(server.getErrorPath());
+	else if (status != 200 && status != 201 && status != 204 && status != 304 && !(status > 99 && status < 200)) //peut etre a changer si on utilise d'autres code 2xx
 		setBody();
 	setHeaders();
+}
+
+bool Response::isPath(std::string path)
+{
+	struct stat check;
+
+	if (path.empty())
+		return false;
+	if (stat(path.c_str(), &check) == 0)
+    {
+		if (S_ISREG(check.st_mode))
+			return true;
+	}
+	return false;
+
 }
 
 std::string Response::getReply()
