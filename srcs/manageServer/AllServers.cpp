@@ -1,5 +1,7 @@
 #include "AllServers.hpp"
 
+int stop = 0;
+
 AllServers::AllServers(void) //default constructor, may be never used
 {
 	this->epfd = -1;
@@ -104,10 +106,13 @@ void AllServers::loop() //it's the principal running function here that will mak
 {
 	int res;
 	int ret;
+	signal(SIGINT, handler_sigquit);
 	while (1)
 	{
 		usleep(8000);
 		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, 0); // epoll_wait is waiting for something happen
+		if (stop == 1)
+			break ;
 		for (int i = 0; i < res; i++)  				   //when something happen, check all the fd which are ready to read in this->events
 		{
 			if ((ret = is_it_equal(this->events[i].data.fd)) != -1) //check if the event that we are reading has an fd that correspond to a listenFd of a server
@@ -168,3 +173,8 @@ void AllServers::nonblock(int sockfd)
   }
 }
 
+void	handler_sigquit(int sig)
+{
+	if (sig)
+		stop = 1;
+}

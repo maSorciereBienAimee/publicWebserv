@@ -2,7 +2,11 @@
 #define ALLSERVERS_HPP
 #include <map>
 #include <vector>
+#include <csignal>
 #include "Server.hpp"
+
+void handler_sigquit(int sig);
+extern int stop;
 
 class AllServers
 {
@@ -21,6 +25,7 @@ class AllServers
 	void nonblock(int sockfd);
 	void pseudoReponse(std::string str, int i);
 	int is_it_equal(int fd);
+
 	private:
 	std::vector<serverBlock> serverBlocks;
 	std::vector<Server> servers;

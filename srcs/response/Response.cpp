@@ -324,7 +324,7 @@ void Response::_get(Request R)
 						readIn(newPath);
 						this->status = 200;
 					}
-					free(dir);
+					closedir(dir);
 				}
 			}
 			else if (_autoindex == 1 && S_ISDIR(check.st_mode))
