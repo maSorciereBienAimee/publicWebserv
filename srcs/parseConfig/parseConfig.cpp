@@ -863,11 +863,11 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 
 void	parseConfig::setLocationConfig(std::string &line, serverLocation &location)
 {
-//int posEnd;
+//	int posEnd;
 	std::string attributName;
 	std::string value;
 //	posEnd =
-			getAttsLocation(line, attributName, value, location);
+	getAttsLocation(line, attributName, value, location);
 }
 
 void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std::string path)
