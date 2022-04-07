@@ -20,7 +20,7 @@ class Cgi
 	int getStatus() const;
 	void setIsIt(int n);
 	int getIsIt() const;
-	void getEnv(int i);
+	int getEnv(int i);
 	void setReal(std::string str);
 	void setQuery(std::string str);
 	void setSimple(std::string str);

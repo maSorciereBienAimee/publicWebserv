@@ -194,7 +194,7 @@ void Cgi::setReal(std::string newPath)
 	this->_realPath = newPath;
 }
 
-void Cgi::getEnv(int len)
+int Cgi::getEnv(int len)
 {
 	std::string pathFile = _realPath;//"." + _serv.getRootServer() + _simple; 
 	std::map<std::string, std::string>	requestHeader = _request.getHeaders();
@@ -269,6 +269,7 @@ void Cgi::getEnv(int len)
 		_env[i][j] = '\0';
 		i++;
 	}
+	return (mapEnv.size());
 }
 
 void	Cgi::cgiRun()
@@ -304,7 +305,7 @@ void	Cgi::cgiRun()
 		file.close();
 	}
 
-	getEnv(body.size());
+	int size = getEnv(body.size());
 	pipe(fd);	
 	pid = fork();
 	if (pid < 0)
@@ -349,7 +350,7 @@ void	Cgi::cgiRun()
 		waitpid(pid, &status, 0);
 		dup2(stockOut, 1);
 		i = 0;
-		if (_env != NULL)
+		if (i < size)
 		{
 			while (_env[i])
 			{
@@ -367,6 +368,7 @@ void	Cgi::cgiRun()
 			temp = buf;
 			str += temp;
 		}
+		std::fclose(tmp);
 		close(fdTmp);
 		setResponse(str, WEXITSTATUS(status));		
 	}
