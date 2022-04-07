@@ -19,7 +19,7 @@ OBJDIR = helper_files
 OBJDIR_STD = helper_files_std
 CC = c++
 RM = rm -f
-CFLAGS = -g3 -fsanitize=address -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 #-g3 -fsanitize=address 
 all: ${NAME}
 
 $(NAME)	: ${OBJS}

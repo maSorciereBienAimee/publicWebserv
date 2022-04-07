@@ -23,7 +23,6 @@ namespace tools
 			std::cout<< "PORT : " << content.getPort() << "\n";
 			std::cout<< "PORT STR : " << content.getPortStr() << "\n";
 			std::cout<< "ROOT SERVER : " << content.getRootServer() << "\n";
-			std::cout<< "ERROR : " << content.getError() << "\n";
 			std::cout<< "CGI BIN : " << content.getCgiBin() << "\n";
 			std::cout<< "CGI EXT : " << content.getCgiExt() << "\n";
 			std::cout<< "AUTOINDEX : " << content.getAI_s() << "\n";
@@ -33,6 +32,10 @@ namespace tools
 			std::cout<< "REDIRECTION : " << content.getRedir_s() << "\n";
 			std::cout<< "UPLOAD : " << content.getUpload_s() << "\n";
 			std::cout<< "IS BODY SET = : " << content.getBodySet_s() << "\n";
+			std::cout << "ERROR PATH = [" << content.getErrorPath() << "]\n";
+			std::cout << "ERROR CODE PATH = [" << content.getErrorCode() << "]\n";
+			std::cout << "ERROR IS SET PATH = [" << content.getErrorSet() << "]\n";
+			
 			std::cout<< "INDEX content : \n";
 			printVector(content.getIndex());
 			std::cout<< "METHODS content : \n";

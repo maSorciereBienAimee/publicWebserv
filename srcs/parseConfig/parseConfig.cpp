@@ -242,19 +242,41 @@ void	parseConfig::parseAndSetCgiBin(std::string &value, serverBlock &server)
 
 void	parseConfig::parseAndSetError(std::string &value, serverBlock &server)
 {
-	int i = 0;
+	int 		i = 0;
+	int			codi;
+	std::string code;
+	std::string path;
 
-	commonParsingValues(value);
-	while (value[i])
+	while(value[i++])
 	{
-		if (value[i] == ' ' && value[i + 1] && !isspace(value[i + 1]))
+		if (value[i] == ' ')
+		{
+			code = value.substr(0, i);
+			path  = value.substr(i, value.size() - i);
+			break;
+		}
+	}
+	if (code.size() != 3)
+		throw OurException("ERROR: server block : error code not valid");
+	codi = atoi(code.c_str());
+	server.setErrorSet(true);
+	server.setErrorCode(codi);
+	commonParsingValues(path);
+	i = 0;
+	while(path[i] == ' ')
+		i++;
+	while (path[i])
+	{
+		if (path[i] == ' ' && path[i + 1] && !isspace(path[i + 1]))
 			throw OurException("ERROR: server block : error one path expected");
 		i++;
 	}
-    std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
-	value.erase(end_pos, value.end());
-	server.setError(value);
-	//std::cout << "ERROR = [" << server.getError() << "]\n";
+    std::string::iterator end_pos = std::remove(path.begin(), path.end(), ' ');
+	path.erase(end_pos, path.end());
+	server.setErrorPath(path);
+	// std::cout << "ERROR PATH = [" << server.getErrorPath() << "]\n";
+	// std::cout << "ERRORCODE PATH = [" << server.getErrorCode() << "]\n";
+	// std::cout << "ERROR SET PATH = [" << server.getErrorSet() << "]\n";
 }
 
 void	parseConfig::parseAndSetRedirServer(std::string &value, serverBlock &server)

@@ -27,18 +27,20 @@ class serverBlock {
 		uint16_t					_port;
 		std::vector<std::string> 	_index;
 		std::string					_cgi_ext_s;
-		std::string					_cgi_bin_s;
-		std::string				    _error;
+		std::string					_cgi_bin_s;	
 		std::string				    _server_root;
-		//NEW
-		std::vector<std::string>	_methods_s; //ok
-		bool      			    	_auto_index_s; //ok set in the ft setAndSarsePort()
-		int							_body_size_s; //ok
-		bool    			    	_auth_basic_s; //ok
-		std::string				    _auth_basic_file_s; //ok
-		std::string                 _redirection_s; //ok
+		std::vector<std::string>	_methods_s; 
+		bool      			    	_auto_index_s; 
+		int							_body_size_s; 
+		bool    			    	_auth_basic_s; 
+		std::string				    _auth_basic_file_s; 
+		std::string                 _redirection_s; 
 		std::string					_upload_s;
 		bool						_bodyIsSet;
+		bool						_errorIsSet;
+		std::string				    _errorPath;
+		int							_errorCode;
+
 
 	public: 
 
@@ -57,7 +59,6 @@ class serverBlock {
 		void										setPort(const uint16_t port);
 		void										setIndex(std::vector<std::string> const &index);
 		void										setRootServer(std::string const& str);
-		void										setError(std::string const& str);
 		void										setCgiBin(std::string const& str);
 		void										setCgiExt(std::string const& ext);
 		void										setMethods_s(std::vector<std::string> const &methods);
@@ -68,6 +69,10 @@ class serverBlock {
 		void										setRedir_s(std::string path);
 		void										setUpload_s(std::string path);
 		void										setBodySet_s(bool val);
+		//
+		void										setErrorSet(bool val);
+		void										setErrorPath(std::string const& str);
+		void										setErrorCode(int code);
 		
 
 
@@ -80,10 +85,8 @@ class serverBlock {
 		std::string	const&							getHostStr(void) const;
 		std::string	const&							getPortStr(void) const;
 		std::string	const&							getRootServer(void) const;
-		std::string	const&							getError(void) const;
 		std::string	const&							getCgiBin(void) const;
 		std::string	const&							getCgiExt(void) const;
-
 		std::vector<std::string> 					getMethods_s(void) const;
 		bool										getAI_s(void) const;
 		int											getBody_s(void) const;
@@ -92,6 +95,10 @@ class serverBlock {
 		std::string									getRedir_s(void) const;
 		std::string									getUpload_s(void) const;
 		bool										getBodySet_s(void) const;
+
+		bool										getErrorSet(void) const;
+		std::string	const&							getErrorPath(void) const;
+		int											getErrorCode(void) const;
 
 		bool operator==(const serverBlock& other);
 };
