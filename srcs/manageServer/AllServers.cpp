@@ -109,8 +109,8 @@ void AllServers::loop() //it's the principal running function here that will mak
 	signal(SIGINT, handler_sigquit);
 	while (1)
 	{
-		usleep(8000);
-		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, 0); // epoll_wait is waiting for something happen
+//		usleep(8000);
+		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, -1); // epoll_wait is waiting for something happen
 		if (stop == 1)
 			break ;
 		for (int i = 0; i < res; i++)  				   //when something happen, check all the fd which are ready to read in this->events
