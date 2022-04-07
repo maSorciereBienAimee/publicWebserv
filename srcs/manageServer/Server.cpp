@@ -67,39 +67,35 @@ std::string Server::processContentLength(std::string request)
 
 std::string Server::processContent(int fd, int epfd, bool *max_size)
 {
-	bool first_time = true;
-	int size = 24;
 	std::string request;
 	std::string bufStr;
-	char buf[size];
+	char buf[MAX_SIZE + 1];
 	int check = 1;
-	memset(buf, '\0', size);
-	while (check > 0)
-	{
-		if (first_time == false)
-		{
-			if (check_size_body(request) == false)
-			{
-				*max_size = false;
-				return request;
-			}
-			request += buf;
-		}
-		first_time = false;
-		memset(buf, '\0', size);
-		check = recv(fd, buf, size - 1, 0);
-	}
+	memset(buf, 0, MAX_SIZE);
+	check = recv(fd, buf, MAX_SIZE, 0);
 	request += buf;
-	if (check_size_body(request) == false)
-	{
-		*max_size = false;
-		return request;
-	}
 	if (check == 0)
 	{
 		std::cout << "connexion close by client" << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+	}
+	if (check == -1)
+	{
+		std::cout << "Error with recv" << std::endl;
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+	}
+	if (check == MAX_SIZE)
+	{
+		std::cout << "Server max request size reached..." << std::endl;
+		close (fd);
+		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+	}
+	if (check_size_body(request) == false)
+	{
+		*max_size = false;
+		return request;
 	}
 	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
 	{
@@ -162,7 +158,7 @@ bool	Server::check_size_body(std::string request)
 		return true;
 	int max_size = this->infoConfig.getBody_s();
 	//IF WE HAVENOT REACHED END OF HEADERS
-	
+
 	//ELSE CREATE STRING WITHOUT HEADERS
 	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
 	std::cout << body << "----" << body.length() << "----" << std::endl;

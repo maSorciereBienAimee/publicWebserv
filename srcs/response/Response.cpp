@@ -94,7 +94,6 @@ bool Response::isPath(std::string path)
 			return true;
 	}
 	return false;
-
 }
 
 std::string Response::getReply()

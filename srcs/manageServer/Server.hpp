@@ -17,6 +17,7 @@
 
 
 #define MAX_CLIENT 5000
+#define MAX_SIZE 65536
 
 class Server
 {
