@@ -35,7 +35,6 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 		redir = 1;
 		_redir_path = _loc.getRedir();
 	}
-	this->body_len = "0";
 	index_vec = _loc.getIndex();
 	_autoindex = _loc.getAI();
 	status = F;
@@ -224,7 +223,6 @@ void Response::readIn(std::string file)
 		setBody();
 		return;
 	}
-	is.close();
 	int len;
 	std::stringstream ss;
 	_cgi.setIsIt(tools::isItCgi(file, _loc));
@@ -233,7 +231,6 @@ void Response::readIn(std::string file)
 		_cgi.setReal(file);
 		std::cout << _cgi.getR() << std::endl;
 		_cgi.cgiRun();
-		std::cout << "retour cgi == " <<  _cgi.getStatus() << std::endl;
 		this->status = _cgi.getStatus();
 		this->body = _cgi.getBody();
 		this->extra_headers = _cgi.getHeaders();
@@ -242,6 +239,7 @@ void Response::readIn(std::string file)
 		ss >> this->body_len;
 		return ;
 	}
+	is.close();
 
 	int length;
 	std::fstream myFile;
@@ -275,7 +273,6 @@ void Response::readIn(std::string file)
 		fav = path.substr(path.size() - 12, 12);
 	if (fav != "favicon.html")
 		std::cout << "_READIN BODY IS: " << this->body << std::endl;
-	this->status = 200;
 }
 
 void Response::_get(Request R)
@@ -300,7 +297,7 @@ void Response::_get(Request R)
 				if (path == root + "favicon.ico")
 					path = root + "favicon.html";
 				readIn(path);
-				//this->status = 200;
+				this->status = 200;
 			}
 			else if (_autoindex == 0 && S_ISDIR(check.st_mode))
 			{
@@ -324,7 +321,7 @@ void Response::_get(Request R)
 						std::string newPath = R.getPath() + "/" + path;
 					//	std::cout << "NEW PATH IS [" << newPath << "\n";
 						readIn(newPath);
-						//this->status = 200;
+						this->status = 200;
 					}
 					closedir(dir);
 				}
@@ -364,7 +361,7 @@ void Response::_homepage(Request R)
 		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
 		{
 			readIn(str);
-			//this->status = 200;
+			this->status = 200;
 			return;
 		}
 	}

@@ -202,16 +202,23 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 	Request marco(req, realPath);
 	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath, realPath);
 	int status = marco.getStatus();
+//	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+	if (marco.getHost() == "127.0.0.1" && this->infoConfig.getHostStr() == "localhost")
+			this->infoConfig.setHostStr("127.0.0.1");
+	if (marco.getHost() == "localhost" && this->infoConfig.getHostStr() == "127.0.0.1")
+			this->infoConfig.setHostStr("localhost");
+
+	std::string hp2 = this->infoConfig.getName() + ':' + this->infoConfig.getPortStr();
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
-	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+	if (marco.getHost() != hp && marco.getHost() != hp2)
 	{
-		if (this->infoConfig.getHostStr() == "127.0.0.1")
-			hp = "localhost:" + this->infoConfig.getPortStr();
-		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
-		{
-			// std::cout << "CEST ICICICICI que f = 400\n";
+//		if (this->infoConfig.getHostStr() == "127.0.0.1")
+//			hp = "localhost:" + this->infoConfig.getPortStr();
+//		if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
+//		{
+//			// std::cout << "CEST ICICICICI que f = 400\n";
 			status = 400;
-		}
+//		}
 	}
 	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
 	//tools::printServerBlock(infoConfig);

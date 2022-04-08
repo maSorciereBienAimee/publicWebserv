@@ -285,14 +285,7 @@ void	Cgi::cgiRun()
 	char **arg = NULL;
 	std::FILE *tmp = std::tmpfile();
 	int fdTmp = fileno(tmp);
-	struct stat stock;
 
-	if (stat(_loc.getCgiBin().c_str(), &stock) != 0)
-	{
-		std::cout << "cgi does not exist" << std::endl;
-		setResponse("", 1);		
-		return ;
-	}
 	std::string body = "";
 	if (_request.getMethod() == "POST")
 		body = _request.getBody();
@@ -317,7 +310,7 @@ void	Cgi::cgiRun()
 	if (pid < 0)
 	{
 		std::cerr << "error fork()" << std::endl;
-		setResponse("", 1);		
+		_status = 500;
 		return;
 	}
 	else if (pid == 0)
@@ -327,7 +320,7 @@ void	Cgi::cgiRun()
 		if (dup2(fd[0], 0) < 0)
 		{
 			std::cerr << "Error dup2 in cgiRun()" << std::endl;
-			setResponse("", 1);		
+			_status = 500;
 			return;
 		}
 		close(fd[0]);
@@ -343,7 +336,7 @@ void	Cgi::cgiRun()
 		if (dup2(fd[1], 1) < 0)
 		{
 			std::cerr << "Error dup2 in cgiRun()" << std::endl;
-			setResponse("", 1);		
+			_status = 500;
 			return;
 		}
 //		std::cout << "CGIRUN BEFORE WRITING" << std::endl;
@@ -396,7 +389,7 @@ void	Cgi::setResponse(std::string str, int retStat)
 	{
 		_headers.clear();
 		_body = "";
-		_status = 500;
+		_status = 502; // ?
 		return ;
 	}
 	else
