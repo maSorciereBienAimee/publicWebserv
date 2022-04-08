@@ -35,6 +35,7 @@ Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock 
 		redir = 1;
 		_redir_path = _loc.getRedir();
 	}
+	this->body_len = "0";
 	index_vec = _loc.getIndex();
 	_autoindex = _loc.getAI();
 	status = F;
