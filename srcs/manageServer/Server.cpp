@@ -11,6 +11,7 @@ Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
 	this->infoConfig = block;
+	std::cout << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << std::endl;
 }
 
 Server::~Server()

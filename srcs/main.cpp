@@ -7,12 +7,17 @@
 
 int main(int argc, char **argv)
 {
-	if (argc != 2)
+	if (argc > 2)
 	{
-		std::cout << "Error: argument" << std::endl;
+		std::cout << "Error: too much arguments" << std::endl;
 		return (1);
 	}
-	AllServers all(argv[1]);
+	std::string path;
+	if (argc == 2)
+		path = argv[1];
+	else
+		path = "conf/default.conf";
+	AllServers all(path);
 	all.init();
 	all.loop();
 }

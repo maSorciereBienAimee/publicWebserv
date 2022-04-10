@@ -41,7 +41,8 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 		for (std::vector<serverBlock>::iterator it2 = blocks.begin(); j < i; it2++, j++)
 		{
 			//SEGFAULT WHEN ENTER IN THE CONDITION 
-			if (it2->getPortStr() == it->getPortStr() && it2->getHostStr() == it->getHostStr())
+			if (it2->getPortStr() == it->getPortStr() && (it2->getHostStr() == it->getHostStr()
+				|| it2->getName() == it->getName()))
 			{
 				std::cout << "erase " << it->getName() << std::endl;
 				this->serverBlocks.erase(it);
@@ -50,8 +51,6 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 			}
 		}
 	}
-	for (std::vector<serverBlock>::iterator it2 = serverBlocks.begin(); it2 != serverBlocks.end(); it2++)
-		std::cout << it2->getName() << std::endl;
 	for (std::vector<serverBlock>::iterator it = serverBlocks.begin(); it != serverBlocks.end(); it++)
         	this->servers.push_back(Server(*it));						//for each data receive earliest in the vector serverBlock, create a server, it initiate in Server class a private member called infoServer and take data parsed before, then, after create, push it in a vector<Server>
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
@@ -74,6 +73,9 @@ void AllServers::init()			//init epoll
 	for (std::vector<int>::iterator it = allListen.begin(); it != allListen.end(); it++) //for each listendFd (that come from server class), we create add an epoll_event with flag EPOLLIN (read flag) EPOLLERR(error flag) and EPOLLHUP( hang up flag) 
 	{										     // instanciated this first epoll_event allow to know if an event happened in these particular socket, if yes, that means data are ready to be read
 		ev.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP; 					
+		ev.data.ptr = NULL;
+		ev.data.u32 = 0;
+		ev.data.u64 = 0;
 		ev.data.fd = *it;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, *it, &ev) < 0)			//epfd = fd of epoll, EPOLL_CTL_ADD = add event flag, *it, the actual listenfd that we want to observ, &ev, event to add
 		{
@@ -146,6 +148,9 @@ void AllServers::addFd(int fd_origin)
 	{
 		nonblock(clifd);	          //get this new fd non blocking
 		ev.events = EPOLLIN | EPOLLOUT | EPOLLET;	  // init an event with these flag, EPOLLIN for read, EPOLLET to hang despite available data is presente
+		ev.data.ptr = NULL;
+		ev.data.u32 = 0;
+		ev.data.u64 = 0;
 		ev.data.fd = clifd;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, clifd, &ev) < 0) //add this new event in epoll_event list
 		{
