@@ -84,7 +84,7 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 	}
 	if (check == -1)
 	{
-		std::cout << RED << "Error with recv" << RESET << std::endl;
+		std::cout << RED << "No datas received" << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}

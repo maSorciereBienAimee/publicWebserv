@@ -72,7 +72,7 @@ void AllServers::init()			//init epoll
 	}
 	for (std::vector<int>::iterator it = allListen.begin(); it != allListen.end(); it++) //for each listendFd (that come from server class), we create add an epoll_event with flag EPOLLIN (read flag) EPOLLERR(error flag) and EPOLLHUP( hang up flag) 
 	{										     // instanciated this first epoll_event allow to know if an event happened in these particular socket, if yes, that means data are ready to be read
-		ev.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP; 					
+		ev.events = EPOLLIN | EPOLLOUT | EPOLLERR | EPOLLHUP;
 		ev.data.ptr = NULL;
 		ev.data.u32 = 0;
 		ev.data.u64 = 0;
