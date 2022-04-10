@@ -1,21 +1,4 @@
 #include "Response.hpp"
-#include <iostream>
-#include <string>
-#include <fstream>
-#include "../manageServer/Server.hpp"
-#include <sys/stat.h>
-#include <vector>
-#include <ctime>
-#include <cstring>
-#include <sstream>
-
-//Response::Response(void)
-//{
-//	return;
-//}
-
-//(peut etre on va avoir besoin plus tard):,config(C), fd(F)
-
 
 Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock server) : request(R), _cgi(myCgi), _loc(loc), _server(server)
 {
@@ -100,19 +83,25 @@ bool Response::isPath(std::string path)
 std::string Response::getReply()
 {
 	std::string reply = _header;
+	std::string body_cut;
+	if (this->body.size() > 30)
+			body_cut = this->body.substr(0, 30) + "...";
+	else
+			body_cut = this->body;
 	//THESE CODES SHOULD NOT INCLUDE BODY... SHOULD THEY INCLUDE THE /r/n/r/n though?
 	if (status != 204 && status != 201 && status != 304 && !(status > 99 && status < 200))
 		reply += "\r\n\r\n" + this->body;
-	std::cout << "REPLY IS:\n" << reply << std::endl;
+	std::cout << std::endl << CYAN << "--- REPLY IS : ---" << std::endl << _header << std::endl;
+	std::cout << "BODY : " << std::endl;
+	std::cout << "|" << body_cut << "|" << RESET << std::endl;
 	return (reply);
 }
 
 void    Response::_delete(std::string path)
 {
     struct stat check;
-//	path.erase(path.begin(), path.begin() + 1);
 	status = 200;
-	if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+	if (stat(path.c_str(), &check) == 0)
     {
         if (remove(path.c_str()) == 0)
 		{
@@ -178,7 +167,6 @@ std::string Response::makeDate(void)
 
     time(&current);
     strftime(rfc_2822, sizeof(rfc_2822), "%a, %d %b %Y %T GMT\n", localtime(&current));
-	std::cout << rfc_2822 << std::endl;
 	std::string ret;
 	ret = rfc_2822;
 	return ret;
@@ -188,7 +176,6 @@ void Response::setBody()
 {
 	std::string code;
 	std::stringstream conv;
-	std::cout << "SET BODYYY\n";
 	conv << status;
 	code = conv.str();
 
@@ -206,7 +193,6 @@ void Response::setBody()
 
 void Response::readIn(std::string file)
 {
-	std::cout << "_READIN FILE IS: " << file << std::endl;
 	if (access(file.c_str(), R_OK) == -1)
 	{
 		this->status = 403;
@@ -218,7 +204,7 @@ void Response::readIn(std::string file)
 	std::ifstream is (file.c_str(), std::ifstream::binary);
 	if (!is)
 	{
-		std::cout << "_READIN FILE DOESN'T exist: " << file << std::endl;
+		std::cout << RED << "_READIN FILE DOESN'T exist: " << file << RESET << std::endl;
 		this->status = 400;
 		this->body = "";
 		setBody();
@@ -231,7 +217,6 @@ void Response::readIn(std::string file)
 	if (_cgi.getIsIt() == 1)
 	{
 		_cgi.setReal(file);
-		std::cout << _cgi.getR() << std::endl;
 		_cgi.cgiRun();
 		this->status = _cgi.getStatus();
 		this->body = _cgi.getBody();
@@ -255,25 +240,11 @@ void Response::readIn(std::string file)
 	}
 	myFile.close();
 	length = this->body.size();
-
-
-//	is.seekg (0, is.end);
-//	int length = is.tellg();
-//	is.seekg (0, is.beg);
-//	char * b = (char *)malloc(sizeof(char) * (length + 1));
-//	b[length] = '\0';
 	ss << length;
 	this->body_len = ss.str();
-//	is.read (b,length);
-//	std::string bufStr(b);
-//	this->body = bufStr;
 	std::string fav = "";
 	std::string path;
 	path = request.getPath();
-	if (path.size() >= 12)
-		fav = path.substr(path.size() - 12, 12);
-	if (fav != "favicon.html")
-		std::cout << "_READIN BODY IS: " << this->body << std::endl;
 	this->status = 200;
 }
 
@@ -282,24 +253,18 @@ void Response::_get(Request R)
 	status = 200;
 	std::string length;
 
-//	if (R.getPath() != (R.getRoot() + '/') )
 	if (R.getPath() != _loc.getRootLoc() + '/' )
 	{
 		struct stat check;
 		std::string path = R.getPath();
-		std::cout << _autoindex << std::endl;
-		std::cout << "location path = " << _loc.getLocationPath() << std::endl;
-//		path.erase(path.begin(), path.begin() + 1);
-		if (stat(path.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+		if (stat(path.c_str(), &check) == 0)
     	{
 			if (S_ISREG(check.st_mode))
 			{
 				std::string root = _loc.getRootLoc();
-//				root.erase(root.begin(), root.begin() + 1);
 				if (path == root + "favicon.ico")
 					path = root + "favicon.html";
 				readIn(path);
-//				this->status = 200;
 			}
 			else if (_autoindex == 0 && S_ISDIR(check.st_mode))
 			{
@@ -321,9 +286,7 @@ void Response::_get(Request R)
 						std::string root = R.getRoot();
 						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath = R.getPath() + "/" + path;
-					//	std::cout << "NEW PATH IS [" << newPath << "\n";
 						readIn(newPath);
-//						this->status = 200;
 					}
 					closedir(dir);
 				}
@@ -342,7 +305,7 @@ void Response::_get(Request R)
 			this->body_message = "File not found";
 		}
 	}
-	else //no file specified so home page??
+	else
 		_homepage(R);
 }
 
@@ -352,18 +315,15 @@ void Response::_homepage(Request R)
 	int i;
 	this->status = 200;
 
-	std::cout << "IN _HOMEPAGE\n";
 
 	for (i = 0; i < size; i++)
 	{
 		std::string str = R.getPath() + index_vec[i];
-		std::cout << str << std::endl;
 		struct stat check;
 		std::stringstream ss;
-		if (stat(str.c_str(), &check) == 0) //could change this to c++ method with fopen, but this is faster?
+		if (stat(str.c_str(), &check) == 0)
 		{
 			readIn(str);
-//			this->status = 200;
 			return;
 		}
 	}
@@ -463,11 +423,7 @@ void Response::_post(Request R)
 		this->status = 204;
 		this->body = "";
 	}
-
 }
-
-
-
 
 void Response::initErrors()
 {
@@ -526,5 +482,3 @@ void Response::initErrors()
 	errors[510] = "510 Not Extended";
 	errors[511] = "511 Network Authentication Required";
 }
-
-

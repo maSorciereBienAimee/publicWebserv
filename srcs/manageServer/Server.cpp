@@ -7,11 +7,12 @@ Server::Server()
 {
 	this->listenfd = -1;
 }
+
 Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
 	this->infoConfig = block;
-	std::cout << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << std::endl;
+	std::cout << GREEN << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 }
 
 Server::~Server()
@@ -41,7 +42,7 @@ void Server::connect()
 	srv.sin_port = htons(this->infoConfig.getPort());
 	if (bind(this->listenfd, (struct sockaddr *) &srv, sizeof(srv)) < 0)
 	{
-		std::cout << "Bind address already in use \n";
+		std::cout << RED << "Bind address already in use." << RESET << std::endl;
 		clear_fd();
 		exit(1);
 	}
@@ -61,7 +62,7 @@ std::string Server::processContentLength(std::string request)
 	std::string body = request.substr(index + 4, request.length() - (index + 4));
 
 	if (static_cast<int>(body.length()) != atoi(tmp1.c_str()))
-		std::cout << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << std::endl;
+		std::cout << RED << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << RESET << std::endl;
 	return(request + "\r\n\r\n");
 }
 
@@ -77,19 +78,19 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 	request += buf;
 	if (check == 0)
 	{
-		std::cout << "connexion close by client" << std::endl;
+		std::cout << PURPLE << "Connexion closed by client" << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	if (check == -1)
 	{
-		std::cout << "Error with recv" << std::endl;
+		std::cout << RED << "Error with recv" << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	if (check == MAX_SIZE)
 	{
-		std::cout << "Server max request size reached..." << std::endl;
+		std::cout << RED << "Server max request size reached..." << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
@@ -102,12 +103,8 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 	{
 		size_t i = 0;
 		while (i < request.length() - 1)
-		{
-			std::cout << i << "is: " << request[i] << std::endl;
 			i++;
-		}
-		std::cout << "find last of is" << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
-		std::cout << "error with recv" << std::endl;
+//?		std::cout << "Find last of is " << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
@@ -120,7 +117,6 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 
 std::string Server::chunkDecoder(std::string str)
 {
-	std::cout << "CHUNK DECODER" << std::endl;
     //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
 	std::string	head = str.substr(0,str.find("\r\n\r\n") + 4);
     //FROM AFTER NEW LINE TO END OF MESSAGE
@@ -162,13 +158,11 @@ bool	Server::check_size_body(std::string request)
 
 	//ELSE CREATE STRING WITHOUT HEADERS
 	std::string	body = request.substr(request.find("\r\n\r\n") + 4, request.length() - 1);
-	std::cout << body << "----" << body.length() << "----" << std::endl;
 	if (static_cast<int>(body.length()) > max_size)
 	{
-		std::cout << "HEREHEREHREHRHERHEH. MAX SIZE: " << max_size << std::endl;
+		std::cout << PURPLE << "MAX SIZE: " << max_size << RESET << std::endl;
 		return false;
 	}
-	std::cout << "TRUE" << std::endl;
 	return true;
 }
 
@@ -178,14 +172,14 @@ void Server::readData(int fd, int epfd)
 	std::string request;
 	request = this->processContent(fd, epfd, &max_size_check);
 	if (request != "")
-		this->pseudoReponse(request, fd, max_size_check);
+		this->launchResponse(request, fd, max_size_check);
 	close(fd);
 	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 
 }
 
 
-void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //destinee a etre suprimee quand la class reponse sera faite
+void Server::launchResponse(std::string req, int fd, bool max_size_check)
 {
 	std::string	queryPath;
 	std::string tmp = "";
@@ -193,8 +187,6 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 
 	serverLocation synthese = tools::whichLocation(simplePath, this->infoConfig);
 	std::string	realPath = tools::getRelativeRoot(synthese, simplePath);
-	//TODO CHANGE /WEBSITE FOR LOCATION ROOT
-//	Request marco(req, synthese.getRootLoc() );
 	if (max_size_check == false)
 	{
 		tmp = req.substr(0, req.length() - 1 - request.find("\r\n\r\n") + 4);
@@ -203,7 +195,6 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 	Request marco(req, realPath);
 	Cgi myCgi(marco, synthese, this->infoConfig, queryPath, simplePath, realPath);
 	int status = marco.getStatus();
-//	if (marco.getHost() != this->infoConfig.getHostStr() && marco.getHost() != hp)
 	if (marco.getHost() == "127.0.0.1" && this->infoConfig.getHostStr() == "localhost")
 			this->infoConfig.setHostStr("127.0.0.1");
 	if (marco.getHost() == "localhost" && this->infoConfig.getHostStr() == "127.0.0.1")
@@ -220,13 +211,8 @@ void Server::pseudoReponse(std::string req, int fd, bool max_size_check) //desti
 		status = 400;
 	}
 	myCgi.setIsIt(tools::isItCgi(realPath, synthese));
-	//tools::printServerBlock(infoConfig);
-	//tools::printLocationBlock(infoConfig.getLocation());
 	if (max_size_check == false)
-	{
-		std::cout << "HERE" << std::endl;
 		status = 413;
-	}
 	Response polo(marco, status, myCgi, synthese, infoConfig);
 	std::string the_reply = polo.getReply();
 	send(fd, the_reply.c_str(), the_reply.length(), 0);

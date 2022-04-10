@@ -55,7 +55,6 @@ void	parseConfig::parseAndSetUploadServer(std::string &value, serverBlock &serve
     std::string::iterator end_pos = std::remove(value.begin(), value.end(), ' ');
 	value.erase(end_pos, value.end());
 	server.setUpload_s(value);
-	std::cout << "UPLOAD SERVER = [" << server.getUpload_s() << "]\n";
 
 }
 
@@ -557,10 +556,8 @@ int		parseConfig::getAttributName(std::string const &line, std::string &attribut
 
 void	parseConfig::setServerConfig(std::string const &line, serverBlock &server)
 {
-//	int posEnd;
 	std::string attributName;
 	std::string value;
-//	posEnd =
 	getAttributName(line, attributName, value, server);
 //	std::cout << "in setServerConfig " << attributName << "\n";
 }

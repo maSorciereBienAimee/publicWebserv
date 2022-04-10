@@ -10,9 +10,7 @@ Cgi::Cgi(Request R, serverLocation loc, serverBlock serv, std::string Q, std::st
 	_headers.clear();
 }
 
-Cgi::~Cgi(void)
-{
-}
+Cgi::~Cgi(void) { }
 
 std::string Cgi::getMimeType(std::string fileName)
 {
@@ -196,7 +194,7 @@ void Cgi::setReal(std::string newPath)
 
 void Cgi::getEnv(int len)
 {
-	std::string pathFile = _realPath;//"." + _serv.getRootServer() + _simple; 
+	std::string pathFile = _realPath;
 	std::map<std::string, std::string>	requestHeader = _request.getHeaders();
 	std::map<std::string, std::string>	mapEnv;
 	std::string pathWQ = getPathWithoutQuery(_request.getPath(), _loc.getCgiExt());
@@ -204,13 +202,12 @@ void Cgi::getEnv(int len)
 	std::string body = "";
 	std::fstream file;
 	mapEnv["REDIRECT_STATUS"] = "200";
-	mapEnv["SERVER_SOFTWARE"] = _serv.getName()+ "/1.0";//_serv.getHostStr() + ":" + _serv.getPortStr()+ "/1.1"; //???
+	mapEnv["SERVER_SOFTWARE"] = _serv.getName()+ "/1.0";
 	mapEnv["SERVER_NAME"] = _serv.getHostStr();
 	mapEnv["GATEWAY_INTERFACE"] = "CGI/1.1";
 	mapEnv["SERVER_PROTOCOL"] = "HTTP/1.1";
 	mapEnv["SERVER_PORT"] = _serv.getPortStr();
 	mapEnv["REQUEST_METHOD"] = _request.getMethod();
-//	mapEnv["PATH_INFO"] = pathFile;
 	mapEnv["PATH_INFO"] = pathFile + getQuery(_query);
 	if (mapEnv["PATH_INFO"] == "")
 		mapEnv["PATH_TRANSLATED"] = "";
@@ -273,7 +270,6 @@ void Cgi::getEnv(int len)
 
 void	Cgi::cgiRun()
 {
-	std::cout << "entre cgiRun" << std::endl;
 	pid_t pid;
 	int fd[2];
 	int i = 0;
@@ -285,14 +281,7 @@ void	Cgi::cgiRun()
 	char **arg = NULL;
 	std::FILE *tmp = std::tmpfile();
 	int fdTmp = fileno(tmp);
-	struct stat stock;
 
-	if (stat(_loc.getCgiBin().c_str(), &stock) != 0)
-	{
-		std::cout << "cgi does not exist" << std::endl;
-		setResponse("", 1);
-		return ;
-	}
 	std::string body = "";
 	if (_request.getMethod() == "POST")
 		body = _request.getBody();
@@ -316,8 +305,7 @@ void	Cgi::cgiRun()
 	pid = fork();
 	if (pid < 0)
 	{
-		std::cerr << "error fork()" << std::endl;
-//		_status = 500;
+		std::cerr << RED << "error fork()" << RESET << std::endl;
 		setResponse("", 1);
 		return;
 	}
@@ -327,15 +315,14 @@ void	Cgi::cgiRun()
 			close (fd[1]);
 		if (dup2(fd[0], 0) < 0)
 		{
-			std::cerr << "Error dup2 in cgiRun()" << std::endl;
-//			_status = 500;
+			std::cerr << RED << "Error dup2 in cgiRun() child" << RESET << std::endl;
 			setResponse("", 1);
 			return;
 		}
 		close(fd[0]);
 		dup2(fdTmp, 1);
 		execve(_loc.getCgiBin().c_str(), arg, _env);
-		std::cout << "error execve()" << std::endl;
+		std::cerr << RED << "error execve()" << RESET << std::endl;
 		exit (1);
 	}
 	else
@@ -344,15 +331,11 @@ void	Cgi::cgiRun()
 				close(fd[0]);
 		if (dup2(fd[1], 1) < 0)
 		{
-			std::cerr << "Error dup2 in cgiRun()" << std::endl;
-//			_status = 500;
+			std::cerr << RED << "Error dup2 in cgiRun() parent" << RESET << std::endl;
 			setResponse("", 1);
 			return;
 		}
-//		std::cout << "CGIRUN BEFORE WRITING" << std::endl;
-//		write(1, body.c_str(), body.size());
 		std::cout << body << std::endl;
-//		write(1, _request.getBody().c_str(), _request.getBody().size());
 		dup2(stockOut, 1);
 		close(stockOut);
 		close(fd[1]);
@@ -381,7 +364,6 @@ void	Cgi::cgiRun()
 		std::fclose(tmp);
 		setResponse(str, WEXITSTATUS(status));		
 	}
-	
 }
 
 void	Cgi::setResponse(std::string str, int retStat)
@@ -416,7 +398,6 @@ void	Cgi::setResponse(std::string str, int retStat)
 			if (*it == ':')
 			{
 				key = headS.substr(0, i);
-				std::cout << "key = " << key << std::endl;
 				len = headS.size() - (i + 1);
 				temp = headS.substr(i + 1, len);
 				headS = temp;
@@ -425,7 +406,6 @@ void	Cgi::setResponse(std::string str, int retStat)
 			else if (*it == '\n' || *it == '\r')
 			{
 				val = headS.substr(0, i);
-				std::cout << "val = " << val << std::endl;
 				_headers.insert(std::make_pair(key, val));
 				len = headS.size() - (i + 1);
 				temp = headS.substr(i + 1, len);
@@ -435,7 +415,6 @@ void	Cgi::setResponse(std::string str, int retStat)
 			}
 		}
 		val = headS.substr(0, i);
-				std::cout << "val = " << val << std::endl;
 		_headers.insert(std::make_pair(key, val));
 	}
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)

@@ -7,7 +7,15 @@
 #include <map>
 #include <list>
 #include <vector>
-
+# define BLACK "\33[30;30m"
+# define RED "\33[30;31m"
+# define GREEN "\33[30;32m"
+# define YELLOW "\33[30;33m"
+# define BLUE "\33[30;34m"
+# define PURPLE "\33[30;35m"
+# define CYAN "\33[30;36m"
+# define WHITE "\33[30;37m"
+# define RESET "\x1b[0m"
 class Request
 {
 		public:

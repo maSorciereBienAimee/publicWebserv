@@ -1,5 +1,6 @@
 #include "tools.hpp"
 #include "../parseConfig/serverLocation.hpp"
+
 namespace tools
 {
 
@@ -143,7 +144,6 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	size_t l;
 	if (( l = loc.getLocationPath().find("/*.")) != std::string::npos)
 			len = len - (len - l);
-	std::cout << "simple IS = " << simple << std::endl;
 
 	temp = simple.substr(len, simple.size() - len);
 	if (temp[0] != '/')
@@ -153,7 +153,6 @@ std::string getRelativeRoot(serverLocation loc, std::string simple)
 	ret = root + temp;
 	if (ret[ret.size() - 1] == '/')
 		ret.erase(ret.end() - 1);
-	std::cout << "REALPATH IS = " << ret << std::endl;
 	return (ret);
 }
 
@@ -308,12 +307,11 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		std::vector<std::string> data;
 		DIR *Dir;
 		struct dirent *DirEntry;
-		//nedd to change the path ???
 		std::string newPath = path;
 		Dir = opendir(newPath.c_str()); //change to path
 		if (Dir == NULL)
 		{
-			std::cout << "Could not open the directory laaaa\n";
+			std::cout << RED << "Could not open the directory" << RESET << std::endl;
 			return (std::vector<std::string>());
 		}
 		while((DirEntry = readdir(Dir)) != NULL)
@@ -357,22 +355,14 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 	std::string	genreateAI(std::string const& locationPath, std::string const& host, std::string const& port, std::string const& path)
 	{
 		std::string buff;
-
-		// std::cout << "Path is  " << path << "\n";
-		// std::cout << "Host is  " << host << "\n";
-		// std::cout << "Port is  " << port << "\n";
-		// std::cout << "LOCATION PATH is  " << locationPath << "\n";
-
-
 		std::vector<std::string> dataAI = tools::getDirAI(path);  // change to do a function generate autoindex(host, port, path,)
 		if (dataAI.empty())
-			std::cerr << "AUTOINDEX: Could not open directory\n";
+			std::cerr << RED << "AUTOINDEX: Could not open directory" << RESET << std::endl;
 
 		buff =	"<!DOCTYPE html>\n<html>\n<body>\n<h1>\nAUTOINDEX</h1>\n<style>html { color-scheme: light dark; }\nbody { width: 35em; margin: left auto;\nfont-family: Tahoma, Verdana, Arial, sans-serif;\n}\n</style>\n";
 		for (std::vector<std::string>::iterator it = dataAI.begin(); it != dataAI.end(); it++)
 		{
 
-			std::cout << "\n\n\n\n\n\n\nHEX PATH IS: " << pathEncoder(*it) << "\n\n\n\n\n\n\n\n\n";
 			if (locationPath == "/")
 				buff += "\t\t<p><a href=\"http://" +  host + ":" + port + locationPath + pathEncoder(*it) + "\">" + (*it) + "</a></p>\n";
 			else

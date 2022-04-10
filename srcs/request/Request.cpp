@@ -166,27 +166,29 @@ void Request::error_checker(void)
 
 void Request::printer(void)
 {
-    std::cout << "------REQUEST INFO RECOVERED IN REQUEST CLASS------" << std::endl;
+    std::cout << std::endl << YELLOW << "--- REQUEST IS : ---" << std::endl;
     std::cout << "ROOT IS: " << _root << std::endl;
-    std::cout << "METHOD" << std::endl;
-    std::cout  << "|" << _method <<  "|" <<std::endl;
-    std::cout << "PATH" << std::endl;
-    std::cout  << "|" << _path << "|" << std::endl;
-    std::cout << "VERSION" << std::endl;
-    std::cout << "|" << _version << "|" << std::endl;
+    std::cout << "METHOD : " << _method << std::endl;
+    std::cout << "PATH : " << _path << std::endl;
+    std::cout << "VERSION : " << _version << std::endl;
     int i = 0;
     int end = _headers.size();
-    std::cout << "HEADERS" << std::endl;
+    std::cout << "HEADERS : " << std::endl;
     std::map<std::string, std::string>::iterator it;
     it = _headers.begin();
     while (i < end)
     {
-        std::cout << "HEADER " << i << "->KEY: |" << it->first << "| VALUE: |" << it->second << "|" << std::endl;
+        std::cout << it->first << " : " << it->second << std::endl;
         i++;
         it++;
     }
-    std::cout << "BODY" << std::endl;
-    std::cout << "|" << _body << "|" << std::endl;
+    std::cout << "BODY : " << std::endl;
+	std::string body_cut;
+	if (_body.size() > 30)
+		body_cut = _body.substr(0, 30) + "...";
+	else
+		body_cut = _body;
+    std::cout << "|" << body_cut << "|" << RESET << std::endl;
 }
 
 std::string const &Request::getMethod() const
@@ -203,7 +205,7 @@ std::string Request::getHost() const
     const std::string key = "Host";
     if (_headers.find("Host") == _headers.end())
     {
-        std::cout << "PROB 1" << std::endl;
+        std::cout << RED << "PROB 1" << RESET << std::endl;
         return NULL;
     }
     try
@@ -212,7 +214,7 @@ std::string Request::getHost() const
     }
     catch (const std::exception &e)
     {
-        std::cout << "PROB 2" << std::endl;
+        std::cout << RED << "PROB 2" << RESET << std::endl;
          return "";
     }
 }

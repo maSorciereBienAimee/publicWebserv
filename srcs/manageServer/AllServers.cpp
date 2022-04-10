@@ -28,7 +28,7 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 	{
 		clear_fd();
 		free(events);
-		std::cerr << e.what() << '\n';
+		std::cerr << RED << e.what() << RESET << std::endl;
 		exit(1);
 	}
 	std::vector<serverBlock> blocks = serverBlocks;
@@ -44,7 +44,7 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 			if (it2->getPortStr() == it->getPortStr() && (it2->getHostStr() == it->getHostStr()
 				|| it2->getName() == it->getName()))
 			{
-				std::cout << "erase " << it->getName() << std::endl;
+				std::cout << RED << "Erase " << it->getName() << RESET << std::endl;
 				this->serverBlocks.erase(it);
 				i--;
 				break ;
@@ -67,7 +67,7 @@ void AllServers::init()			//init epoll
 	this->epfd = epoll_create(MAX_CLIENT);	//create an epoll, and stock the fd that it create
 	if (!this->epfd)
 	{
-		std::cout << "epoll_create failed" << std::endl;
+		std::cout << RED << "epoll_create failed" << RESET << std::endl;
 		exit(1);
 	}
 	for (std::vector<int>::iterator it = allListen.begin(); it != allListen.end(); it++) //for each listendFd (that come from server class), we create add an epoll_event with flag EPOLLIN (read flag) EPOLLERR(error flag) and EPOLLHUP( hang up flag) 
@@ -79,7 +79,7 @@ void AllServers::init()			//init epoll
 		ev.data.fd = *it;
 		if (epoll_ctl(this->epfd, EPOLL_CTL_ADD, *it, &ev) < 0)			//epfd = fd of epoll, EPOLL_CTL_ADD = add event flag, *it, the actual listenfd that we want to observ, &ev, event to add
 		{
-			std::cout << "epoll_ctl failed" << std::endl;
+			std::cout << RED << "epoll_ctl failed" << RESET << std::endl;
 			clear_fd();
 			exit(1);
 		}
