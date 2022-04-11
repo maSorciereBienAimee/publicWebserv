@@ -33,6 +33,7 @@ class AllServers
 	private:
 	std::vector<serverBlock>	serverBlocks;
 	std::vector<Server>			servers;
+	std::map<int, Server *>			toSend;
 	int							epfd;
 	std::vector<int>			allListen;
 	std::map<int, int>			allFd;

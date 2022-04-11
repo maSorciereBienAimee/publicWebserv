@@ -80,6 +80,16 @@ bool Response::isPath(std::string path)
 	return false;
 }
 
+std::string Response::getBody() const
+{
+	return (this->body);
+}
+
+std::string Response::getHeader() const
+{
+	return (_header);
+}
+
 std::string Response::getReply()
 {
 	std::string reply = _header;
@@ -154,7 +164,12 @@ void Response::setHeaders()
 		it++;
 	}
 	if (status != 404 && status != 201 && status != 304 && !(status > 99 && status < 200))
-		_header += "Content-Length: " + body_len;
+	{
+			if (this->body.size() > 100000)
+				_header += "Transfer-Encoding: chunked";
+			else
+				_header += "Content-Length: " + body_len;
+	}
 }
 
 std::string Response::makeDate(void)

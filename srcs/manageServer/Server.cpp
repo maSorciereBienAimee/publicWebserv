@@ -6,11 +6,13 @@
 Server::Server()
 {
 	this->listenfd = -1;
+	this->ok = 0;
 }
 
 Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
+	this->ok = 0;
 	this->infoConfig = block;
 	std::cout << GREEN << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 }
@@ -172,14 +174,72 @@ void Server::readData(int fd, int epfd)
 	std::string request;
 	request = this->processContent(fd, epfd, &max_size_check);
 	if (request != "")
-		this->launchResponse(request, fd, max_size_check);
-	close(fd);
-	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-
+		this->launchResponse(request, max_size_check);
+	this->ok = 1;
+	//close(fd);
+	//epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 }
 
+std::string	Server::getHex(int n)
+{
+	std::stringstream ss;
+	ss << std::hex << n;
+	std::string str = ss.str();
+	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+	return (str);
+}
 
-void Server::launchResponse(std::string req, int fd, bool max_size_check)
+std::string	Server::getCutReply()
+{
+	std::string cut;
+	std::string dup = reply;
+	unsigned int size_cut = 100000;
+	int len; 
+	std::string hexa;
+	if (this->body.size() > size_cut)
+	{
+		if (this->ok == 1)
+		{
+			len = size_cut;
+			hexa = getHex(len);
+			cut = this->header + "\r\n\r\n" + hexa + "\r\n" +  body.substr(0, size_cut) + "\r\n";
+			len = header.size() + 4 + size_cut;
+			reply = dup.substr(len, dup.size() - len); 
+			this->ok = 2;
+			return (cut);
+		}
+		else if (this->ok == 2)
+		{
+			if (reply.size() > size_cut)
+			{
+				len = size_cut;
+				hexa = getHex(len);
+				cut = hexa + "\r\n" + reply.substr(0, size_cut) + "\r\n";
+				reply = dup.substr(size_cut, dup.size() - size_cut);
+				return (cut);
+			}
+			else
+			{
+				len = reply.size();
+				hexa = getHex(len);
+				cut = hexa + "\r\n" + reply + "\r\n";
+				reply = "";
+				ok = 3;
+				return (cut);
+			}
+		}
+		else if (ok == 3)
+		{
+			cut = "0\r\n\r\n";
+			ok = 0;
+			return (cut);
+		}
+	}
+	ok = 0;
+	return (this->reply);
+}
+
+void Server::launchResponse(std::string req, bool max_size_check)
 {
 	std::string	queryPath;
 	std::string tmp = "";
@@ -214,8 +274,15 @@ void Server::launchResponse(std::string req, int fd, bool max_size_check)
 	if (max_size_check == false)
 		status = 413;
 	Response polo(marco, status, myCgi, synthese, infoConfig);
-	std::string the_reply = polo.getReply();
-	send(fd, the_reply.c_str(), the_reply.length(), 0);
+	this->reply = polo.getReply();
+	this->header = polo.getHeader();
+	this->body = polo.getBody();
+//	send(fd, the_reply.c_str(), the_reply.length(), 0);
+}
+
+int Server::getOk() const
+{
+	return (this->ok);
 }
 
 int Server::getListen() const

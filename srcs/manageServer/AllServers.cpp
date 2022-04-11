@@ -126,13 +126,39 @@ void AllServers::loop() //it's the principal running function here that will mak
 
 					if (it->getListen() == allFd[this->events[i].data.fd])    //searching here for corresponding server of the actual fd. We set it when we add the Fd to the list at creation
 					{
-						std::map<int,int>::iterator it2 = allFd.find(this->events[i].data.fd);
+					//	std::map<int,int>::iterator it2 = allFd.find(this->events[i].data.fd);
 
 						it->readData(this->events[i].data.fd, epfd); 	  //send to read in Server class
-						allFd.erase(it2);
-						break;	
+						if (it->getOk() != 0)
+						{	
+							toSend.insert(std::make_pair(this->events[i].data.fd, &(*it)));
+						//	allFd.erase(it2);
+						}
+						break;
 					}
 				}
+			}
+		}
+		std::map<int, Server *> stock = toSend;
+		std::map<int, Server *>::iterator it = toSend.begin();
+		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)
+		{
+			std::string rep = it->second->getCutReply();
+			send(it->first, rep.c_str(), rep.size(), 0);
+			if (it->second->getOk() == 0)
+			{
+				std::map<int,int>::iterator it3 = allFd.find(it->first);
+				toSend.erase(it);
+				close(it->first);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
+				if (it3 != allFd.end())
+					allFd.erase(it3);
+			}
+			else
+			{
+				if (it == toSend.end())
+					break ;
+				it++;
 			}
 		}
 	}

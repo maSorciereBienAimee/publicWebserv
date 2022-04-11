@@ -32,6 +32,8 @@ class Response
 	void		_post(Request R);
 	void		_other(Request R);
 	std::string	getReply();
+	std::string	getHeader() const;
+	std::string	getBody() const;
 	void		readIn(std::string file);
 	void		initErrors();
 	std::string	makeDate(void);

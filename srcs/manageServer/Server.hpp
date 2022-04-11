@@ -9,6 +9,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 #include "../parseConfig/parseConfig.hpp"
 #include "../parseConfig/serverBlock.hpp"
 #include "../request/Request.hpp"
@@ -33,15 +34,22 @@ class Server
 	std::string					chunkDecoder(std::string str);
 	void						nonblock(int sockfd);
 	std::vector<std::string>	_server;
-	void						launchResponse(std::string str, int fd, bool max_size_check);
+	void						launchResponse(std::string str, bool max_size_check);
 	int							getListen() const;
 	void						readData(int fd, int epfd);
+	std::string					getCutReply();
+	std::string					getHex(int n);
+	int							getOk() const;
 
 	private:
 	std::string			request;
 	serverBlock			infoConfig;
 	int					listenfd;
 	struct epoll_event	*events;
+	int					ok;
+	std::string			reply;
+	std::string			header;
+	std::string			body;
 };
 
 #endif
