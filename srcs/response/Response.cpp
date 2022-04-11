@@ -310,6 +310,9 @@ void Response::_get(Request R)
 			{
 				std::string path = R.getPath();
 				this->body = tools::genreateAI(_loc.getLocationPath() , _server.getHostStr(), _server.getPortStr(), path);
+				std::stringstream conv2;
+				conv2 << body.length();
+				this->body_len = conv2.str();
 				this->status = 200;
 				return ;
 			}
