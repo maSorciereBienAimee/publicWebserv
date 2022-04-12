@@ -114,7 +114,14 @@ void AllServers::loop() //it's the principal running function here that will mak
 		usleep(8000);
 		res = epoll_wait(this->epfd, this->events, MAX_CLIENT, 0); // epoll_wait is waiting for something happen
 		if (stop == 1)
+		{
+			for (std::map<int, Server *>::iterator it = toSend.begin(); it != toSend.end(); it++)
+			{
+				close(it->first);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
+			}
 			break ;
+		}
 		for (int i = 0; i < res; i++)  				   //when something happen, check all the fd which are ready to read in this->events
 		{
 			if ((ret = is_it_equal(this->events[i].data.fd)) != -1) //check if the event that we are reading has an fd that correspond to a listenFd of a server
@@ -148,9 +155,9 @@ void AllServers::loop() //it's the principal running function here that will mak
 			if (it->second->getOk() == 0)
 			{
 				std::map<int,int>::iterator it3 = allFd.find(it->first);
-				toSend.erase(it);
 				close(it->first);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
+				toSend.erase(it);
 				if (it3 != allFd.end())
 					allFd.erase(it3);
 			}

@@ -83,18 +83,21 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 		std::cout << PURPLE << "Connexion closed by client" << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+		ok = 0;
 	}
 	if (check == -1)
 	{
 		std::cout << RED << "No datas received" << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+		ok = 0;
 	}
 	if (check == MAX_SIZE)
 	{
 		std::cout << RED << "Server max request size reached..." << RESET << std::endl;
 		close (fd);
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+		ok = 0;
 	}
 	if (check_size_body(request) == false)
 	{
@@ -174,10 +177,10 @@ void Server::readData(int fd, int epfd)
 	std::string request;
 	request = this->processContent(fd, epfd, &max_size_check);
 	if (request != "")
+	{	
 		this->launchResponse(request, max_size_check);
-	this->ok = 1;
-	//close(fd);
-	//epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+		this->ok = 1;
+	}
 }
 
 std::string	Server::getHex(int n)
