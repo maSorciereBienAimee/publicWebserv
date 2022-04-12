@@ -28,15 +28,16 @@ class Server
 	~Server();
 	void						clear_fd();
 	void						connect();
-	std::string					processContent(int fd, int epfd, bool *max_size);
+	int					processContent(int fd, bool *max_size);
+	int					contentLength(int fd);
 	bool						check_size_body(std::string request);
-	std::string					processContentLength(std::string);
-	std::string					chunkDecoder(std::string str);
+	std::string							processContentLength(std::string);
+	int							chunkDecoder(int fd);
 	void						nonblock(int sockfd);
 	std::vector<std::string>	_server;
 	void						launchResponse(std::string str, bool max_size_check);
 	int							getListen() const;
-	void						readData(int fd, int epfd);
+	int							readData(int fd);
 	std::string					getCutReply();
 	std::string					getHex(int n);
 	int							getOk() const;
@@ -52,6 +53,7 @@ class Server
 	std::string			reply;
 	std::string			header;
 	std::string			body;
+	std::map<int, std::string>	req;
 };
 
 #endif

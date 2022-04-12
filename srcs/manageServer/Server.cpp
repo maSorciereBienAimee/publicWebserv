@@ -58,91 +58,119 @@ void Server::connect()
 
 }
 
-std::string Server::processContentLength(std::string request)
+int Server::contentLength(int fd)
 {
-	std::string tmp = request.substr(request.find("Content-Length: ") + 15, request.length());
-	int index = request.find("\r\n\r\n");
-	std::string tmp1 = tmp.substr(0, index - 1);
-	std::string body = request.substr(index + 4, request.length() - (index + 4));
-
-	if (static_cast<int>(body.length()) != atoi(tmp1.c_str()))
-		std::cout << RED << "ERROR: Body length not as expected" << atoi(tmp1.c_str()) << RESET << std::endl;
-	return(request + "\r\n\r\n");
+	if ((req[fd]).find("Content-Length: ") != std::string::npos)
+	{
+		isChunked = 0;
+		int c = (req[fd]).find("Content-Length:");
+		std::string body = "";
+		std::string length = (req[fd]).substr(c, (req[fd]).size() - c);
+		int d = length.find("\r\n");
+		std::string length2 = length.substr(0, d);
+		size_t i = 0;
+		for ( ; i < length2.length(); i++ )
+		{
+			if (std::isdigit(length2[i]))
+				break;
+		}
+		length2 = length2.substr(i, length2.length() - i );
+		i = 0;
+		for ( ; i < length2.length(); i++ )
+		{
+			if (!(std::isdigit(length2[i])))
+				break;
+		}
+		length2 = length2.substr(0, i);
+		std::stringstream ss(length2);
+		size_t x = 0;
+		ss >> x;
+		if ((req[fd]).find("\r\n\r\n") == std::string::npos)
+				return (0);
+		if ((req[fd]).find("\r\n\r\n") != std::string::npos)
+			body = (req[fd]).substr((req[fd]).find("\r\n\r\n") + 4, (req[fd]).length() - 1);
+		if (body.size() != x)
+			return (0);
+		else
+		{
+			req[fd] += "\r\n\r\n";
+			return (1);
+		}
+	}
+	return (-1);
 }
 
-
-std::string Server::processContent(int fd, int epfd, bool *max_size)
+int Server::processContent(int fd, bool *max_size)
 {
-	std::string request;
 	std::string bufStr;
 	char buf[MAX_SIZE + 1];
 	int check = 1;
+	int a;
 	memset(buf, 0, MAX_SIZE);
 	check = recv(fd, buf, MAX_SIZE, 0);
-	request += buf;
+	req[fd] += buf;
+
 	if (check == 0)
 	{
 		std::cout << PURPLE << "Connexion closed by client" << RESET << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 		ok = 0;
+		return (-2);
 	}
-	// if (check == -1)
-	// {
-	// 	std::cout << RED << "No datas received" << RESET << std::endl;
-	// 	close (fd);
-	// 	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-	// 	ok = 0;
-	// }
-	if (check == MAX_SIZE)
+	if (check == -1)
 	{
-		std::cout << RED << "Server max request size reached..." << RESET << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+		a = contentLength(fd);
+		if (a != -1)
+			return (a);
+		a = chunkDecoder(fd);
+		if (a != -1)
+			return (a);
+		if ((req[fd]).find("Content-Length: ") == std::string::npos
+				&& ((req[fd]).find_last_of("\r\n\r\n") != (req[fd]).length() - 1))
+			return (1);
+		//std::cout << RED << "No datas received" << RESET << std::endl;
 		ok = 0;
+		return (-1);
 	}
-	if (check_size_body(request) == false)
+	if (check_size_body(req[fd]) == false)
 	{
 		*max_size = false;
-		return request;
+		return (-1);
 	}
-	if (request.find("Content-Length: ") == std::string::npos && (request.find_last_of("\r\n\r\n") != request.length() - 1))
-	{
-		size_t i = 0;
-		while (i < request.length() - 1)
-			i++;
-//?		std::cout << "Find last of is " << request.find_last_of("\r\n\r\n") << "LEN IS" << request.length() - 1 << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-	}
-	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
-	{
-		isChunked = 1;
-		return (chunkDecoder(request));
-	}
-	if (request.find("Content-Length: ") != std::string::npos)
-	{
-			isChunked = 0;
-			return(processContentLength(request));
-	}
-	return (request);
+	a = contentLength(fd);
+	if (a != -1)
+		return (a);
+	a = chunkDecoder(fd);
+	if (a != -1)
+		return (a);
+	if ((req[fd]).find("Content-Length: ") == std::string::npos
+			&& ((req[fd]).find_last_of("\r\n\r\n") != (req[fd]).length() - 1))
+		return (1);
+	return (1);
 }
 
-std::string Server::chunkDecoder(std::string str)
+int Server::chunkDecoder(int fd)
 {
-    //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
-	std::string	head = str.substr(0,str.find("\r\n\r\n") + 4);
-    //FROM AFTER NEW LINE TO END OF MESSAGE
-	std::string	coded = str.substr(str.find("\r\n\r\n") + 4, str.length() - 1);
-
-    std::string	subchunk = coded;
-	std::string	body;
-	// GET CHUNK SIZE FROM BASE 16
-    int			chunksize = strtol(coded.c_str(), NULL, 16);
-	size_t		i = 0;
-
-	while (chunksize)
+	if ((req[fd]).find("Transfer-encoding: chunked") != std::string::npos)
 	{
+	    //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
+		int len = (req[fd]).find("\r\n\r\n") + 4;
+		int ret;
+		if ((req[fd]).find("0\r\n\r\n"))
+			ret = 1;
+		else
+			ret = 0;
+		std::string	head = (req[fd]).substr(0,len);
+   	 //FROM AFTER NEW LINE TO END OF MESSAGE
+		std::string	coded = (req[fd]).substr(len, (req[fd]).size() - len);
+	
+		std::string	subchunk = coded;
+		std::string	body;
+		// GET CHUNK SIZE FROM BASE 16
+		int chunksize = strtol(coded.c_str(), NULL, 16);
+		size_t	i = 0;
+	
+		while (chunksize)
+		{
         //FIND END OF INITAL CHUNKSIZE LABEL
 		i = coded.find("\r\n", i) + 2;
         // SKIP PAST INITIAL SIZE \R\N LABEL
@@ -153,9 +181,13 @@ std::string Server::chunkDecoder(std::string str)
         subchunk = coded.substr(i, coded.length() - i);
 		//GET SIZE OF NEXT CHUNK
         chunksize = strtol(subchunk.c_str(), NULL, 16);
+		}
+		req[fd] = head + body;
+	   	if (ret == 1)
+			req[fd] += "\r\n\r\n";
+		return (ret);
 	}
-	std::string decoded = head + body + "\r\n\r\n";
-    return (decoded);
+    return (-1);
 }
 
 bool	Server::check_size_body(std::string request)
@@ -179,17 +211,24 @@ bool	Server::check_size_body(std::string request)
 	return true;
 }
 
-void Server::readData(int fd, int epfd)
+int Server::readData(int fd)
 {
 	bool max_size_check = true;
-	std::string request;
-	request = this->processContent(fd, epfd, &max_size_check);
-	if (request != "")
+	std::string str = "";
+	std::map<int, std::string>::iterator ite = req.find(fd);
+	int result;
+	
+	if (ite != req.end())
+			req.insert(std::make_pair(fd, str));
+	result = this->processContent(fd,&max_size_check);
+	if (result == 1)
 	{	
-		this->launchResponse(request, max_size_check);
+		this->launchResponse(req[fd], max_size_check);
 		this->ok = 1;
-		isChunked = 0;
+		std::map<int, std::string>::iterator it = req.find(fd);
+		req.erase(it);
 	}
+	return (result);
 }
 
 std::string	Server::getHex(int n)
