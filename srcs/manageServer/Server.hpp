@@ -40,6 +40,7 @@ class Server
 	std::string					getCutReply();
 	std::string					getHex(int n);
 	int							getOk() const;
+	int							getIsChunked() const;
 
 	private:
 	std::string			request;
@@ -47,6 +48,7 @@ class Server
 	int					listenfd;
 	struct epoll_event	*events;
 	int					ok;
+	int					isChunked;
 	std::string			reply;
 	std::string			header;
 	std::string			body;

@@ -7,12 +7,14 @@ Server::Server()
 {
 	this->listenfd = -1;
 	this->ok = 0;
+	this->isChunked = 0;
 }
 
 Server::Server(serverBlock block)
 {
 	this->listenfd = -1;
 	this->ok = 0;
+	this->isChunked = 0;
 	this->infoConfig = block;
 	std::cout << GREEN << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 }
@@ -114,9 +116,15 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 	}
 	if (request.find("Transfer-Encoding: chunked") != std::string::npos)
+	{
+		isChunked = 1;
 		return (chunkDecoder(request));
+	}
 	if (request.find("Content-Length: ") != std::string::npos)
-		return(processContentLength(request));
+	{
+			isChunked = 0;
+			return(processContentLength(request));
+	}
 	return (request);
 }
 
@@ -180,6 +188,7 @@ void Server::readData(int fd, int epfd)
 	{	
 		this->launchResponse(request, max_size_check);
 		this->ok = 1;
+		isChunked = 0;
 	}
 }
 
@@ -286,6 +295,11 @@ void Server::launchResponse(std::string req, bool max_size_check)
 int Server::getOk() const
 {
 	return (this->ok);
+}
+
+int Server::getIsChunked() const
+{
+	return (this->isChunked);
 }
 
 int Server::getListen() const

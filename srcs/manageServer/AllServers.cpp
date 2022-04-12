@@ -138,7 +138,8 @@ void AllServers::loop() //it's the principal running function here that will mak
 						it->readData(this->events[i].data.fd, epfd); 	  //send to read in Server class
 						if (it->getOk() != 0)
 							toSend.insert(std::make_pair(this->events[i].data.fd, &(*it)));
-						allFd.erase(it2);
+						if (it->getIsChunked() == 0)
+							allFd.erase(it2);
 						break;
 					}
 				}
