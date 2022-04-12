@@ -1,1 +1,20 @@
-ceci est un test
+network:
+  version: 2
+  ethernets:
+      eth0:
+          addresses: [192.168.1.2/24]
+          gateway4: 192.168.1.1
+          dhcp4: true
+          optional: true
+          nameservers:
+              addresses: [8.8.8.8,8.8.4.4]
+              
+              
+              
+              
+              # Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  renderer: NetworkManager
+
+

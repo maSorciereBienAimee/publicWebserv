@@ -87,13 +87,13 @@ std::string Server::processContent(int fd, int epfd, bool *max_size)
 		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 		ok = 0;
 	}
-	if (check == -1)
-	{
-		std::cout << RED << "No datas received" << RESET << std::endl;
-		close (fd);
-		epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
-		ok = 0;
-	}
+	// if (check == -1)
+	// {
+	// 	std::cout << RED << "No datas received" << RESET << std::endl;
+	// 	close (fd);
+	// 	epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
+	// 	ok = 0;
+	// }
 	if (check == MAX_SIZE)
 	{
 		std::cout << RED << "Server max request size reached..." << RESET << std::endl;

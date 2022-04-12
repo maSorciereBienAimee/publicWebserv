@@ -115,14 +115,12 @@ void    Response::_delete(std::string path)
     {
         if (remove(path.c_str()) == 0)
 		{
-		   std::pair<std::string, std::string> p1("optiona_header_check", "WORKING");
-		   this->extra_headers.insert(p1);
-           status = 200;
 		   readIn("deleted_200.html");
+           status = 200;
 		   return;
 		}
     }
-	status = 403;
+	status = 404;
 	this->body_message = "file_not_found.html";
 	return;
 }
