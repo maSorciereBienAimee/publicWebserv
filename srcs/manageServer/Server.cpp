@@ -118,9 +118,9 @@ int Server::processContent(int fd, bool *max_size)
 	}
 	if (check == 0)
 	{
-		std::cout << PURPLE << "Connexion closed by client" << RESET << std::endl;
+		std::cout << PURPLE << "Connection closed by client" << RESET << std::endl;
 		ok = 0;
-		return (-2);
+		return (-1);
 	}
 	if (check == -1)
 	{

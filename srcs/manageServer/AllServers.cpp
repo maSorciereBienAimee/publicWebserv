@@ -145,7 +145,7 @@ void AllServers::loop() //it's the principal running function here that will mak
 				{
 					//std::map<int,int>::iterator it2 = allFd.find(itC->first);
 					data = it->readData(itC->first);
-					if (data == -2)
+					if (data == -1)
 					{
 						close(itC->first);
 						epoll_ctl(epfd, EPOLL_CTL_DEL, itC->first, NULL);
@@ -164,10 +164,20 @@ void AllServers::loop() //it's the principal running function here that will mak
 		}
 		std::map<int, Server *> stock = toSend;
 		std::map<int, Server *>::iterator it = toSend.begin();
+		int res;
 		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)
 		{
 			std::string rep = it->second->getCutReply();
-			send(it->first, rep.c_str(), rep.size(), 0);
+			res = send(it->first, rep.c_str(), rep.size(), 0);
+			if ( res >= 0)
+				std::cout << GREEN << "send succeed" << RESET << std::endl;
+			if ( res == -1)
+			{
+				close(it->first);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
+				toSend.erase(it);
+				std::cout << RED << "send failed" << RESET << std::endl;
+			}
 			if (it->second->getOk() == 0)
 			{
 				close(it->first);
