@@ -29,7 +29,7 @@ class Server
 	void						clear_fd();
 	void						connect();
 	int					processContent(int fd, bool *max_size);
-	int					contentLength(int fd);
+	int					contentLength(int fd, std::string buf);
 	bool						check_size_body(std::string request);
 	std::string							processContentLength(std::string);
 	int							chunkDecoder(int fd);

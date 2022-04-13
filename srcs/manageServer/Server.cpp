@@ -58,7 +58,7 @@ void Server::connect()
 
 }
 
-int Server::contentLength(int fd)
+int Server::contentLength(int fd, std::string buf)
 {
 	if ((req[fd]).find("Content-Length: ") != std::string::npos)
 	{
@@ -89,8 +89,13 @@ int Server::contentLength(int fd)
 				return (0);
 		if ((req[fd]).find("\r\n\r\n") != std::string::npos)
 			body = (req[fd]).substr((req[fd]).find("\r\n\r\n") + 4, (req[fd]).length() - 1);
-		if (body.size() != x)
+		if (body.size() != x && buf.size() >= MAX_SIZE)
 			return (0);
+		if (body.size() != x)
+		{
+			std::cout << RED << "Body size (" << body.size() << ") don't match with Content-Length (" << x << ")" << RESET << std::endl;
+			return (-2);
+		}
 		else
 		{
 			req[fd] += "\r\n\r\n";
@@ -124,7 +129,9 @@ int Server::processContent(int fd, bool *max_size)
 	}
 	if (check == -1)
 	{
-		a = contentLength(fd);
+		a = contentLength(fd, buf);
+		if (a == -2)
+			return (-1);
 		if (a != -1)
 			return (a);
 		a = chunkDecoder(fd);
@@ -142,7 +149,9 @@ int Server::processContent(int fd, bool *max_size)
 		*max_size = false;
 		return (1);
 	}
-	a = contentLength(fd);
+	a = contentLength(fd, buf);
+	if (a == -2)
+		return (-1);
 	if (a != -1)
 		return (a);
 	a = chunkDecoder(fd);
@@ -222,6 +231,8 @@ int Server::readData(int fd)
 	if (ite != req.end())
 			req.insert(std::make_pair(fd, str));
 	result = this->processContent(fd,&max_size_check);
+	if (result == -1)
+			req[fd] = "";
 	if (result == 1)
 	{	
 		this->launchResponse(req[fd], max_size_check);
