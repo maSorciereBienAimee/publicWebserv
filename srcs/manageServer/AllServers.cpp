@@ -137,29 +137,27 @@ void AllServers::loop() //it's the principal running function here that will mak
 				addFd(ret);
 		}
 		std::map<int, int> copy = allFd;
-		std::map<int, int>::iterator itF = allFd.begin();
 		for (std::map<int, int>::iterator itC =copy.begin(); itC != copy.end(); itC++)
 		{
 			for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
 			{
 				if (it->getListen() == itC->second)
 				{
-					//std::map<int,int>::iterator it2 = allFd.find(itC->first);
+					std::map<int,int>::iterator it2 = allFd.find(itC->first);
 					data = it->readData(itC->first);
 					if (data == -1)
 					{
 						close(itC->first);
 						epoll_ctl(epfd, EPOLL_CTL_DEL, itC->first, NULL);
-						allFd.erase(itF);
+						allFd.erase(it2);
+						break;
 					}
 					else if (data == 1)
 					{
 						toSend.insert(std::make_pair(itC->first, &(*it)));
-						allFd.erase(itF);
+						allFd.erase(it2);
+						break;
 					}
-					else
-							itF++;
-					break;
 				}
 			}
 		}
