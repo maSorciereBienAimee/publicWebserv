@@ -161,34 +161,47 @@ int Server::chunkDecoder(int fd)
 	    //FROM BEGINNING OF REQUEST UNTIL THE END OF FIRST EMPTY LINE
 		int len = (req[fd]).find("\r\n\r\n") + 4;
 		int ret;
-		if ((req[fd]).find("0\r\n\r\n"))
-			ret = 1;
+		if ((req[fd]).find("0\r\n\r\n") != std::string::npos)
+				ret = 1;
 		else
 			ret = 0;
+		std::cout << "1" << std::endl;
 		std::string	head = (req[fd]).substr(0,len);
+		std::cout << "2" << std::endl;
    	 //FROM AFTER NEW LINE TO END OF MESSAGE
 		std::string	coded = (req[fd]).substr(len, (req[fd]).size() - len);
+		std::cout << "3" << std::endl;
 	
 		std::string	subchunk = coded;
+		std::cout << "4" << std::endl;
 		std::string	body;
+		std::cout << "5" << std::endl;
 		// GET CHUNK SIZE FROM BASE 16
 		int chunksize = strtol(coded.c_str(), NULL, 16);
+		std::cout << "6" << std::endl;
 		size_t	i = 0;
+		std::cout << "7" << std::endl;
 	
 		while (chunksize)
 		{
         //FIND END OF INITAL CHUNKSIZE LABEL
+		std::cout << "8" << std::endl;
 		i = coded.find("\r\n", i) + 2;
         // SKIP PAST INITIAL SIZE \R\N LABEL
+		std::cout << "9" << std::endl;
 		body += coded.substr(i, chunksize);
 		//SIZE ADDED IS CHUNKSIZE + THE \R\N AT END WHICH ISN'T INCLUDED IN CHUNKSIZE
+		std::cout << "10" << std::endl;
         i += chunksize + 2;
 		//TAKE NEXT 100
+		std::cout << "11" << std::endl;
         subchunk = coded.substr(i, coded.length() - i);
 		//GET SIZE OF NEXT CHUNK
+		std::cout << "12" << std::endl;
         chunksize = strtol(subchunk.c_str(), NULL, 16);
 		}
 		req[fd] = head + body;
+		std::cout << "13" << std::endl;
 	   	if (ret == 1)
 			req[fd] += "\r\n\r\n";
 		return (ret);
