@@ -162,29 +162,6 @@ void AllServers::loop() //it's the principal running function here that will mak
 				}
 			}
 		}
-//		for (int i = 0; i < res; i++)  				   //when something happen, check all the fd which are ready to read in this->events
-//		{
-//			if ((ret = is_it_equal(this->events[i].data.fd)) != -1) //check if the event that we are reading has an fd that correspond to a listenFd of a server
-//				addFd(ret);					//if it is the case, that means that a new event is created so we had it in epoll_event list
-//			else							//else we are goind to read the data
-//			{
-//				for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
-//				{
-//
-//					if (it->getListen() == allFd[this->events[i].data.fd])    //searching here for corresponding server of the actual fd. We set it when we add the Fd to the list at creation
-//					{
-//						std::map<int,int>::iterator it2 = allFd.find(this->events[i].data.fd);
-//
-//						it->readData(this->events[i].data.fd); 	  //send to read in Server class
-//						if (it->getOk() != 0)
-//							toSend.insert(std::make_pair(this->events[i].data.fd, &(*it)));
-//						if (it->getIsChunked() == 0)
-//							allFd.erase(it2);
-//						break;
-//					}
-//				}
-//			}
-//		}
 		std::map<int, Server *> stock = toSend;
 		std::map<int, Server *>::iterator it = toSend.begin();
 		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)

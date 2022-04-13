@@ -510,10 +510,16 @@ std::string getSimplePath(std::string req, std::string *query, serverBlock block
 	int fin;
 	std::string::iterator it = req.begin();
 
-	while (*it != ' ')
+	while (*it != ' ' && it != req.end())
 	{
 		it++;
 		deb++;
+	}
+	if (it == req.end())
+	{
+		*query = "";
+		path = "";
+		return (path);
 	}
 	it++;
 	deb++;

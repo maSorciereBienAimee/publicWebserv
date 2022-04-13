@@ -134,7 +134,7 @@ int Server::processContent(int fd, bool *max_size)
 	if (check_size_body(req[fd]) == false)
 	{
 		*max_size = false;
-		return (-1);
+		return (1);
 	}
 	a = contentLength(fd);
 	if (a != -1)
