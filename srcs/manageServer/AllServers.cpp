@@ -147,11 +147,11 @@ void AllServers::loop() //it's the principal running function here that will mak
 					data = it->readData(itC->first);
 					if (data == -1)
 					{
+						if (toSend.find(itC->first) != toSend.end())
+							toSend.erase(itC->first);
 						close(itC->first);
 						epoll_ctl(epfd, EPOLL_CTL_DEL, itC->first, NULL);
 						allFd.erase(it2);
-						if (toSend.find(itC->first) != toSend.end())
-							toSend.erase(itC->first);
 						break;
 					}
 					else if (data == -3)
@@ -167,40 +167,41 @@ void AllServers::loop() //it's the principal running function here that will mak
 			}
 		}
 		std::map<int, Server *> stock = toSend;
-		std::map<int, Server *>::iterator it = toSend.begin();
 		int res;
+		int f;
+		for (std::map<int, Server *>::iterator it2 = toSend.begin(); it2 != toSend.end(); it2++)
+				std::cout << it2->first << std::endl;
 		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)
 		{
 			std::string rep;
-			if (it->second->getRep() == "HTTP/1.1 100 CONTINUE\r\n\r\n")
+			f = it2->first;
+				std::cout << "in = " << it2->first << std::endl;
+			if (it2->second->getRep() == "HTTP/1.1 100 CONTINUE\r\n\r\n")
 			{
-				rep = it->second->getRep();
+					std::cout << "1" << std::endl;
+				rep = it2->second->getRep();
 				std::cout << std::endl << CYAN << "REPLY IS :" << std::endl << rep << RESET << std::endl;
 			}
 			else
-				rep = it->second->getCutReply();
-			res = send(it->first, rep.c_str(), rep.size(), 0);
+				rep = it2->second->getCutReply();
+					std::cout << "2" << std::endl;
+			res = send(it2->first, rep.c_str(), rep.size(), 0);
 			if ( res >= 0)
 				std::cout << GREEN << "send succeed" << RESET << std::endl;
 			if ( res == -1)
 			{
-				close(it->first);
-				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
-				toSend.erase(it);
+					std::cout << "3" << std::endl;
+				close(it2->first);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, it2->first, NULL);
 				std::cout << RED << "send failed" << RESET << std::endl;
+				toSend.erase(f);
 			}
-			if (it->second->getOk() == 0)
+			if (it2->second->getOk() == 0)
 			{
-				close(it->first);
-				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
-				toSend.erase(it);
-				it++;
-			}
-			else
-			{
-				if (it == toSend.end())
-					break ;
-				it++;
+					std::cout << "4" << std::endl;
+				close(it2->first);
+				epoll_ctl(epfd, EPOLL_CTL_DEL, it2->first, NULL);
+				toSend.erase(f);
 			}
 		}
 	}
