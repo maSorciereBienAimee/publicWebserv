@@ -194,6 +194,7 @@ void AllServers::loop() //it's the principal running function here that will mak
 				close(it->first);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, it->first, NULL);
 				toSend.erase(it);
+				it++;
 			}
 			else
 			{
