@@ -34,6 +34,11 @@ Response::~Response()
 
 void Response::launch(serverBlock server)
 {
+	if (status == 100)
+	{
+		this->_header = "HTTP/1.1 100 Continue\r\n";
+		return;
+	}
 	std::vector<std::string> methods = _loc.getMethods();
 	std::string reponse;
 	if (redir == 1)
@@ -110,19 +115,19 @@ std::string Response::getReply()
 void    Response::_delete(std::string path)
 {
     struct stat check;
-	status = 200;
-	if (stat(path.c_str(), &check) == 0)
+    status = 200;
+    if (stat(path.c_str(), &check) == 0)
     {
         if (remove(path.c_str()) == 0)
-		{
-		   readIn("deleted_200.html");
-           status = 200;
-		   return;
-		}
+        {
+            std::string root = _loc.getRootLoc();
+            std::string newPath = root + "deleted_200.html";
+            readIn(newPath);
+            return;
+        }
     }
-	status = 404;
-	this->body_message = "file_not_found.html";
-	return;
+    status = 404;
+    return;
 }
 
 void	Response::_other(Request req)
@@ -296,8 +301,6 @@ void Response::_get(Request R)
 					}
 					else
 					{
-						std::string root = R.getRoot();
-						root.erase(root.begin(), root.begin() + 1);
 						std::string newPath = R.getPath() + "/" + path;
 						readIn(newPath);
 					}

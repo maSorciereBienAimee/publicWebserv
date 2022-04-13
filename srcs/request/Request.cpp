@@ -1,10 +1,7 @@
 #include "Request.hpp"
 #include <stdexcept>
-//Request::Request(void) : _orig_req("yo")
-//{
-//}
 
-Request::Request(std::string str, std::string root) : _orig_req(str), _root(root)
+Request::Request(std::string str, std::string path) : _orig_req(str), _path(path)
 {
     status = 200;
 	this->parse(str);
@@ -30,7 +27,6 @@ Request&	Request::operator=(const Request& copy)
         i++;
         it++;
     }
-
 	return *this;
 }
 
@@ -82,14 +78,7 @@ int Request::parseRequestLine(const std::string &str)
     line = line.substr(break_1, end - break_1);
     int break_2 = line.find_first_of(' ');
     //PATH IS FROM 0 UNTIL FIRST SPACE
-    _path = line.substr(0, break_2);
-	_path = _root;
     pathDecoder(_path);
-//    int x = _root.length() - 1;
-    // GET RID OF DOUBLE //
-//    if (x > -1 && _path[0] == '/' && _root[x] == '/')
-//        _root.erase(_root.end() - 1);
-//    _path = _root + _path;
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);
@@ -134,40 +123,13 @@ void Request::parse(const std::string &str)
         tmp = tmp.erase(0, 1);
     //COLLECT BODY
     _body = tmp.substr(0, tmp.length() - 4);
-    error_checker();
     //TMP:PRINTER
     printer();
-}
-
-void Request::error_checker(void)
-{
-    const std::string con_key = "Content-Length";
-    const std::string cont_key = "Expect";
-    //CHECK LENGTH
-    if (_headers.find(con_key) != _headers.end())
-    {
-        if (static_cast<int>(_body.length()) != (atoi(_headers[con_key].c_str())))
-        {
-            this->status = 400;
-            if (_headers.find(cont_key) != _headers.end())
-            {
-                if (_headers[cont_key] == "100-continue") 
-                    this->status = 417;
-            }
-        }
-        else
-        if (_headers.find(cont_key) != _headers.end())
-        {
-            if (_headers[cont_key] == "100-continue")
-                _headers[cont_key] = "";
-        }
-    }
 }
 
 void Request::printer(void)
 {
     std::cout << std::endl << YELLOW << "--- REQUEST IS : ---" << std::endl;
-    std::cout << "ROOT IS: " << _root << std::endl;
     std::cout << "METHOD : " << _method << std::endl;
     std::cout << "PATH : " << _path << std::endl;
     std::cout << "VERSION : " << _version << std::endl;
@@ -222,17 +184,6 @@ std::string Request::getHost() const
 int const &Request::getStatus() const
 {
 	return (this->status);
-}
-
-void	Request::setRoot(const std::string& root)
-{
-    _root = root;
-    return;
-}
-
-std::string	Request::getRoot(void)
-{
-    return _root;
 }
 
 const std::string& Request::getBody() const
