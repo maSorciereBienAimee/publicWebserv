@@ -169,28 +169,22 @@ void AllServers::loop() //it's the principal running function here that will mak
 		std::map<int, Server *> stock = toSend;
 		int res;
 		int f;
-		for (std::map<int, Server *>::iterator it2 = toSend.begin(); it2 != toSend.end(); it2++)
-				std::cout << it2->first << std::endl;
 		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)
 		{
 			std::string rep;
 			f = it2->first;
-				std::cout << "in = " << it2->first << std::endl;
 			if (it2->second->getRep() == "HTTP/1.1 100 CONTINUE\r\n\r\n")
 			{
-					std::cout << "1" << std::endl;
 				rep = it2->second->getRep();
 				std::cout << std::endl << CYAN << "REPLY IS :" << std::endl << rep << RESET << std::endl;
 			}
 			else
 				rep = it2->second->getCutReply();
-					std::cout << "2" << std::endl;
 			res = send(it2->first, rep.c_str(), rep.size(), 0);
 			if ( res >= 0)
 				std::cout << GREEN << "send succeed" << RESET << std::endl;
 			if ( res == -1)
 			{
-					std::cout << "3" << std::endl;
 				close(it2->first);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, it2->first, NULL);
 				std::cout << RED << "send failed" << RESET << std::endl;
@@ -198,7 +192,6 @@ void AllServers::loop() //it's the principal running function here that will mak
 			}
 			if (it2->second->getOk() == 0)
 			{
-					std::cout << "4" << std::endl;
 				close(it2->first);
 				epoll_ctl(epfd, EPOLL_CTL_DEL, it2->first, NULL);
 				toSend.erase(f);
