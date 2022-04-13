@@ -882,10 +882,8 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 
 void	parseConfig::setLocationConfig(std::string &line, serverLocation &location)
 {
-//	int posEnd;
 	std::string attributName;
 	std::string value;
-//	posEnd =
 	getAttsLocation(line, attributName, value, location);
 }
 
@@ -893,7 +891,6 @@ void	parseConfig::setLocationBlock(IT &start, IT &end, serverBlock &server, std:
 {
 	serverLocation location;
 
-	//std::string locPath = parseLocationPath(path);
 	for (; start != end;)
 	{
 		if (isServerBlock(*start) || isLocationBlock(*start))
@@ -1011,8 +1008,8 @@ void parseConfig::setOneServer(IT &start, IT &end, std::vector<serverBlock> &ser
 	}
 	// once we get all the config from one server we push back the server 
 	// with updated info in the vector<serverBLock> servers
-	if (_lsn == 0 || _hst == 0)
-		throw OurException("Directive in server block missing: port and host");
+	if (_lsn == 0 || _hst == 0 || _rt == 0)
+		throw OurException("Directive in server block missing: port || host || root");
 	servers.push_back(server);
 }
 
