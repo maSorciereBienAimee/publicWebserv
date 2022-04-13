@@ -3,6 +3,10 @@
 
 Request::Request(std::string str, std::string path) : _orig_req(str), _path(path)
 {
+    _method = "";
+	_version = "";
+	_body = "";
+    _port = 0;
     status = 200;
 	this->parse(str);
 }
@@ -73,10 +77,14 @@ int Request::parseRequestLine(const std::string &str)
     int break_1 = line.find_first_of(' ');
     //METHOD IS FROM 0 UNTIL FIRST SPACE
     _method = line.substr(0, break_1);
+    while (line[break_1 + 1] == ' ')
+        break_1++;
     break_1 += 1;
     //REMOVE METHOD AND SPACE FROM LINE
     line = line.substr(break_1, end - break_1);
     int break_2 = line.find_first_of(' ');
+    while (line[break_2 + 1] == ' ')
+        break_2++;
     //PATH IS FROM 0 UNTIL FIRST SPACE
     pathDecoder(_path);
     break_2 += 1;
@@ -167,8 +175,7 @@ std::string Request::getHost() const
     const std::string key = "Host";
     if (_headers.find("Host") == _headers.end())
     {
-        std::cout << RED << "PROB 1" << RESET << std::endl;
-        return NULL;
+        return "";
     }
     try
     {
@@ -176,7 +183,6 @@ std::string Request::getHost() const
     }
     catch (const std::exception &e)
     {
-        std::cout << RED << "PROB 2" << RESET << std::endl;
          return "";
     }
 }

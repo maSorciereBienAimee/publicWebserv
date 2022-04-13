@@ -509,30 +509,35 @@ std::string getSimplePath(std::string req, std::string *query, serverBlock block
 	int deb = 0;
 	int fin;
 	std::string::iterator it = req.begin();
-
+	std::cout << "1" << std::endl;
 	while (*it != ' ' && it != req.end())
 	{
 		it++;
 		deb++;
 	}
+	std::cout << "2" << std::endl;
 	if (it == req.end())
 	{
 		*query = "";
 		path = "";
 		return (path);
 	}
+	std::cout << "3" << std::endl;
 	it++;
 	deb++;
 	std::string::iterator it2 = it;
 	fin = deb;
-	while (*it2 != ' ')
+	std::cout << "4" << std::endl;
+	while (*it2 && *it2 != ' ')
 	{
 		it2++;
 		fin++;
 	}
+	std::cout << "4" << std::endl;
 	*query = req.substr(deb, fin - deb);
+	std::cout << "4" << std::endl;
 	path = root + *query;
-
+	std::cout << "5" << std::endl;
 	if (stat(path.c_str(), &s) == 0)
 		path = *query;
 	else

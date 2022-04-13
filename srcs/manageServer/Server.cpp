@@ -107,6 +107,59 @@ int Server::contentLength(int fd, std::string buf)
 	return (-1);
 }
 
+bool Server::errorChecker(std::string request)
+{
+	//obligatoire, a moins: "M_P_H\r\nHost:\r\n\r\n"
+	if (request.length() < 22)
+	{
+		std::cout << RED << "Invalid request" << RESET << std::endl;
+		return false;
+	}
+	std::string line = "";
+    std::string::size_type end = 0;
+	//skip empty lines
+    while (line.length() == 0)
+    {
+        end = request.find_first_of('\r');
+		if (end == std::string::npos)
+			return false;
+        line = request.substr(0, end);
+    }
+	if (std::count(line.begin(), line.end(), ' ') < 2)
+	{
+		std::cout << RED << "Invalid request line" << RESET << std::endl;
+		return false;
+	}
+	//obligatoire: "M_P_H\r\n"
+	if (line.length() < 9)
+	{
+		std::cout << RED << "Invalid request line" << RESET << std::endl;
+		return false;
+	}
+	int sp = 0;
+	for (unsigned int i = 0; i < line.length(); i++)
+	{
+		if (line[i] == ' ')
+		{
+			if (i == 0)
+				sp++;
+			else if (line[i - 1] != ' ')
+				sp++;
+		}
+	}
+	if (sp != 2)
+	{
+		std::cout << RED << "Invalid request line" << RESET << std::endl;
+		return false;
+	}
+	if (request.find("\r\nHost:") == std::string::npos)
+	{
+		std::cout << RED << "missing host field" << RESET << std::endl;
+		return false;
+	}
+	return true;
+}
+
 int Server::processContent(int fd, bool *max_size)
 {
 	std::string bufStr;
@@ -143,8 +196,11 @@ int Server::processContent(int fd, bool *max_size)
 		if ((req[fd]).find("Content-Length: ") == std::string::npos
 				&& ((req[fd]).find_last_of("\r\n\r\n") != (req[fd]).length() - 1))
 			return (1);
-		//std::cout << RED << "No datas received" << RESET << std::endl;
 		ok = 0;
+		return (-1);
+	}
+	if (errorChecker(req[fd]) == false)
+	{
 		return (-1);
 	}
 	if (check_size_body(req[fd]) == false)
@@ -336,7 +392,6 @@ void Server::launchResponse(std::string req, bool max_size_check)
 		this->infoConfig.setHostStr("127.0.0.1");
 	if (marco.getHost() == ("localhost:" + this->infoConfig.getPortStr()) && this->infoConfig.getHostStr() == "127.0.0.1")
 		this->infoConfig.setHostStr("localhost");
-
 	std::string hp2 = this->infoConfig.getName() + ':' + this->infoConfig.getPortStr();
 	std::string hp = this->infoConfig.getHostStr() + ':' + this->infoConfig.getPortStr();
 	if (marco.getHost() != hp && marco.getHost() != hp2)

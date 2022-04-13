@@ -33,6 +33,7 @@ class Server
 	bool						check_size_body(std::string request);
 	std::string							processContentLength(std::string);
 	int							chunkDecoder(int fd);
+	bool errorChecker(std::string request);
 	void						nonblock(int sockfd);
 	std::vector<std::string>	_server;
 	void						launchResponse(std::string str, bool max_size_check);

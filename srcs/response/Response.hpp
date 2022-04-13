@@ -53,7 +53,6 @@ class Response
 	std::map<std::string, std::string>	extra_headers;
 	std::map<int, std::string>			errors;
 	Request								request;
-	int									fd;
 	Cgi									_cgi;
 	serverLocation						_loc;
 	serverBlock							_server;

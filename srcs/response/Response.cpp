@@ -2,6 +2,17 @@
 
 Response::Response(Request R, int F, Cgi myCgi, serverLocation loc, serverBlock server) : request(R), _cgi(myCgi), _loc(loc), _server(server)
 {
+	_header = "";
+	body_message = "";
+	body = "";
+	body_len = "";
+	reply = "";
+	status = 0;
+	type = "";
+	errorPath = "";
+	_path = "";
+	_old_path = "";
+	_redir_path = "";
 	if (F == 400)
 	{
 		this->body_message = "Bad request";
