@@ -221,6 +221,8 @@ int Server::readData(int fd)
 	if (ite != req.end())
 			req.insert(std::make_pair(fd, str));
 	result = this->processContent(fd,&max_size_check);
+	if (req[fd] == "")
+			return (0);
 	if (result == 1)
 	{	
 		this->launchResponse(req[fd], max_size_check);
