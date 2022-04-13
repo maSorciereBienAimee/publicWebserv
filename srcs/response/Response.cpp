@@ -45,11 +45,6 @@ Response::~Response()
 
 void Response::launch(serverBlock server)
 {
-	if (status == 100)
-	{
-		this->_header = "HTTP/1.1 100 Continue\r\n";
-		return;
-	}
 	std::vector<std::string> methods = _loc.getMethods();
 	std::string reponse;
 	if (redir == 1)

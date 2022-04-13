@@ -51,6 +51,7 @@ class Request
 			int											_port;
 			const std::string							_orig_req;
 			std::string									_path;
+			void versionChecker(void);
 
 };
 

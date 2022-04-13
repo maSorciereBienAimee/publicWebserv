@@ -63,6 +63,49 @@ void Request::pathDecoder(std::string path)
     this->_path = ret;
 }
 
+void Request::versionChecker()
+{
+    if ( _version.length() < 8 || _version.length() > 9)
+    {
+        std::cout << "lenght is " << _version.length() << std::endl;
+        status = 400;
+    }
+    std::string check = "HTTP/";
+    unsigned int i;
+    for (i = 0; i < check.length(); i++)
+    {
+        if (_version[i] != check[i])
+        {
+            status = 400;
+            return;
+        }
+    }
+    if (!(isdigit(_version[i])) || _version[i] == '0')
+    {
+        status = 400;
+        return;
+    }
+    if (_version[i] > '1')
+    {
+        status = 505;
+    }
+    i++;
+    if (_version[i] != '.')
+    {
+        status = 400;
+        return;
+    }
+    i++;
+    if (!(isdigit(_version[i])))
+    {
+        status = 400;
+        return;
+    }
+    if (_version[i] > '1')
+        status = 505;
+    return;
+}
+
 int Request::parseRequestLine(const std::string &str)
 {
     /*** LINE1 PARSING ***/
@@ -90,6 +133,7 @@ int Request::parseRequestLine(const std::string &str)
     break_2 += 1;
     //VERSION IS FROM AFTER PREV SPACE UNTIL END
     _version = line.substr(break_2,  line.length() - break_2);
+    versionChecker();
 	return end;
 }
 
@@ -99,7 +143,7 @@ std::string Request::parseHeaders(const std::string &str, int end)
     std::string tmp = str;
     std::string key;
     std::string val;
-    int split;
+    unsigned int split;
     //DELETE FIRST LINE FROM STR
     tmp = tmp.erase(0, (size_t)end + 2);
     int ptr = 0;
@@ -110,7 +154,12 @@ std::string Request::parseHeaders(const std::string &str, int end)
         //COLLECT KEY AND VALUE AND INSERT IN MAP HEADERS
         split = tmp.find_first_of(':');
         key = tmp.substr(0, split);
-        val = tmp.substr(split + 2, ((ptr_end - 1) - (split + 2)));
+        if (split + 1 < (tmp.length() - 1))
+            split++;
+        while (tmp[split] == ' ')
+            split++;
+        val = tmp.substr(split, (ptr_end - 1) - split);
+        std::cout << "--" << val << "--" << std::endl;
         std::pair<std::string, std::string> tmp_pair(key, val);
         _headers.insert(tmp_pair);
         tmp = tmp.erase(0, ptr_end + 1);
