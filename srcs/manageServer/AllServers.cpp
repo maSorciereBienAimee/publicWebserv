@@ -47,6 +47,7 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 				std::cout << RED << "Erase " << it->getName() << RESET << std::endl;
 				this->serverBlocks.erase(it);
 				i--;
+				it--;
 				break ;
 			}
 		}
