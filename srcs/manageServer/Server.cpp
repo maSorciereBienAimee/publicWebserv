@@ -110,6 +110,12 @@ int Server::processContent(int fd, bool *max_size)
 	check = recv(fd, buf, MAX_SIZE, 0);
 	req[fd] += buf;
 
+	if ((req[fd]).find("\r\n\r\n") == std::string::npos)
+	{
+		if (req[fd] == "\r\n")
+			req[fd] = "";
+		return (0);
+	}
 	if (check == 0)
 	{
 		std::cout << PURPLE << "Connexion closed by client" << RESET << std::endl;
@@ -221,8 +227,6 @@ int Server::readData(int fd)
 	if (ite != req.end())
 			req.insert(std::make_pair(fd, str));
 	result = this->processContent(fd,&max_size_check);
-	if (req[fd] == "")
-			return (0);
 	if (result == 1)
 	{	
 		this->launchResponse(req[fd], max_size_check);
