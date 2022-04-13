@@ -89,6 +89,8 @@ int Server::contentLength(int fd, std::string buf)
 				return (0);
 		if ((req[fd]).find("\r\n\r\n") != std::string::npos)
 			body = (req[fd]).substr((req[fd]).find("\r\n\r\n") + 4, (req[fd]).length() - 1);
+		if ((req[fd]).find("100-continue") != std::string::npos && body.size() != x && req[fd] == buf)
+				return (-3);
 		if (body.size() != x && buf.size() >= MAX_SIZE)
 			return (0);
 		if (body.size() != x)
@@ -114,6 +116,7 @@ int Server::processContent(int fd, bool *max_size)
 	memset(buf, 0, MAX_SIZE);
 	check = recv(fd, buf, MAX_SIZE, 0);
 	req[fd] += buf;
+	bufStr = buf;
 
 	if ((req[fd]).find("\r\n\r\n") == std::string::npos)
 	{
@@ -129,7 +132,7 @@ int Server::processContent(int fd, bool *max_size)
 	}
 	if (check == -1)
 	{
-		a = contentLength(fd, buf);
+		a = contentLength(fd, bufStr);
 		if (a == -2)
 			return (-1);
 		if (a != -1)
@@ -149,7 +152,7 @@ int Server::processContent(int fd, bool *max_size)
 		*max_size = false;
 		return (1);
 	}
-	a = contentLength(fd, buf);
+	a = contentLength(fd, bufStr);
 	if (a == -2)
 		return (-1);
 	if (a != -1)
@@ -233,6 +236,13 @@ int Server::readData(int fd)
 	result = this->processContent(fd,&max_size_check);
 	if (result == -1)
 			req[fd] = "";
+	if (result == -3)
+	{
+		this->ok = 1;
+		this->reply = "HTTP/1.1 100 CONTINUE\r\n\r\n";
+		this->header = "HTTP/1.1 100 CONTINUE\r\n\r\n";
+		this->body = "";
+	}
 	if (result == 1)
 	{	
 		this->launchResponse(req[fd], max_size_check);
@@ -343,6 +353,10 @@ void Server::launchResponse(std::string req, bool max_size_check)
 //	send(fd, the_reply.c_str(), the_reply.length(), 0);
 }
 
+std::string Server::getRep() const
+{
+	return (this->reply);
+}
 int Server::getOk() const
 {
 	return (this->ok);

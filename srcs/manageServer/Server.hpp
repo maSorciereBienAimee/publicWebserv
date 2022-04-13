@@ -40,6 +40,7 @@ class Server
 	int							readData(int fd);
 	std::string					getCutReply();
 	std::string					getHex(int n);
+	std::string					getRep() const;
 	int							getOk() const;
 	int							getIsChunked() const;
 

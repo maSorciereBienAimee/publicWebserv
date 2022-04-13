@@ -150,11 +150,16 @@ void AllServers::loop() //it's the principal running function here that will mak
 						close(itC->first);
 						epoll_ctl(epfd, EPOLL_CTL_DEL, itC->first, NULL);
 						allFd.erase(it2);
+						if (toSend.find(itC->first) != toSend.end())
+							toSend.erase(itC->first);
 						break;
 					}
+					else if (data == -3)
+						toSend.insert(std::make_pair(itC->first, &(*it)));
 					else if (data == 1)
 					{
-						toSend.insert(std::make_pair(itC->first, &(*it)));
+						if (toSend.find(itC->first) == toSend.end())
+							toSend.insert(std::make_pair(itC->first, &(*it)));
 						allFd.erase(it2);
 						break;
 					}
@@ -166,7 +171,14 @@ void AllServers::loop() //it's the principal running function here that will mak
 		int res;
 		for (std::map<int, Server *>::iterator it2 = stock.begin(); it2 != stock.end(); it2++)
 		{
-			std::string rep = it->second->getCutReply();
+			std::string rep;
+			if (it->second->getRep() == "HTTP/1.1 100 CONTINUE\r\n\r\n")
+			{
+				rep = it->second->getRep();
+				std::cout << std::endl << CYAN << "REPLY IS :" << std::endl << rep << RESET << std::endl;
+			}
+			else
+				rep = it->second->getCutReply();
 			res = send(it->first, rep.c_str(), rep.size(), 0);
 			if ( res >= 0)
 				std::cout << GREEN << "send succeed" << RESET << std::endl;
