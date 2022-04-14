@@ -881,7 +881,7 @@ int		parseConfig:: getAttsLocation(std::string const &line, std::string &attribu
 			countEachAttLoc(attribut);
 			if (_lsnl > 1 || _idxl > 1 || _rtl > 1 || _ail > 1 || _cgxl > 1 || _cgbl > 1 
 			|| _mtdl > 1 || _cmsl > 1 || _abl > 1 || _abfl > 1 || _rdrl > 1 || _upl > 1)
-					throw OurException("Directive in location block not allowed here: "  + (*it) + " found twice");
+					throw OurException("Directive in location block not allowed here: "  + (*it) + "found twice");
 			value = (line).substr(attribut.length(), line.length() - attribut.length());
 			getValuesLocationBlock(attribut, value, location);
 			return ((*it).length());
