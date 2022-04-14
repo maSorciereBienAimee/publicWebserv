@@ -22,6 +22,7 @@ class parseConfig  {
 
 	private: 
 
+		// directives server's block
 		int _lsn;
 		int _idx;
 		int _rt;
@@ -36,6 +37,20 @@ class parseConfig  {
 		int _abf;
 		int _rdr;
 		int _up;
+
+		//directives location's block
+		int _lsnl;
+		int _idxl;
+		int _rtl;
+		int _ail;
+		int _cgxl;
+		int _cgbl;
+		int _mtdl;
+		int _cmsl;
+		int _abl;
+		int _abfl;
+		int _rdrl;
+		int _upl;
 	
 	public:
 
@@ -66,6 +81,7 @@ class parseConfig  {
 	void						setLocationConfig(std::string &line, serverLocation &location);
 	int							getAttsLocation(std::string const &line, std::string &attribut, std::string& value, serverLocation &location);
 	void 						getValuesLocationBlock(std::string const& attribut, std::string& value, serverLocation &location);
+	void						countEachAttLoc(std::string const& attribut);
 
 	private:
 
