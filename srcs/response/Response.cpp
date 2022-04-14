@@ -360,7 +360,7 @@ void Response::_homepage(Request R)
 void Response::_post(Request R)
 {
 	(void)R;
-	status = 200;
+	status = 204;
 	int len;
 	std::stringstream ss;
 	std::map<std::string, std::string> headers = R.getHeaders();
