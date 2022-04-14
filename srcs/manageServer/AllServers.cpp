@@ -44,7 +44,7 @@ AllServers::AllServers(std::string path) //constructor wich accept the argv[1] o
 			if (it2->getPortStr() == it->getPortStr() && (it2->getHostStr() == it->getHostStr()
 				|| it2->getName() == it->getName()))
 			{
-				std::cout << RED << "Erase " << it->getName() << RESET << std::endl;
+				std::cout << RED << it->getHostStr() << ":" << it->getPortStr() << " already set, " << it->getName() << " is delete" << RESET << std::endl;
 				this->serverBlocks.erase(it);
 				i--;
 				it--;

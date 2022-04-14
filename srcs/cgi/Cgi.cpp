@@ -306,7 +306,9 @@ void	Cgi::cgiRun()
 	if (pid < 0)
 	{
 		std::cerr << RED << "error fork()" << RESET << std::endl;
-		setResponse("", 1);
+		_headers.clear();
+		_body = "";
+		_status = 500;
 		return;
 	}
 	else if (pid == 0)
@@ -316,7 +318,9 @@ void	Cgi::cgiRun()
 		if (dup2(fd[0], 0) < 0)
 		{
 			std::cerr << RED << "Error dup2 in cgiRun() child" << RESET << std::endl;
-			setResponse("", 1);
+			_headers.clear();
+			_body = "";
+			_status = 500;
 			return;
 		}
 		close(fd[0]);
@@ -332,7 +336,9 @@ void	Cgi::cgiRun()
 		if (dup2(fd[1], 1) < 0)
 		{
 			std::cerr << RED << "Error dup2 in cgiRun() parent" << RESET << std::endl;
-			setResponse("", 1);
+			_headers.clear();
+			_body = "";
+			_status = 500;
 			return;
 		}
 		std::cout << body << std::endl;
@@ -380,42 +386,47 @@ void	Cgi::setResponse(std::string str, int retStat)
 	if (retStat == 1)
 	{
 		_headers.clear();
-		_body = "";
-		_status = 500;
+		_body = "<html></html>";
+		_status = 200;
 		return ;
 	}
 	else
 	{
 		_status = 200;
+		_body = str;
+		_headers.clear();
 		sep = str.find("\r\n\r\n", 0);
-		if (sep < str.size())
-				sep += 4;
-		_body = str.substr(sep, str.size() - sep);
-		head = str.substr(0, sep - 4);
-		headS = head;
-		for (std::string::iterator it = head.begin(); it != head.end(); it++)
+		if (sep != std::string::npos)
 		{
-			if (*it == ':')
+			if (sep < str.size())
+				sep += 4;
+			_body = str.substr(sep, str.size() - sep);
+			head = str.substr(0, sep - 4);
+			headS = head;
+			for (std::string::iterator it = head.begin(); it != head.end(); it++)
 			{
-				key = headS.substr(0, i);
-				len = headS.size() - (i + 1);
-				temp = headS.substr(i + 1, len);
-				headS = temp;
-				i = 0;
+				if (*it == ':')
+				{
+					key = headS.substr(0, i);
+					len = headS.size() - (i + 1);
+					temp = headS.substr(i + 1, len);
+					headS = temp;
+					i = 0;
+				}
+				else if (*it == '\n' || *it == '\r')
+				{
+					val = headS.substr(0, i);
+					_headers.insert(std::make_pair(key, val));
+					len = headS.size() - (i + 1);
+					temp = headS.substr(i + 1, len);
+					headS = temp;
+					it++;
+					i = 0;
+				}
 			}
-			else if (*it == '\n' || *it == '\r')
-			{
-				val = headS.substr(0, i);
-				_headers.insert(std::make_pair(key, val));
-				len = headS.size() - (i + 1);
-				temp = headS.substr(i + 1, len);
-				headS = temp;
-				it++;
-				i = 0;
-			}
+			val = headS.substr(0, i);
+			_headers.insert(std::make_pair(key, val));
 		}
-		val = headS.substr(0, i);
-		_headers.insert(std::make_pair(key, val));
 	}
 	for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
 	{

@@ -16,7 +16,6 @@ Server::Server(serverBlock block)
 	this->ok = 0;
 	this->isChunked = 0;
 	this->infoConfig = block;
-	std::cout << GREEN << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 }
 
 Server::~Server()
@@ -46,7 +45,7 @@ void Server::connect()
 	srv.sin_port = htons(this->infoConfig.getPort());
 	if (bind(this->listenfd, (struct sockaddr *) &srv, sizeof(srv)) < 0)
 	{
-		std::cout << RED << "Bind address already in use." << RESET << std::endl;
+		std::cout << RED << "Bind address already in use on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 		clear_fd();
 		exit(1);
 	}
@@ -55,7 +54,7 @@ void Server::connect()
 		clear_fd();
 		exit(1);
 	}
-
+	std::cout << GREEN << "Server '" << this->infoConfig.getName() << "' is launched on " << this->infoConfig.getHostStr() << ":" << this->infoConfig.getPortStr() << RESET << std::endl;
 }
 
 int Server::contentLength(int fd, std::string buf)
