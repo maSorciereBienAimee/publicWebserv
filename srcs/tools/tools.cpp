@@ -186,6 +186,7 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		struct stat	stock;
 		std::vector<serverLocation> location = block.getLocation();
 		serverLocation ret;
+		std::string root = block.getRootServer();
 		std::string	realPath = block.getRootServer() + path;
 
 		ret.setIndex(block.getIndex());
@@ -202,6 +203,8 @@ serverLocation	searchLocation(std::string path, serverBlock block)
 		ret.setBodySetLoc(block.getBodySet_s());
 
 
+		if (stat(root.c_str(), &stock) != 0)
+			return (ret);
 		if (stat(realPath.c_str(), &stock) == 0)
 		{
 			if (S_ISDIR(stock.st_mode))
@@ -509,6 +512,13 @@ std::string getSimplePath(std::string req, std::string *query, serverBlock block
 	int deb = 0;
 	int fin;
 	std::string::iterator it = req.begin();
+
+	if (stat(root.c_str(), &s) != 0)
+	{
+		*query = root;
+		path = root;
+		return (path);
+	}
 	while (*it != ' ' && it != req.end())
 	{
 		it++;

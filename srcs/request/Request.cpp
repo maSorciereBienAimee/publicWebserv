@@ -67,7 +67,7 @@ void Request::versionChecker()
 {
     if ( _version.length() < 8 || _version.length() > 9)
     {
-        std::cout << "lenght is " << _version.length() << std::endl;
+ //       std::cout << "lenght is " << _version.length() << std::endl;
         status = 400;
     }
     std::string check = "HTTP/";
@@ -159,7 +159,7 @@ std::string Request::parseHeaders(const std::string &str, int end)
         while (tmp[split] == ' ')
             split++;
         val = tmp.substr(split, (ptr_end - 1) - split);
-        std::cout << "--" << val << "--" << std::endl;
+    //    std::cout << "--" << val << "--" << std::endl;
         std::pair<std::string, std::string> tmp_pair(key, val);
         _headers.insert(tmp_pair);
         tmp = tmp.erase(0, ptr_end + 1);
