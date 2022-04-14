@@ -153,16 +153,32 @@ std::string Request::parseHeaders(const std::string &str, int end)
     {
         //COLLECT KEY AND VALUE AND INSERT IN MAP HEADERS
         split = tmp.find_first_of(':');
-        key = tmp.substr(0, split);
-        if (split + 1 < (tmp.length() - 1))
-            split++;
-        while (tmp[split] == ' ')
-            split++;
-        val = tmp.substr(split, (ptr_end - 1) - split);
-    //    std::cout << "--" << val << "--" << std::endl;
-        std::pair<std::string, std::string> tmp_pair(key, val);
-        _headers.insert(tmp_pair);
-        tmp = tmp.erase(0, ptr_end + 1);
+        std::string::size_type t = split;
+        if (t != std::string::npos)
+        {
+            key = tmp.substr(0, split);
+            if (split + 1 < (tmp.length() - 1))
+                split++;
+            while (tmp[split] == ' ')
+                split++;
+            if (!tmp[split])
+                val = "";
+            else
+            {
+                val = tmp.substr(split, (ptr_end - 1) - split);
+                for (std::string::iterator it = val.end() - 1; it != val.begin(); it--)
+                {
+                    if (*it == ' ')
+                    {
+                        val.erase(it);
+                    }
+                }
+
+            }
+            std::pair<std::string, std::string> tmp_pair(key, val);
+            _headers.insert(tmp_pair);
+            tmp = tmp.erase(0, ptr_end + 1);
+        }
         ptr_end = tmp.find_first_of('\n');
 
     }
@@ -197,7 +213,7 @@ void Request::printer(void)
     it = _headers.begin();
     while (i < end)
     {
-        std::cout << it->first << " : " << it->second << std::endl;
+        std::cout << it->first << ":" << it->second << std::endl;
         i++;
         it++;
     }
