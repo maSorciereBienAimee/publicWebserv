@@ -515,6 +515,7 @@ std::string getSimplePath(std::string req, std::string *query, serverBlock block
 
 	if (stat(root.c_str(), &s) != 0)
 	{
+		std::cout << RED << "Server root don't exist" << RESET << std::endl;
 		*query = root;
 		path = root;
 		return (path);
